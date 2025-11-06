@@ -1,0 +1,106 @@
+#cloud-config
+# Cloud-init configuration for k3s control plane node
+# Upload this to Hetzner Cloud when creating the server
+
+# Set hostname
+hostname: ctrl
+
+# Create users
+users:
+  - name: alex
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAmm9jDoXxpMFSGUYFUCk56TaPPTxMRdgnTY9FCBwjF3
+    lock_passwd: false
+    passwd: $6$rounds=4096$saltsaltsal$YhqPJxPJ3VfKLHrJFVqMvLHCKEI4K7WJBOqXEY0MUdlJdC8mNGZJBdVNXPzKqJQq8QHJNQlNGKFJdVNXPzKqJ
+
+# Set root password (hashed)
+chpasswd:
+  list: |
+    root:123password
+    alex:123password
+  expire: True
+
+# Package updates and installations
+package_update: true
+package_upgrade: true
+packages:
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - net-tools
+
+# Write k3s installation script
+write_files:
+  - path: /root/install-k3s-server.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      set -e
+
+      echo "Installing k3s server..."
+
+      # Install k3s in server mode
+      curl -sfL https://get.k3s.io | sh -s - server \
+        --disable traefik \
+        --disable servicelb \
+        --write-kubeconfig-mode 644 \
+        --node-name ctrl \
+        --cluster-cidr 10.42.0.0/16 \
+        --service-cidr 10.43.0.0/16 \
+        --flannel-backend vxlan \
+        --tls-san $(curl -s http://169.254.169.254/hetzner/v1/metadata/public-ipv4) \
+        --node-ip $(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}') \
+        --advertise-address $(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
+      # Wait for k3s to be ready
+      echo "Waiting for k3s to be ready..."
+      until kubectl get nodes; do
+        sleep 5
+      done
+
+      # Copy kubeconfig to alex user
+      mkdir -p /home/alex/.kube
+      cp /etc/rancher/k3s/k3s.yaml /home/alex/.kube/config
+      chown -R alex:alex /home/alex/.kube
+
+      # Save the node token for workers
+      cp /var/lib/rancher/k3s/server/node-token /root/k3s-token
+      chmod 600 /root/k3s-token
+
+      echo "k3s server installation complete!"
+      echo "Node token saved to /root/k3s-token"
+      echo "Share this token with worker nodes"
+
+# Run commands on first boot
+runcmd:
+  - echo "Cloud-init started for control plane node"
+  - timedatectl set-timezone UTC
+  - systemctl enable systemd-timesyncd
+  - systemctl start systemd-timesyncd
+  # Wait for network to be ready
+  - sleep 10
+  # Install k3s server
+  - /root/install-k3s-server.sh
+  - echo "Cloud-init completed for control plane node"
+
+# Final message
+final_message: |
+  Cloud-init for ctrl has completed!
+
+  k3s server is installed and running.
+
+  To connect:
+    ssh alex@<server-ip>
+    Password: 123password (change on first login!)
+
+  Get the node token for workers:
+    sudo cat /root/k3s-token
+
+  Check k3s status:
+    sudo systemctl status k3s
+    kubectl get nodes
