@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wallabag-tailscale-config
+data:
+  serve.json: |
+    {
+      "TCP": {
+        "443": {
+          "HTTPS": true
+        }
+      },
+      "Web": {
+        "wallabag.tail55277.ts.net:443": {
+          "Handlers": {
+            "/": {
+              "Proxy": "http://127.0.0.1:80"
+            }
+          }
+        }
+      }
+    }

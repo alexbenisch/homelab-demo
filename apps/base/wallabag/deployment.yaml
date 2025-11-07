@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallabag
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wallabag
+  template:
+    metadata:
+      labels:
+        app: wallabag
+    spec:
+      serviceAccountName: wallabag
+
+      containers:
+        # Wallabag application container
+        - name: wallabag
+          image: wallabag/wallabag:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: SYMFONY__ENV__DOMAIN_NAME
+              value: "https://wallabag.tail55277.ts.net"
+            - name: SYMFONY__ENV__SERVER_NAME
+              value: "Wallabag on Tailnet"
+            - name: SYMFONY__ENV__FOSUSER_REGISTRATION
+              value: "false"
+            - name: SYMFONY__ENV__FOSUSER_CONFIRMATION
+              value: "false"
+          volumeMounts:
+            - name: wallabag-data
+              mountPath: /var/www/wallabag/data
+            - name: wallabag-images
+              mountPath: /var/www/wallabag/web/assets/images
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+
+        # Tailscale sidecar container
+        - name: tailscale
+          image: tailscale/tailscale:latest
+          env:
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: wallabag-tailscale-auth
+                  key: TS_AUTHKEY
+            - name: TS_USERSPACE
+              value: "true"
+            - name: TS_STATE_DIR
+              value: /var/lib/tailscale
+            - name: TS_HOSTNAME
+              value: "wallabag"
+            - name: TS_SERVE_CONFIG
+              value: /config/serve.json
+          volumeMounts:
+            - name: tailscale-state
+              mountPath: /var/lib/tailscale
+            - name: tailscale-config
+              mountPath: /config
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+
+      volumes:
+        - name: wallabag-data
+          persistentVolumeClaim:
+            claimName: wallabag-data-pvc
+        - name: wallabag-images
+          emptyDir: {}
+        - name: tailscale-state
+          emptyDir: {}
+        - name: tailscale-config
+          configMap:
+            name: wallabag-tailscale-config
