@@ -4,9 +4,12 @@ Wallabag is a self-hosted read-it-later application. This deployment is configur
 
 ## Access
 
-- **URL**: `https://wallabag.tail55277.ts.net`
+- **Primary URL (HTTPS)**: `https://wallabag-1.tail55277.ts.net`
+- **Alternative (HTTP)**: `http://100.103.138.118` (Tailnet IP)
 - **Network**: Tailnet only (not publicly accessible)
-- **TLS**: Automatic via Tailscale MagicDNS
+- **TLS**: Automatic via Tailscale MagicDNS (HTTPS URL only)
+
+**Note**: The hostname includes a `-1` suffix added automatically by Tailscale to ensure uniqueness.
 
 ## Prerequisites
 
@@ -74,13 +77,37 @@ From any device on your Tailnet:
 tailscale status
 ```
 
-You should see `wallabag` listed as a device.
+You should see `wallabag-1` listed as a device with IP `100.103.138.118`.
 
-### 7. Access Wallabag
+### 7. Verify Connectivity
+
+Test that wallabag is accessible via Tailnet:
+
+```bash
+# Test HTTPS via MagicDNS (recommended)
+curl -I https://wallabag-1.tail55277.ts.net
+
+# Expected output:
+# HTTP/2 302
+# location: https://wallabag-1.tail55277.ts.net/login
+# server: nginx
+# set-cookie: PHPSESSID=...; path=/; secure; HttpOnly; SameSite=lax
+
+# Test HTTP via Tailnet IP (alternative)
+curl -I http://100.103.138.118
+
+# Expected output:
+# HTTP/1.1 302 Found
+# Location: http://100.103.138.118/login
+```
+
+Both should return a `302 Found` redirect to the login page, indicating wallabag is working correctly.
+
+### 8. Access Wallabag
 
 Open your browser and navigate to:
 ```
-https://wallabag.tail55277.ts.net
+https://wallabag-1.tail55277.ts.net
 ```
 
 **Default credentials:**
