@@ -4,6 +4,9 @@ metadata:
   name: linkding
   annotations:
     external-dns.alpha.kubernetes.io/hostname: linkding.k8s-demo.de
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
 spec:
   rules:
     - host: linkding.k8s-demo.de
@@ -16,3 +19,7 @@ spec:
                 name: linkding
                 port:
                   number: 9090
+  tls:
+    - hosts:
+        - linkding.k8s-demo.de
+      secretName: linkding-tls

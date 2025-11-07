@@ -1,0 +1,20 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    # Enable ACME (Let's Encrypt)
+    additionalArguments:
+      - "--certificatesresolvers.letsencrypt.acme.email=alexander.benisch@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      # Use staging for testing, remove this line for production
+      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+
+    # Ensure persistent storage for certificates
+    persistence:
+      enabled: true
+      path: /data
+      size: 128Mi
