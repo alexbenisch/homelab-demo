@@ -34,9 +34,6 @@ spec:
               mountPath: /var/www/wallabag/data
             - name: wallabag-images
               mountPath: /var/www/wallabag/web/assets/images
-          securityContext:
-            runAsUser: 65534
-            runAsGroup: 65534
 
         # Tailscale sidecar container
         - name: tailscale
@@ -55,6 +52,14 @@ spec:
               value: "wallabag"
             - name: TS_SERVE_CONFIG
               value: /config/serve.json
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
           volumeMounts:
             - name: tailscale-state
               mountPath: /var/lib/tailscale
