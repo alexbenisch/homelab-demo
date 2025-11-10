@@ -9,16 +9,20 @@ Nexus 3 is a universal artifact repository manager that supports Docker images, 
 
 ## Initial Setup
 
-### 1. Get Admin Password
+### 1. Admin Password
 
-Nexus generates a random admin password on first startup:
+The admin password is stored in a SOPS-encrypted secret (`secret.yaml`). The password is: `gaic4aeShae8hahSh2ay1iRui`
+
+**Important**: On first startup, Nexus generates a random password. You'll need to change it to match the secret:
 
 ```bash
 # Wait for Nexus to fully start (takes 2-3 minutes)
 kubectl wait --for=condition=ready pod -l app=nexus -n nexus --timeout=5m
 
-# Get the initial admin password
+# Get the initial random password
 kubectl exec -n nexus deployment/nexus -- cat /nexus-data/admin.password
+
+# Use this password to login, then change it in the setup wizard
 ```
 
 ### 2. Complete Setup Wizard
@@ -26,10 +30,12 @@ kubectl exec -n nexus deployment/nexus -- cat /nexus-data/admin.password
 1. Visit `https://nexus.k8s-demo.de`
 2. Click "Sign In" (top right)
 3. Username: `admin`
-4. Password: (use the password from step 1)
+4. Password: (use the random password from step 1)
 5. Follow the setup wizard:
-   - Change admin password (save it securely!)
-   - Configure anonymous access (recommend: disable)
+   - **Change admin password to**: `gaic4aeShae8hahSh2ay1iRui` (matches the secret)
+   - Configure anonymous access:
+     - ✅ Enable for easier k8s image pulls (recommended for homelab)
+     - ❌ Disable for better security
    - Click "Finish"
 
 ### 3. Configure Docker Registry
@@ -78,6 +84,11 @@ docker login registry.k8s-demo.de
 ### Push Images
 
 ```bash
+# Login with the configured credentials
+docker login registry.k8s-demo.de
+# Username: admin
+# Password: gaic4aeShae8hahSh2ay1iRui
+
 # Tag your image
 docker tag demo-api:latest registry.k8s-demo.de/demo-api:latest
 
@@ -85,7 +96,7 @@ docker tag demo-api:latest registry.k8s-demo.de/demo-api:latest
 docker push registry.k8s-demo.de/demo-api:latest
 
 # List images in registry
-curl -u admin:password https://registry.k8s-demo.de/v2/_catalog
+curl -u admin:gaic4aeShae8hahSh2ay1iRui https://registry.k8s-demo.de/v2/_catalog
 ```
 
 ### Pull Images from Kubernetes

@@ -6,6 +6,7 @@ namespace: nexus
 resources:
   - namespace.yaml
   - storage.yaml
+  - secret.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
