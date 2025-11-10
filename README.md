@@ -1,0 +1,223 @@
+# Homelab Demo
+
+A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository demonstrates modern cloud-native practices including infrastructure as code, encrypted secrets management, and automated deployments.
+
+## 🏗️ Infrastructure
+
+- **Kubernetes**: k3s cluster (1 control plane + workers)
+- **GitOps**: Flux CD for automated deployments
+- **Ingress**: Traefik with automatic Let's Encrypt certificates
+- **DNS**: External-DNS with Hetzner webhook for automated DNS management
+- **Secrets**: SOPS with age encryption for secure secret management
+- **Domain**: k8s-demo.de
+
+## 📦 Deployed Applications
+
+### [Linkding](apps/base/linkding/)
+**Bookmark Manager** - Self-hosted bookmark management application
+
+- **URL**: https://linkding.k8s-demo.de
+- **Image**: `sissbruecker/linkding:1.31.0`
+- **Storage**: 5Gi persistent volume
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Bookmark collection and organization
+  - Tag-based categorization
+  - Full-text search
+  - Browser extensions support
+
+### [Wallabag](apps/base/wallabag/)
+**Read-it-Later Service** - Save and organize articles for reading
+
+- **URL**: https://wallabag-1.tail55277.ts.net (Tailnet-only)
+- **Image**: `wallabag/wallabag:latest`
+- **Storage**: 5Gi persistent volume
+- **Access**: Private (Tailscale sidecar)
+- **Features**:
+  - Article extraction and storage
+  - Offline reading
+  - Mobile apps available
+  - RSS feed generation
+
+### [Demo API](apps/base/demo-api/)
+**FastAPI REST API** - Portable Python application for testing across platforms
+
+- **URL**: https://demo-api.k8s-demo.de
+- **Image**: `registry.k8s-demo.de/demo-api:latest` (local registry)
+- **Built with**: FastAPI + uv package manager
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Health and readiness probes
+  - Metrics endpoint
+  - System info endpoint (shows environment details)
+  - Request echo for debugging proxies
+  - Auto-generated API documentation at `/docs`
+
+### [Nexus Repository Manager](apps/base/nexus/)
+**Artifact Repository** - Universal repository manager for Docker, Maven, npm, and more
+
+- **UI**: https://nexus.k8s-demo.de
+- **Docker Registry**: https://registry.k8s-demo.de
+- **Image**: `sonatype/nexus3:latest`
+- **Storage**: 50Gi persistent volume
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Docker registry (hosted on port 5000)
+  - Support for multiple repository formats
+  - Repository proxying and grouping
+  - Role-based access control
+  - Blob store management
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- k3s cluster with kubectl access
+- Flux CLI installed
+- SOPS with age key configured
+- GitHub repository access
+
+### Deploy an Application
+
+All applications are managed via GitOps with Flux:
+
+```bash
+# 1. Add your app to apps/base/ directory
+# 2. Add to staging kustomization
+vim apps/staging/kustomization.yaml
+
+# 3. Commit and push
+git add apps/
+git commit -m "Add new application"
+git push
+
+# 4. Trigger Flux reconciliation
+flux reconcile kustomization apps --with-source
+
+# 5. Verify deployment
+kubectl get pods -n your-app-namespace
+```
+
+## 🔐 Secrets Management
+
+Secrets are encrypted with SOPS using age encryption:
+
+```bash
+# Create a secret
+cat > apps/base/myapp/secret.yaml <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: myapp-secret
+stringData:
+  PASSWORD: my-secret-password
+EOF
+
+# Encrypt with SOPS
+sops -e -i apps/base/myapp/secret.yaml
+
+# Commit (now safely encrypted)
+git add apps/base/myapp/secret.yaml
+git commit -m "Add encrypted secret"
+git push
+
+# Flux automatically decrypts and applies!
+```
+
+The age public key is configured in `.sops.yaml`.
+
+## 🌐 DNS Management
+
+DNS records are automatically managed via external-dns with Hetzner webhook:
+
+- Add the annotation to your Ingress: `external-dns.alpha.kubernetes.io/hostname: myapp.k8s-demo.de`
+- Push to git and reconcile with Flux
+- DNS record is automatically created in Hetzner DNS
+
+## 📚 Documentation
+
+- [Deployment Guide](docs/deployment.md) - Detailed deployment instructions
+- [Testing Deployments](docs/testing-deployments.md) - How to test deployments
+- [Persistent Storage](docs/persistent-storage.md) - Storage configuration
+- [Tailnet-Only Apps](docs/tailnet-only-apps.md) - Private apps with Tailscale
+- [Wallabag Deployment Test](docs/wallabag-deployment-test.md) - Wallabag setup guide
+
+## 🏗️ Repository Structure
+
+```
+homelab-demo/
+├── apps/
+│   ├── base/              # Base application manifests
+│   │   ├── demo-api/      # Demo FastAPI application
+│   │   ├── linkding/      # Linkding bookmark manager
+│   │   ├── nexus/         # Nexus repository manager
+│   │   └── wallabag/      # Wallabag read-it-later
+│   └── staging/           # Staging overlays
+│       └── kustomization.yaml
+├── infrastructure/
+│   ├── base/              # Infrastructure components
+│   │   └── external-dns/  # External DNS with Hetzner
+│   └── staging/
+├── clusters/              # Flux cluster configuration
+│   └── staging/
+├── demo-api/              # Demo API source code
+│   ├── src/
+│   ├── Dockerfile
+│   └── pyproject.toml
+├── docs/                  # Documentation
+├── cloud-init/            # Cloud-init configs for nodes
+└── .sops.yaml            # SOPS encryption config
+```
+
+## 🔧 Maintenance
+
+### Update Flux
+
+```bash
+flux check --pre
+flux install --export > clusters/staging/flux-system/gotk-components.yaml
+git commit -am "Update Flux components"
+git push
+```
+
+### View Flux Status
+
+```bash
+# Overall status
+flux get all
+
+# Specific resources
+flux get kustomizations
+flux get helmreleases
+
+# Logs
+flux logs --follow --level=error
+```
+
+### Backup
+
+Important data to backup:
+
+- Persistent volumes (linkding, wallabag, nexus data)
+- SOPS age private key (`~/.config/sops/age/keys.txt`)
+- Kubernetes secrets (if not in git)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📝 License
+
+This is a personal homelab demo repository. Use at your own risk.
+
+## 🔗 Resources
+
+- [Flux Documentation](https://fluxcd.io/docs/)
+- [k3s Documentation](https://docs.k3s.io/)
+- [SOPS Documentation](https://github.com/mozilla/sops)
+- [Traefik Documentation](https://doc.traefik.io/traefik/)
+- [External DNS](https://github.com/kubernetes-sigs/external-dns)
