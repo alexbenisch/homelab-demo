@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluster Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎛️ Cluster Dashboard</h1>
+            <div class="cluster-info">
+                <span>Kubernetes {{ cluster_info.kubernetes_version }}</span>
+                <span>Platform: {{ cluster_info.platform }}</span>
+                <span class="status-badge {% if cluster_info.in_cluster %}in-cluster{% else %}external{% endif %}">
+                    {% if cluster_info.in_cluster %}In-Cluster{% else %}External{% endif %}
+                </span>
+            </div>
+        </header>
+
+        <!-- Statistics Overview -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_nodes }}</div>
+                <div class="stat-label">Nodes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.running_pods }}/{{ stats.total_pods }}</div>
+                <div class="stat-label">Pods Running</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_namespaces }}</div>
+                <div class="stat-label">Namespaces</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_services }}</div>
+                <div class="stat-label">Services</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_ingresses }}</div>
+                <div class="stat-label">Ingresses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_pvcs }}</div>
+                <div class="stat-label">Volumes</div>
+            </div>
+        </section>
+
+        <!-- Nodes Section -->
+        <section class="section">
+            <h2>📦 Nodes</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Roles</th>
+                            <th>Version</th>
+                            <th>Region/Zone</th>
+                            <th>Instance Type</th>
+                            <th>CPU</th>
+                            <th>Memory</th>
+                            <th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for node in nodes %}
+                        <tr>
+                            <td><strong>{{ node.name }}</strong></td>
+                            <td><span class="status-badge {% if node.status == 'Ready' %}ready{% else %}not-ready{% endif %}">{{ node.status }}</span></td>
+                            <td>{{ node.roles }}</td>
+                            <td>{{ node.version }}</td>
+                            <td>{{ node.region }} / {{ node.zone }}</td>
+                            <td>{{ node.instance_type }}</td>
+                            <td>{{ node.cpu_allocatable }}</td>
+                            <td>{{ node.memory_allocatable }}</td>
+                            <td>{{ node.age }}d</td>
+                        </tr>
+                        <tr class="node-details">
+                            <td colspan="9">
+                                <div class="details-grid">
+                                    <div><strong>OS:</strong> {{ node.os }}</div>
+                                    <div><strong>Kernel:</strong> {{ node.kernel }}</div>
+                                    <div><strong>Runtime:</strong> {{ node.container_runtime }}</div>
+                                    <div><strong>Addresses:</strong>
+                                        {% for addr in node.addresses %}
+                                            {{ addr.type }}: {{ addr.address }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Ingresses & Domains Section -->
+        <section class="section">
+            <h2>🌐 Ingresses & Domains</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Namespace</th>
+                            <th>Class</th>
+                            <th>Hosts</th>
+                            <th>Addresses</th>
+                            <th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ingress in ingresses %}
+                        <tr>
+                            <td><strong>{{ ingress.name }}</strong></td>
+                            <td><span class="namespace-badge">{{ ingress.namespace }}</span></td>
+                            <td>{{ ingress.class }}</td>
+                            <td>
+                                {% for rule in ingress.rules %}
+                                    <div class="domain">{{ rule.host }}</div>
+                                    {% for path in rule.paths %}
+                                        <div class="path">{{ path }}</div>
+                                    {% endfor %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for addr in ingress.addresses %}
+                                    <div class="ip-address">{{ addr }}</div>
+                                {% endfor %}
+                            </td>
+                            <td>{{ ingress.age }}d</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Pods by Namespace Section -->
+        <section class="section">
+            <h2>🚀 Pods by Namespace</h2>
+            {% for namespace, pods in pods_by_namespace.items() %}
+            <details class="namespace-section" open>
+                <summary>
+                    <strong>{{ namespace }}</strong>
+                    <span class="pod-count">{{ pods|length }} pods</span>
+                </summary>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Ready</th>
+                                <th>Restarts</th>
+                                <th>Node</th>
+                                <th>IP</th>
+                                <th>Age</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pod in pods %}
+                            <tr>
+                                <td><strong>{{ pod.name }}</strong></td>
+                                <td><span class="status-badge {% if pod.status == 'Running' %}running{% elif pod.status == 'Pending' %}pending{% else %}failed{% endif %}">{{ pod.status }}</span></td>
+                                <td>{{ pod.ready }}</td>
+                                <td>{{ pod.restarts }}</td>
+                                <td>{{ pod.node }}</td>
+                                <td><code>{{ pod.ip }}</code></td>
+                                <td>{{ pod.age }}d</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            {% endfor %}
+        </section>
+
+        <!-- Services Section -->
+        <section class="section">
+            <h2>🔌 Services</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Namespace</th>
+                            <th>Type</th>
+                            <th>Cluster IP</th>
+                            <th>External IPs</th>
+                            <th>Ports</th>
+                            <th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service in services %}
+                        <tr>
+                            <td><strong>{{ service.name }}</strong></td>
+                            <td><span class="namespace-badge">{{ service.namespace }}</span></td>
+                            <td><span class="type-badge">{{ service.type }}</span></td>
+                            <td><code>{{ service.cluster_ip }}</code></td>
+                            <td>
+                                {% if service.external_ips %}
+                                    {% for ip in service.external_ips %}
+                                        <div class="ip-address">{{ ip }}</div>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="muted">None</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% for port in service.ports %}
+                                    <span class="port-badge">{{ port }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>{{ service.age }}d</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Storage Section -->
+        <section class="section">
+            <h2>💾 Persistent Volumes</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Namespace</th>
+                            <th>Status</th>
+                            <th>Volume</th>
+                            <th>Capacity</th>
+                            <th>Access Modes</th>
+                            <th>Storage Class</th>
+                            <th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pvc in pvcs %}
+                        <tr>
+                            <td><strong>{{ pvc.name }}</strong></td>
+                            <td><span class="namespace-badge">{{ pvc.namespace }}</span></td>
+                            <td><span class="status-badge {% if pvc.status == 'Bound' %}ready{% else %}pending{% endif %}">{{ pvc.status }}</span></td>
+                            <td><code>{{ pvc.volume }}</code></td>
+                            <td>{{ pvc.capacity }}</td>
+                            <td>{{ pvc.access_modes }}</td>
+                            <td>{{ pvc.storage_class }}</td>
+                            <td>{{ pvc.age }}d</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <p>Cluster Dashboard v1.0.0 | Last updated: <span id="timestamp"></span></p>
+            <p><a href="/api/cluster">API Documentation</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Update timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+        // Auto-refresh every 30 seconds
+        setTimeout(() => location.reload(), 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+[project]
+name = "cluster-dashboard"
+version = "1.0.0"
+description = "Kubernetes cluster dashboard showing nodes, pods, services, and cloud provider info"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.115.0",
+    "uvicorn[standard]==0.32.0",
+    "kubernetes==30.1.0",
+    "jinja2==3.1.4",
+    "httpx==0.27.0",
+    "python-multipart==0.0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "httpx>=0.24.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -68,6 +68,24 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
   - Role-based access control
   - Blob store management
 
+### [Cluster Dashboard](apps/base/cluster-dashboard/)
+**Kubernetes Monitoring Dashboard** - Real-time cluster monitoring and visualization
+
+- **URL**: https://dashboard.k8s-demo.de
+- **Image**: `cluster-dashboard:latest` (local build)
+- **Built with**: FastAPI + Kubernetes Python Client + uv
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Live cluster metrics and statistics
+  - Nodes overview with cloud provider details (region, zone, instance type)
+  - All pods grouped by namespace
+  - Ingress routes with domains and IP addresses
+  - Services with endpoints
+  - Persistent volume claims and status
+  - Auto-refresh every 30 seconds
+  - Read-only RBAC permissions
+  - Perfect for homelab monitoring and multi-cloud testing
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -148,6 +166,7 @@ DNS records are automatically managed via external-dns with Hetzner webhook:
 homelab-demo/
 ├── apps/
 │   ├── base/              # Base application manifests
+│   │   ├── cluster-dashboard/ # Cluster dashboard app
 │   │   ├── demo-api/      # Demo FastAPI application
 │   │   ├── linkding/      # Linkding bookmark manager
 │   │   ├── nexus/         # Nexus repository manager
@@ -160,6 +179,10 @@ homelab-demo/
 │   └── staging/
 ├── clusters/              # Flux cluster configuration
 │   └── staging/
+├── cluster-dashboard/     # Cluster dashboard source code
+│   ├── src/
+│   ├── Dockerfile
+│   └── pyproject.toml
 ├── demo-api/              # Demo API source code
 │   ├── src/
 │   ├── Dockerfile
