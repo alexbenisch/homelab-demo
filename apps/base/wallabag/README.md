@@ -140,6 +140,36 @@ The `tailscale-config.yaml` ConfigMap defines how Tailscale serves the applicati
 
 ## Troubleshooting
 
+### CSS/Assets Not Loading
+
+**Problem**: Wallabag loads but CSS and other static assets fail to load, resulting in unstyled pages.
+
+**Root Cause**: Hostname mismatch between `SYMFONY__ENV__DOMAIN_NAME` and Tailscale serve configuration.
+
+**Solution**: Ensure the domain name in `deployment.yaml` matches the hostname in `tailscale-config.yaml`:
+
+```yaml
+# In deployment.yaml
+env:
+  - name: SYMFONY__ENV__DOMAIN_NAME
+    value: "https://wallabag-1.tail55277.ts.net"  # Must match Tailscale hostname
+
+# In tailscale-config.yaml
+"Web": {
+  "wallabag-1.tail55277.ts.net:443": {  # Must match DOMAIN_NAME
+    "Handlers": {
+      "/": {
+        "Proxy": "http://127.0.0.1:80"
+      }
+    }
+  }
+}
+```
+
+**Why This Happens**: Wallabag uses `SYMFONY__ENV__DOMAIN_NAME` to generate URLs for CSS, JavaScript, and other assets. If this doesn't match the actual hostname where Tailscale is serving the application, the browser will request assets from the wrong URL and they will fail to load.
+
+**Note**: Tailscale automatically appends `-1` (or higher) to hostnames to ensure uniqueness in your Tailnet. Always verify the actual hostname using `tailscale status` and update both configurations to match.
+
 ### Pod Not Starting
 
 ```bash
