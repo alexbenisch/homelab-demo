@@ -11,7 +11,3 @@ spec:
       port: 8081
       targetPort: 8081
       protocol: TCP
-    - name: docker-registry
-      port: 5000
-      targetPort: 5000
-      protocol: TCP
