@@ -43,7 +43,6 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
 **FastAPI REST API** - Portable Python application for testing across platforms
 
 - **URL**: https://demo-api.k8s-demo.de
-- **Image**: `registry.k8s-demo.de/demo-api:latest` (local registry)
 - **Built with**: FastAPI + uv package manager
 - **Access**: Public (via Traefik ingress)
 - **Features**:
@@ -57,7 +56,6 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
 **Artifact Repository** - Universal repository manager for Docker, Maven, npm, and more
 
 - **UI**: https://nexus.k8s-demo.de
-- **Docker Registry**: https://registry.k8s-demo.de
 - **Image**: `sonatype/nexus3:latest`
 - **Storage**: 50Gi persistent volume
 - **Access**: Public (via Traefik ingress)
