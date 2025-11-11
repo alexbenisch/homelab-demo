@@ -19,6 +19,7 @@ spec:
         fsGroup: 1000
 
       containers:
+        # Cluster Dashboard application container
         - name: cluster-dashboard
           image: cluster-dashboard:latest
           imagePullPolicy: IfNotPresent
@@ -65,3 +66,44 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
             runAsNonRoot: true
+
+        # Tailscale sidecar container
+        - name: tailscale
+          image: tailscale/tailscale:latest
+          env:
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-dashboard-tailscale-auth
+                  key: TS_AUTHKEY
+            - name: TS_USERSPACE
+              value: "true"
+            - name: TS_STATE_DIR
+              value: /var/lib/tailscale
+            - name: TS_HOSTNAME
+              value: "cluster-dashboard"
+            - name: TS_SERVE_CONFIG
+              value: /config/serve.json
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+          volumeMounts:
+            - name: tailscale-state
+              mountPath: /var/lib/tailscale
+            - name: tailscale-config
+              mountPath: /config
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+
+      volumes:
+        - name: tailscale-state
+          emptyDir: {}
+        - name: tailscale-config
+          configMap:
+            name: cluster-dashboard-tailscale-config
