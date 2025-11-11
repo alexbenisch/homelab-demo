@@ -112,8 +112,10 @@ kubectl port-forward -n cluster-dashboard svc/cluster-dashboard 8000:80
 
 ## Access
 
-- **URL**: https://dashboard.k8s-demo.de
-- **Local**: http://localhost:8000 (port-forward)
+- **URL**: https://cluster-dashboard.tail55277.ts.net (Tailscale VPN only)
+- **Local**: http://localhost:8000 (port-forward for testing)
+
+The dashboard is secured with Tailscale and only accessible when connected to the Tailnet. This provides secure, authenticated access without exposing the dashboard to the public internet.
 
 ## API Endpoints
 
@@ -140,7 +142,11 @@ The dashboard requires read-only access to cluster resources:
 - Namespaces
 - Deployments, ReplicaSets, StatefulSets, DaemonSets
 
-The ServiceAccount and ClusterRole are defined in `rbac.yaml`.
+Additionally, the Tailscale sidecar requires:
+- Secret management (create, get, update, patch) for state storage
+- Event creation for debugging
+
+The ServiceAccount, ClusterRole, and Role are defined in `rbac.yaml`.
 
 ## Configuration
 
@@ -224,14 +230,17 @@ docker run -p 8000:8000 cluster-dashboard:latest
 ### Cannot access dashboard
 
 ```bash
-# Check ingress
-kubectl get ingress -n cluster-dashboard
-kubectl describe ingress cluster-dashboard -n cluster-dashboard
+# Check Tailscale sidecar is running
+kubectl get pods -n cluster-dashboard
+kubectl logs -n cluster-dashboard -l app=cluster-dashboard -c tailscale
 
-# Check external-dns
-kubectl logs -n kube-system -l app.kubernetes.io/name=external-dns | grep dashboard
+# Verify Tailscale connection
+kubectl logs -n cluster-dashboard -l app=cluster-dashboard -c tailscale | grep "Startup complete"
 
-# Port-forward for testing
+# Check that certificate was issued
+kubectl logs -n cluster-dashboard -l app=cluster-dashboard -c tailscale | grep "got cert"
+
+# Port-forward for local testing (bypasses Tailscale)
 kubectl port-forward -n cluster-dashboard svc/cluster-dashboard 8000:80
 ```
 
@@ -263,8 +272,11 @@ The dashboard uses CSS variables for easy theming. Edit `src/static/css/style.cs
 
 ## Security
 
+- **Tailscale Authentication**: Only accessible via private VPN
+- **No Public Exposure**: Not accessible from the internet
+- **Encrypted Connection**: Automatic HTTPS with Tailscale certificates
 - Runs as non-root user (UID 1000)
-- Read-only cluster access (no write permissions)
+- Read-only cluster access (no write permissions to cluster resources)
 - Resource limits configured
 - Health checks enabled
 - Auto-refresh prevents stale data

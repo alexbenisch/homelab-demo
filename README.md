@@ -71,10 +71,10 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
 ### [Cluster Dashboard](apps/base/cluster-dashboard/)
 **Kubernetes Monitoring Dashboard** - Real-time cluster monitoring and visualization
 
-- **URL**: https://dashboard.k8s-demo.de
+- **URL**: https://cluster-dashboard.tail55277.ts.net (Tailnet-only)
 - **Image**: `cluster-dashboard:latest` (local build)
 - **Built with**: FastAPI + Kubernetes Python Client + uv
-- **Access**: Public (via Traefik ingress)
+- **Access**: Private (Tailscale sidecar)
 - **Features**:
   - Live cluster metrics and statistics
   - Nodes overview with cloud provider details (region, zone, instance type)
@@ -84,6 +84,7 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
   - Persistent volume claims and status
   - Auto-refresh every 30 seconds
   - Read-only RBAC permissions
+  - Secured with Tailscale authentication
   - Perfect for homelab monitoring and multi-cloud testing
 
 ## 🚀 Getting Started
