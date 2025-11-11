@@ -44,3 +44,36 @@ subjects:
   - kind: ServiceAccount
     name: cluster-dashboard
     namespace: cluster-dashboard
+---
+# Role for Tailscale state management
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cluster-dashboard-tailscale
+rules:
+  # Tailscale needs to manage its state secret
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["tailscale"]
+    verbs: ["get", "update", "patch"]
+  # Tailscale needs to create the state secret if it doesn't exist
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+  # Optional: Allow Tailscale to write events for debugging
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-dashboard-tailscale
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cluster-dashboard-tailscale
+subjects:
+  - kind: ServiceAccount
+    name: cluster-dashboard
+    namespace: cluster-dashboard
