@@ -5,7 +5,7 @@ Nexus 3 is a universal artifact repository manager that supports Docker images, 
 ## Access
 
 - **UI**: `https://nexus.k8s-demo.de`
-- **Docker Registry**: `https://registry.k8s-demo.de`
+- **Docker Registry**: Access via repository path (see Docker Registry setup below)
 
 ## Initial Setup
 
@@ -38,7 +38,20 @@ kubectl exec -n nexus deployment/nexus -- cat /nexus-data/admin.password
      - ❌ Disable for better security
    - Click "Finish"
 
-### 3. Configure Docker Registry
+### 3. Enable Docker Bearer Token Realm
+
+**This step is required before creating Docker repositories:**
+
+1. Go to **Settings (gear icon)** → **Security** → **Realms**
+2. Add **Docker Bearer Token Realm** to the **Active** list (drag from Available to Active)
+3. Click **Save**
+
+This realm is required for:
+- Docker client authentication
+- Anonymous pulls from Docker repositories
+- Proper token-based authentication
+
+### 4. Configure Docker Registry
 
 #### Create Docker Hosted Repository
 
@@ -46,10 +59,12 @@ kubectl exec -n nexus deployment/nexus -- cat /nexus-data/admin.password
 2. Select **docker (hosted)**
 3. Configure:
    - **Name**: `docker-hosted`
-   - **HTTP**: `5000` (already configured in deployment)
+   - **HTTP**: Leave blank (will use connector on port 5000, but access via path)
    - **Allow anonymous docker pull**: ✓ (for easier k8s usage) or ✗ (for security)
    - **Enable Docker V1 API**: ✗ (not needed)
 4. Click **Create repository**
+
+**Note**: Without a dedicated subdomain or port forwarding, Docker images are accessed via the repository path: `nexus.k8s-demo.de/repository/docker-hosted/`
 
 #### Create Docker Group Repository (Optional)
 
@@ -71,45 +86,46 @@ This allows you to proxy Docker Hub and host images together:
 
 ### Configure Docker Client
 
-```bash
-# Add registry.k8s-demo.de to Docker's insecure registries if not using HTTPS
-# Or trust the Let's Encrypt certificate (should work automatically)
+The Docker registry is accessed via the repository path:
 
-# Login to the registry
-docker login registry.k8s-demo.de
+```bash
+# Login to the registry (using the repository path)
+docker login nexus.k8s-demo.de
+# When prompted for repository, you can specify: nexus.k8s-demo.de/repository/docker-hosted
 # Username: admin (or create a new user in Nexus)
-# Password: your-nexus-password
+# Password: gaic4aeShae8hahSh2ay1iRui
 ```
+
+**Note**: Nexus serves Docker registries on repository paths like `/repository/docker-hosted/` rather than dedicated ports when using a single ingress. This is the standard approach for Nexus behind a reverse proxy.
 
 ### Push Images
 
 ```bash
-# Login with the configured credentials
-docker login registry.k8s-demo.de
-# Username: admin
-# Password: gaic4aeShae8hahSh2ay1iRui
-
-# Tag your image
-docker tag demo-api:latest registry.k8s-demo.de/demo-api:latest
+# Tag your image with the full repository path
+docker tag cluster-dashboard:latest nexus.k8s-demo.de/repository/docker-hosted/cluster-dashboard:latest
 
 # Push to registry
-docker push registry.k8s-demo.de/demo-api:latest
+docker push nexus.k8s-demo.de/repository/docker-hosted/cluster-dashboard:latest
 
-# List images in registry
-curl -u admin:gaic4aeShae8hahSh2ay1iRui https://registry.k8s-demo.de/v2/_catalog
+# Pull from registry
+docker pull nexus.k8s-demo.de/repository/docker-hosted/cluster-dashboard:latest
+
+# List images in registry via Nexus REST API
+curl -u admin:gaic4aeShae8hahSh2ay1iRui \
+  "https://nexus.k8s-demo.de/service/rest/v1/components?repository=docker-hosted"
 ```
 
 ### Pull Images from Kubernetes
 
 #### Option 1: Anonymous Pull (if enabled)
 
-No configuration needed! Just use the image:
+If you enabled anonymous pulls when creating the repository, no configuration needed:
 
 ```yaml
 spec:
   containers:
-    - name: demo-api
-      image: registry.k8s-demo.de/demo-api:latest
+    - name: cluster-dashboard
+      image: nexus.k8s-demo.de/repository/docker-hosted/cluster-dashboard:latest
 ```
 
 #### Option 2: With Authentication
@@ -118,25 +134,25 @@ Create a Docker registry secret:
 
 ```bash
 kubectl create secret docker-registry nexus-registry \
-  --docker-server=registry.k8s-demo.de \
+  --docker-server=nexus.k8s-demo.de \
   --docker-username=admin \
-  --docker-password=your-password \
-  -n demo-api
+  --docker-password=gaic4aeShae8hahSh2ay1iRui \
+  -n cluster-dashboard
 
-# Use in deployment
-kubectl patch serviceaccount default -n demo-api \
+# Use in deployment by patching the service account
+kubectl patch serviceaccount cluster-dashboard -n cluster-dashboard \
   -p '{"imagePullSecrets": [{"name": "nexus-registry"}]}'
 ```
 
-Or add to deployment:
+Or add to deployment manifest:
 
 ```yaml
 spec:
   imagePullSecrets:
     - name: nexus-registry
   containers:
-    - name: demo-api
-      image: registry.k8s-demo.de/demo-api:latest
+    - name: cluster-dashboard
+      image: nexus.k8s-demo.de/repository/docker-hosted/cluster-dashboard:latest
 ```
 
 ## Configuration
@@ -162,10 +178,9 @@ spec:
 
 ### Ingress
 
-- **nexus.k8s-demo.de**: Nexus web UI (port 8081)
-- **registry.k8s-demo.de**: Docker registry (port 5000)
+- **nexus.k8s-demo.de**: Nexus web UI (port 8081) and Docker registry (port 5000)
 
-Both use Let's Encrypt for TLS certificates.
+Uses Let's Encrypt for TLS certificates.
 
 ## Deployment
 
@@ -242,13 +257,37 @@ kubectl run -n nexus test-nexus --rm -it --image=curlimages/curl --restart=Never
 
 ### Docker Push/Pull Fails
 
-1. **Check Nexus logs** for authentication errors
-2. **Verify Docker registry** is configured in Nexus (port 5000)
-3. **Check ingress** for registry.k8s-demo.de
+1. **Verify Docker Bearer Token Realm is enabled**:
+   - Settings → Security → Realms
+   - Ensure "Docker Bearer Token Realm" is in the Active list
+
+2. **Check Nexus logs** for authentication errors:
+   ```bash
+   kubectl logs -n nexus deployment/nexus | grep -i docker
+   ```
+
+3. **Verify Docker registry** is configured in Nexus (port 5000):
+   - Settings → Repositories → docker-hosted
+   - Check HTTP port is set to 5000
+
 4. **Test registry API**:
    ```bash
-   curl https://registry.k8s-demo.de/v2/
-   # Should return: {}
+   # Test repository endpoint
+   curl -u admin:gaic4aeShae8hahSh2ay1iRui \
+     "https://nexus.k8s-demo.de/service/rest/v1/repositories"
+
+   # List images in docker-hosted repository
+   curl -u admin:gaic4aeShae8hahSh2ay1iRui \
+     "https://nexus.k8s-demo.de/service/rest/v1/components?repository=docker-hosted"
+   ```
+
+5. **Check Docker client configuration**:
+   ```bash
+   # Verify login
+   docker login nexus.k8s-demo.de
+
+   # Check stored credentials
+   cat ~/.docker/config.json | grep nexus
    ```
 
 ### Performance Issues
