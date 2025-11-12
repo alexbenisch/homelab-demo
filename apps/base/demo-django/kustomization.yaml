@@ -1,13 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: nexus
+namespace: demo-django
 
 resources:
   - namespace.yaml
-  - storage.yaml
   - secret.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
-  - docker-registry-ingress.yaml

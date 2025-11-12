@@ -35,8 +35,30 @@ override.tf.json
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 
+DOCKER-REGISTRY-SETUP.md
+
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform,kubernetes
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+db.sqlite3
+*.log

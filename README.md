@@ -52,20 +52,6 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
   - Request echo for debugging proxies
   - Auto-generated API documentation at `/docs`
 
-### [Nexus Repository Manager](apps/base/nexus/)
-**Artifact Repository** - Universal repository manager for Docker, Maven, npm, and more
-
-- **UI**: https://nexus.k8s-demo.de
-- **Image**: `sonatype/nexus3:latest`
-- **Storage**: 50Gi persistent volume
-- **Access**: Public (via Traefik ingress)
-- **Features**:
-  - Docker registry (hosted on port 5000)
-  - Support for multiple repository formats
-  - Repository proxying and grouping
-  - Role-based access control
-  - Blob store management
-
 ### [Cluster Dashboard](apps/base/cluster-dashboard/)
 **Kubernetes Monitoring Dashboard** - Real-time cluster monitoring and visualization
 
@@ -168,7 +154,6 @@ homelab-demo/
 │   │   ├── cluster-dashboard/ # Cluster dashboard app
 │   │   ├── demo-api/      # Demo FastAPI application
 │   │   ├── linkding/      # Linkding bookmark manager
-│   │   ├── nexus/         # Nexus repository manager
 │   │   └── wallabag/      # Wallabag read-it-later
 │   └── staging/           # Staging overlays
 │       └── kustomization.yaml
@@ -220,7 +205,7 @@ flux logs --follow --level=error
 
 Important data to backup:
 
-- Persistent volumes (linkding, wallabag, nexus data)
+- Persistent volumes (linkding, wallabag)
 - SOPS age private key (`~/.config/sops/age/keys.txt`)
 - Kubernetes secrets (if not in git)
 

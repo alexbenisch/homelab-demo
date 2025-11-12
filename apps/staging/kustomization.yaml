@@ -4,5 +4,5 @@ resources:
   - linkding
   - wallabag
   - demo-api
-  - nexus
   - cluster-dashboard
+  - demo-django
