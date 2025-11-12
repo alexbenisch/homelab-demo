@@ -32,6 +32,21 @@ spec:
                 secretKeyRef:
                   name: demo-django-secret
                   key: DJANGO_SECRET_KEY
+            - name: DJANGO_SUPERUSER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: demo-django-secret
+                  key: DJANGO_SUPERUSER_USERNAME
+            - name: DJANGO_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-django-secret
+                  key: DJANGO_SUPERUSER_PASSWORD
+            - name: DJANGO_SUPERUSER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: demo-django-secret
+                  key: DJANGO_SUPERUSER_EMAIL
             - name: DJANGO_ALLOWED_HOSTS
               value: "demo-django.k8s-demo.de,localhost,127.0.0.1"
             - name: DJANGO_DEBUG
