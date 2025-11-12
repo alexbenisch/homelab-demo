@@ -125,9 +125,16 @@ git commit -m "Add encrypted secret"
 git push
 
 # Flux automatically decrypts and applies!
+
+# To view/edit an encrypted secret locally:
+sops apps/base/myapp/secret.yaml
+
+# To decrypt to stdout:
+sops -d apps/base/myapp/secret.yaml
 ```
 
 The age public key is configured in `.sops.yaml`.
+**Note**: You need the age private key in `~/.config/sops/age/keys.txt` to decrypt secrets locally.
 
 ## 🌐 DNS Management
 
