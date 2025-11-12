@@ -19,7 +19,7 @@ spec:
 
       containers:
         - name: demo-django
-          image: ghcr.io/alex/demo-django:latest
+          image: ghcr.io/alexbenisch/demo-django:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
