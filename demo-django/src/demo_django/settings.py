@@ -16,6 +16,11 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# CSRF trusted origins for production
+CSRF_TRUSTED_ORIGINS = [
+    'https://demo-django.k8s-demo.de',
+]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
