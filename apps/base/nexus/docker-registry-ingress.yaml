@@ -1,16 +1,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nexus
+  name: nexus-docker-registry
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: nexus.k8s-demo.de
+    external-dns.alpha.kubernetes.io/hostname: docker-registry.k8s-demo.de
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
     # Enable large uploads for Docker images
-    traefik.ingress.kubernetes.io/router.middlewares: default-strip-prefix@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: default-docker-registry-size@kubernetescrd
 spec:
   rules:
-    - host: nexus.k8s-demo.de
+    - host: docker-registry.k8s-demo.de
       http:
         paths:
           - path: /
@@ -19,4 +19,4 @@ spec:
               service:
                 name: nexus
                 port:
-                  number: 8081
+                  number: 8082

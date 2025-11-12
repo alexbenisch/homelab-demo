@@ -23,6 +23,9 @@ spec:
             - containerPort: 8081
               name: http
               protocol: TCP
+            - containerPort: 8082
+              name: docker
+              protocol: TCP
 
           env:
             - name: INSTALL4J_ADD_VM_PARAMS
