@@ -31,11 +31,11 @@ jobs:
 
       - name: Run unittest tests
         working-directory: ./demo-django
-        run: uv run python src/manage.py test --pattern="tests.py"
+        run: uv run python src/manage.py test core.tests
 
       - name: Run pytest tests
         working-directory: ./demo-django
-        run: uv run pytest
+        run: uv run python -m pytest
 
   build-and-push:
     runs-on: ubuntu-latest
