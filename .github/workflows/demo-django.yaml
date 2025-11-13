@@ -30,8 +30,8 @@ jobs:
         run: pip install uv
 
       - name: Run unittest tests
-        working-directory: ./demo-django/src
-        run: uv run --directory .. manage.py test --pattern="tests.py"
+        working-directory: ./demo-django
+        run: uv run python src/manage.py test --pattern="tests.py"
 
       - name: Run pytest tests
         working-directory: ./demo-django
