@@ -29,6 +29,10 @@ jobs:
       - name: Install uv
         run: pip install uv
 
+      - name: Sync dependencies with test extras
+        working-directory: ./demo-django
+        run: uv sync --extra test
+
       - name: Run unittest tests
         working-directory: ./demo-django
         run: uv run python src/manage.py test core.tests
