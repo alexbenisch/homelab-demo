@@ -15,6 +15,7 @@ This application serves as a practical example of:
 - **Comprehensive Test Suite**: Full test coverage using Django's TestCase
 - **Automated CI/CD**: GitHub Actions workflow that runs tests before building
 - **Django's unittest framework**: Using Django's native testing tools
+- **PostgreSQL Database**: Production-ready database with persistent storage
 - **Health Probes**: Kubernetes liveness and readiness endpoints
 - **Production-Ready**: Gunicorn WSGI server with WhiteNoise for static files
 
@@ -217,6 +218,44 @@ git push origin main
 # GitHub Actions will run all tests automatically
 ```
 
+## PostgreSQL Database
+
+### Architecture
+
+The deployment includes a dedicated PostgreSQL database:
+
+- **PostgreSQL 16 Alpine**: Lightweight, production-ready database
+- **Persistent Storage**: 5Gi PersistentVolumeClaim for data persistence
+- **Health Checks**: Liveness and readiness probes using `pg_isready`
+- **Resource Limits**: CPU and memory limits for stability
+- **Secure Configuration**: Credentials stored in SOPS-encrypted secrets
+
+### Database Schema
+
+The PostgreSQL database includes Django's default tables plus any custom models:
+
+```bash
+# View database tables
+kubectl exec -n tested-django deployment/postgres -- \
+  psql -U tested_django -d tested_django -c '\dt'
+
+# View database connections
+kubectl exec -n tested-django deployment/postgres -- \
+  psql -U tested_django -d tested_django -c 'SELECT * FROM pg_stat_activity;'
+```
+
+### Backup and Restore
+
+```bash
+# Backup database
+kubectl exec -n tested-django deployment/postgres -- \
+  pg_dump -U tested_django tested_django > backup.sql
+
+# Restore database
+kubectl exec -i -n tested-django deployment/postgres -- \
+  psql -U tested_django tested_django < backup.sql
+```
+
 ## Deployment Workflow
 
 ### 1. Code Changes
@@ -393,6 +432,20 @@ python manage.py test --verbosity=3
 | `DJANGO_ALLOWED_HOSTS` | `tested-django.k8s-demo.de,...` | Allowed hostnames |
 | `DJANGO_DEBUG` | `False` | Debug mode (always False in production) |
 | `ENVIRONMENT` | `production` | Environment name |
+| `POSTGRES_HOST` | - | PostgreSQL host (presence triggers PostgreSQL mode) |
+| `POSTGRES_PORT` | `5432` | PostgreSQL port |
+| `POSTGRES_DB` | `tested_django` | PostgreSQL database name |
+| `POSTGRES_USER` | From secret | PostgreSQL username |
+| `POSTGRES_PASSWORD` | From secret | PostgreSQL password |
+
+### Database Configuration
+
+The application uses **PostgreSQL in production** (Kubernetes) and **SQLite for local development**:
+
+- **Production**: When `POSTGRES_HOST` environment variable is set, Django connects to PostgreSQL
+- **Local Development**: Without `POSTGRES_HOST`, Django uses SQLite (no additional setup needed)
+
+This allows for seamless local development without requiring PostgreSQL installation.
 
 ### Secrets Management
 

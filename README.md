@@ -72,13 +72,15 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
 **Django Application with Comprehensive Testing** - Demonstrating Django's integrated unit testing in CI/CD
 
 - **URL**: https://tested-django.k8s-demo.de
-- **Built with**: Django 5.0 + Gunicorn + WhiteNoise + uv package manager
+- **Built with**: Django 5.0 + PostgreSQL + Gunicorn + WhiteNoise + uv package manager
 - **Image**: `ghcr.io/alexbenisch/tested-django:latest` (GitHub Container Registry)
+- **Database**: PostgreSQL 16 with persistent storage (5Gi)
 - **Access**: Public (via Traefik ingress)
 - **Features**:
   - Comprehensive Django unittest-based test suite (20+ tests)
   - GitHub Actions CI/CD with automated testing
   - Django's native TestCase framework
+  - PostgreSQL database with automatic backups
   - Test-first development example
   - Health and readiness probes
   - Production-ready deployment after tests pass

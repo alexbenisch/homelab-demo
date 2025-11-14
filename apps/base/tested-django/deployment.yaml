@@ -47,6 +47,22 @@ spec:
                 secretKeyRef:
                   name: tested-django-secret
                   key: DJANGO_SUPERUSER_EMAIL
+            - name: POSTGRES_DB
+              value: "tested_django"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: tested-django-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tested-django-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: POSTGRES_PORT
+              value: "5432"
             - name: DJANGO_ALLOWED_HOSTS
               value: "tested-django.k8s-demo.de,localhost,127.0.0.1"
             - name: DJANGO_DEBUG
