@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .badge {
+            display: inline-block;
+            background: #11998e;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        .endpoints {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+        }
+        .endpoints h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .endpoints ul {
+            list-style: none;
+            padding: 0;
+        }
+        .endpoints li {
+            padding: 0.5rem 0;
+        }
+        .endpoints a {
+            color: #11998e;
+            text-decoration: none;
+            font-family: monospace;
+        }
+        .endpoints a:hover {
+            text-decoration: underline;
+        }
+        .testing-badge {
+            display: inline-block;
+            background: #38ef7d;
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <p>{{ message }}</p>
+        <span class="badge">Running on Kubernetes</span>
+        <span class="testing-badge">✓ Comprehensive Unit Tests</span>
+
+        <div class="endpoints">
+            <h2>Available Endpoints</h2>
+            <ul>
+                <li><a href="/">/</a> - Home page</li>
+                <li><a href="/health/">/health/</a> - Health check</li>
+                <li><a href="/ready/">/ready/</a> - Readiness probe</li>
+                <li><a href="/info/">/info/</a> - System information</li>
+                <li><a href="/admin/">/admin/</a> - Django admin</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

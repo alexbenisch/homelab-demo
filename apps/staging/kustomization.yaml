@@ -6,3 +6,4 @@ resources:
   - demo-api
   - cluster-dashboard
   - demo-django
+  - tested-django

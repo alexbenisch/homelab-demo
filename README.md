@@ -68,6 +68,21 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
   - Static file serving with WhiteNoise
   - Production-ready WSGI server (Gunicorn)
 
+### [Tested Django](apps/base/tested-django/)
+**Django Application with Comprehensive Testing** - Demonstrating Django's integrated unit testing in CI/CD
+
+- **URL**: https://tested-django.k8s-demo.de
+- **Built with**: Django 5.0 + Gunicorn + WhiteNoise + uv package manager
+- **Image**: `ghcr.io/alexbenisch/tested-django:latest` (GitHub Container Registry)
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Comprehensive Django unittest-based test suite (20+ tests)
+  - GitHub Actions CI/CD with automated testing
+  - Django's native TestCase framework
+  - Test-first development example
+  - Health and readiness probes
+  - Production-ready deployment after tests pass
+
 ### [Cluster Dashboard](apps/base/cluster-dashboard/)
 **Kubernetes Monitoring Dashboard** - Real-time cluster monitoring and visualization
 
@@ -178,6 +193,7 @@ homelab-demo/
 │   │   ├── demo-api/      # Demo FastAPI application
 │   │   ├── demo-django/   # Demo Django application
 │   │   ├── linkding/      # Linkding bookmark manager
+│   │   ├── tested-django/ # Tested Django application
 │   │   └── wallabag/      # Wallabag read-it-later
 │   └── staging/           # Staging overlays
 │       └── kustomization.yaml
@@ -196,6 +212,10 @@ homelab-demo/
 │   ├── Dockerfile
 │   └── pyproject.toml
 ├── demo-django/           # Demo Django source code
+│   ├── src/
+│   ├── Dockerfile
+│   └── pyproject.toml
+├── tested-django/         # Tested Django source code
 │   ├── src/
 │   ├── Dockerfile
 │   └── pyproject.toml
