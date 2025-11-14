@@ -52,6 +52,22 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
   - Request echo for debugging proxies
   - Auto-generated API documentation at `/docs`
 
+### [Demo Django](apps/base/demo-django/)
+**Django Web Application** - Learning Django deployment with GitOps workflows
+
+- **URL**: https://demo-django.k8s-demo.de
+- **Built with**: Django 5.0 + Gunicorn + WhiteNoise + uv package manager
+- **Image**: `ghcr.io/alexbenisch/demo-django:latest` (GitHub Container Registry)
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Health and readiness probes for Kubernetes
+  - System info endpoint for debugging
+  - Django admin interface
+  - Automated CI/CD with GitHub Actions
+  - SOPS-encrypted secrets for Django secret key
+  - Static file serving with WhiteNoise
+  - Production-ready WSGI server (Gunicorn)
+
 ### [Cluster Dashboard](apps/base/cluster-dashboard/)
 **Kubernetes Monitoring Dashboard** - Real-time cluster monitoring and visualization
 
@@ -160,6 +176,7 @@ homelab-demo/
 │   ├── base/              # Base application manifests
 │   │   ├── cluster-dashboard/ # Cluster dashboard app
 │   │   ├── demo-api/      # Demo FastAPI application
+│   │   ├── demo-django/   # Demo Django application
 │   │   ├── linkding/      # Linkding bookmark manager
 │   │   └── wallabag/      # Wallabag read-it-later
 │   └── staging/           # Staging overlays
@@ -175,6 +192,10 @@ homelab-demo/
 │   ├── Dockerfile
 │   └── pyproject.toml
 ├── demo-api/              # Demo API source code
+│   ├── src/
+│   ├── Dockerfile
+│   └── pyproject.toml
+├── demo-django/           # Demo Django source code
 │   ├── src/
 │   ├── Dockerfile
 │   └── pyproject.toml
