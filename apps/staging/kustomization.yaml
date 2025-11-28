@@ -7,3 +7,4 @@ resources:
   - cluster-dashboard
   - demo-django
   - tested-django
+  - wordpress

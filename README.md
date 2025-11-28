@@ -104,6 +104,21 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
   - Secured with Tailscale authentication
   - Perfect for homelab monitoring and multi-cloud testing
 
+### [WordPress](apps/base/wordpress/)
+**Content Management System** - Popular CMS for websites and blogs
+
+- **URL**: https://wordpress.k8s-demo.de
+- **Image**: `wordpress:6.4-apache`
+- **Database**: MySQL 8.0 with persistent storage (5Gi)
+- **Storage**: 5Gi persistent volume for WordPress content
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Full WordPress CMS with MySQL backend
+  - Persistent storage for content and uploads
+  - Automatic Let's Encrypt SSL certificates
+  - Health and readiness probes
+  - SOPS-encrypted database credentials
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -196,7 +211,8 @@ homelab-demo/
 │   │   ├── demo-django/   # Demo Django application
 │   │   ├── linkding/      # Linkding bookmark manager
 │   │   ├── tested-django/ # Tested Django application
-│   │   └── wallabag/      # Wallabag read-it-later
+│   │   ├── wallabag/      # Wallabag read-it-later
+│   │   └── wordpress/     # WordPress CMS
 │   └── staging/           # Staging overlays
 │       └── kustomization.yaml
 ├── infrastructure/
