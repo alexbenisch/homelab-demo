@@ -173,23 +173,267 @@ Before creating manifests for a new application, review existing applications to
 
 ### Deploy an Application
 
-All applications are managed via GitOps with Flux:
+Follow these steps to deploy a new application to the cluster. All applications are managed via GitOps with Flux CD.
+
+#### Step 1: Create Base Manifests
+
+Create a new directory under `apps/base/` with the following files:
 
 ```bash
-# 1. Add your app to apps/base/ directory
-# 2. Add to staging kustomization
+mkdir -p apps/base/myapp
+
+# Create namespace
+cat > apps/base/myapp/namespace.yaml <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myapp
+EOF
+
+# Create deployment
+cat > apps/base/myapp/deployment.yaml <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+EOF
+
+# Create service
+cat > apps/base/myapp/service.yaml <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  namespace: myapp
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: myapp
+EOF
+
+# Create ingress with required annotations
+cat > apps/base/myapp/ingress.yaml <<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: myapp.k8s-demo.de
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+spec:
+  rules:
+    - host: myapp.k8s-demo.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: myapp
+                port:
+                  number: 8080
+EOF
+
+# Create PVC (if needed) - DO NOT specify storageClassName
+cat > apps/base/myapp/pvc.yaml <<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myapp-storage
+  namespace: myapp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+EOF
+
+# Create secret
+cat > apps/base/myapp/secret.yaml <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: myapp-credentials
+  namespace: myapp
+type: Opaque
+stringData:
+  admin-password: changeme123
+EOF
+
+# Create kustomization.yaml
+cat > apps/base/myapp/kustomization.yaml <<EOF
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: myapp
+
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - pvc.yaml
+  - secret.yaml
+EOF
+```
+
+#### Step 2: Encrypt Secrets with SOPS
+
+```bash
+# Encrypt the secret file
+sops --encrypt --in-place apps/base/myapp/secret.yaml
+
+# Verify encryption
+cat apps/base/myapp/secret.yaml | grep ENC
+```
+
+#### Step 3: Create Staging Overlay
+
+```bash
+mkdir -p apps/staging/myapp
+
+cat > apps/staging/myapp/kustomization.yaml <<EOF
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/myapp
+EOF
+```
+
+#### Step 4: Add to Staging Kustomization
+
+```bash
+# Edit apps/staging/kustomization.yaml and add your app to the resources list
 vim apps/staging/kustomization.yaml
 
-# 3. Commit and push
-git add apps/
-git commit -m "Add new application"
-git push
+# Add this line to the resources section:
+#  - myapp
+```
 
-# 4. Trigger Flux reconciliation
+#### Step 5: Commit and Push
+
+```bash
+# Stage all changes
+git add apps/
+
+# Commit with descriptive message
+git commit -m "Add myapp application
+
+- Add deployment with health probes
+- Configure Traefik ingress with Let's Encrypt TLS
+- Add external-dns annotation for automatic DNS
+- Configure SOPS-encrypted credentials
+- Add staging overlay
+"
+
+# Push to remote
+git push
+```
+
+#### Step 6: Trigger Flux Reconciliation
+
+```bash
+# Trigger Flux to sync from git
 flux reconcile kustomization apps --with-source
 
-# 5. Verify deployment
-kubectl get pods -n your-app-namespace
+# Expected output:
+# ✔ applied revision main@sha1:xxxxx
+```
+
+#### Step 7: Verify Deployment
+
+```bash
+# Check all resources
+kubectl get all -n myapp
+
+# Check pod status (should be Running)
+kubectl get pods -n myapp
+
+# Check PVC status (should be Bound)
+kubectl get pvc -n myapp
+
+# Check ingress (should have ADDRESS)
+kubectl get ingress -n myapp
+
+# Check pod logs
+kubectl logs -n myapp -l app=myapp
+
+# Verify DNS record was created (wait 1-2 minutes)
+dig myapp.k8s-demo.de
+
+# Test the application
+curl https://myapp.k8s-demo.de
+```
+
+#### Step 8: Troubleshooting
+
+If the pod is not starting:
+
+```bash
+# Describe the pod to see events
+kubectl describe pod -n myapp -l app=myapp
+
+# Check pod logs
+kubectl logs -n myapp -l app=myapp --tail=50
+
+# Check if PVC is pending
+kubectl describe pvc -n myapp
+```
+
+If ingress is not working:
+
+```bash
+# Check ingress details
+kubectl describe ingress -n myapp
+
+# Verify external-dns created the record
+kubectl logs -n kube-system -l app.kubernetes.io/name=external-dns --tail=50 | grep myapp
+
+# Check certificate status
+kubectl get certificate -n myapp
 ```
 
 ## 🔐 Secrets Management
