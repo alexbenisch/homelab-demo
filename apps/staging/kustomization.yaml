@@ -8,3 +8,4 @@ resources:
   - demo-django
   - tested-django
   - wordpress
+  - grafana
