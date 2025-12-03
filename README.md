@@ -119,6 +119,21 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
   - Health and readiness probes
   - SOPS-encrypted database credentials
 
+### [Grafana](apps/base/grafana/)
+**Monitoring and Observability Platform** - Metrics visualization and dashboarding
+
+- **URL**: https://grafana.k8s-demo.de
+- **Image**: `grafana/grafana:latest`
+- **Storage**: 10Gi persistent volume for dashboards and data
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Metrics visualization and dashboarding
+  - Data source integrations (Prometheus, Loki, etc.)
+  - Customizable dashboards
+  - Automatic Let's Encrypt SSL certificates
+  - SOPS-encrypted admin credentials
+  - Ready for cluster monitoring setup
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -127,6 +142,34 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
 - Flux CLI installed
 - SOPS with age key configured
 - GitHub repository access
+
+### Adding New Applications - Checklist
+
+Before creating manifests for a new application, review existing applications to understand the cluster's patterns and requirements:
+
+**Infrastructure Patterns to Follow:**
+1. **Storage**: Default storage class is `local-path` - do NOT specify `storageClassName` in PVCs
+2. **Ingress Controller**: Cluster uses `traefik` (not nginx)
+3. **Required Ingress Annotations**:
+   - `external-dns.alpha.kubernetes.io/hostname: your-app.k8s-demo.de` (for automatic DNS)
+   - `traefik.ingress.kubernetes.io/router.entrypoints: web,websecure`
+   - `traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt` (for automatic TLS)
+4. **Secrets**: All secrets must be encrypted with SOPS before committing
+5. **Namespace**: Each app should have its own namespace defined in `namespace.yaml`
+
+**Reference Examples:**
+- Simple app with public access: `apps/base/linkding/`
+- App with database: `apps/base/wordpress/`
+- App with CI/CD: `apps/base/demo-django/` or `apps/base/tested-django/`
+- Private app with Tailscale: `apps/base/wallabag/` or `apps/base/cluster-dashboard/`
+
+**Pre-deployment Checklist:**
+- [ ] Reviewed existing apps for patterns
+- [ ] PVC does not specify storageClassName (uses default `local-path`)
+- [ ] Ingress uses Traefik annotations (not nginx)
+- [ ] Ingress has `external-dns.alpha.kubernetes.io/hostname` annotation
+- [ ] Secrets are encrypted with SOPS
+- [ ] Added app to `apps/staging/kustomization.yaml`
 
 ### Deploy an Application
 
@@ -209,6 +252,7 @@ homelab-demo/
 │   │   ├── cluster-dashboard/ # Cluster dashboard app
 │   │   ├── demo-api/      # Demo FastAPI application
 │   │   ├── demo-django/   # Demo Django application
+│   │   ├── grafana/       # Grafana monitoring
 │   │   ├── linkding/      # Linkding bookmark manager
 │   │   ├── tested-django/ # Tested Django application
 │   │   ├── wallabag/      # Wallabag read-it-later
