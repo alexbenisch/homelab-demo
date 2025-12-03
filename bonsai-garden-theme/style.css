@@ -1,0 +1,559 @@
+/*
+Theme Name: Bonsai Garden
+Theme URI: https://wordpress.k8s-demo.de
+Description: A beautiful zen-inspired theme for bonsai shops with natural aesthetics and WooCommerce integration
+Version: 1.0.0
+Author: Bonsai Garten
+Author URI: https://wordpress.k8s-demo.de
+License: GPL v2 or later
+Text Domain: bonsai-garden
+Tags: e-commerce, woocommerce, nature, garden, zen, responsive, custom-header
+*/
+
+/* ========================================
+   CSS RESET & BASE
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Bonsai Garden Color Palette */
+    --color-primary: #2d5016;        /* Deep forest green */
+    --color-secondary: #7d8f69;      /* Sage green */
+    --color-accent: #c4a57b;         /* Natural wood/bamboo */
+    --color-light: #f4f1ea;          /* Light parchment */
+    --color-dark: #1a1a1a;           /* Almost black */
+    --color-white: #ffffff;
+
+    /* Nature-inspired gradients */
+    --gradient-hero: linear-gradient(135deg, #2d5016 0%, #4a7c25 100%);
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #f9f8f5 100%);
+
+    /* Typography */
+    --font-primary: 'Lora', 'Georgia', serif;
+    --font-secondary: 'Noto Sans', 'Helvetica Neue', sans-serif;
+    --font-accent: 'Cinzel', serif;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 3rem;
+    --spacing-xl: 5rem;
+
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(45, 80, 22, 0.1);
+    --shadow-md: 0 4px 16px rgba(45, 80, 22, 0.15);
+    --shadow-lg: 0 8px 32px rgba(45, 80, 22, 0.2);
+}
+
+/* ========================================
+   TYPOGRAPHY
+   ======================================== */
+
+body {
+    font-family: var(--font-secondary);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-dark);
+    background-color: var(--color-light);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+p {
+    margin-bottom: var(--spacing-sm);
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--color-secondary);
+}
+
+/* ========================================
+   LAYOUT
+   ======================================== */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.container-wide {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.section {
+    padding: var(--spacing-xl) 0;
+}
+
+.section-alt {
+    background-color: var(--color-white);
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+    background-color: transparent;
+    color: var(--color-primary);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-accent {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+    border-color: var(--color-accent);
+}
+
+.btn-accent:hover {
+    background-color: transparent;
+    color: var(--color-accent);
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.site-header {
+    background-color: var(--color-white);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.site-logo {
+    font-family: var(--font-accent);
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.site-logo:hover {
+    color: var(--color-secondary);
+}
+
+/* ========================================
+   NAVIGATION
+   ======================================== */
+
+.main-navigation ul {
+    list-style: none;
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.main-navigation a {
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.main-navigation a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+}
+
+.main-navigation a:hover::after {
+    width: 100%;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.hero {
+    background: var(--gradient-hero);
+    color: var(--color-white);
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" opacity="0.1"><path fill="white" d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: cover;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.hero h1 {
+    color: var(--color-white);
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.95;
+}
+
+/* ========================================
+   CARDS
+   ======================================== */
+
+.card {
+    background: var(--gradient-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: var(--spacing-md);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.card-text {
+    color: #666;
+    margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+   GRID SYSTEM
+   ======================================== */
+
+.grid {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+
+.site-footer {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: var(--spacing-lg) 0 var(--spacing-md);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.footer-section h3 {
+    color: var(--color-white);
+    margin-bottom: var(--spacing-sm);
+}
+
+.footer-section a {
+    color: var(--color-light);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.footer-section a:hover {
+    color: var(--color-white);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-light);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .main-navigation ul {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .header-container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--spacing-xs); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-3 { margin-top: var(--spacing-md); }
+.mt-4 { margin-top: var(--spacing-lg); }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--spacing-xs); }
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+
+/* ========================================
+   WOOCOMMERCE INTEGRATION
+   ======================================== */
+
+/* Product Grid Layout */
+.woocommerce ul.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.woocommerce ul.products li.product {
+    background: var(--gradient-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0;
+    display: flex !important;
+    flex-direction: column;
+    float: none !important;
+}
+
+.woocommerce ul.products li.product:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Product Images */
+.woocommerce ul.products li.product img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__link {
+    display: block;
+}
+
+/* Product Content */
+.woocommerce ul.products li.product .woocommerce-loop-product__title,
+.woocommerce ul.products li.product h2,
+.woocommerce ul.products li.product h3 {
+    font-family: var(--font-primary);
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin: var(--spacing-sm) var(--spacing-md);
+}
+
+.woocommerce ul.products li.product .price {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin: 0 var(--spacing-md) var(--spacing-sm);
+}
+
+.woocommerce ul.products li.product .price del {
+    opacity: 0.5;
+    margin-right: 0.5rem;
+}
+
+/* Add to Cart Buttons */
+.woocommerce ul.products li.product .button,
+.woocommerce ul.products li.product a.added_to_cart {
+    display: block;
+    width: 80%;
+    margin: var(--spacing-sm) auto;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.woocommerce ul.products li.product .button:hover,
+.woocommerce ul.products li.product a.added_to_cart:hover {
+    background-color: transparent;
+    color: var(--color-primary);
+}
+
+/* Product Sale Badge */
+.woocommerce span.onsale {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background-color: var(--color-accent);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    z-index: 10;
+}
+
+/* Override WooCommerce default column widths */
+.woocommerce .products ul,
+.woocommerce-page .products ul {
+    display: grid !important;
+}
+
+.woocommerce .products ul li,
+.woocommerce-page .products ul li,
+.woocommerce ul.products[class*="columns-"] li.product,
+.woocommerce-page ul.products[class*="columns-"] li.product {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    float: none !important;
+}
+
+/* Ensure inner content fills card */
+.woocommerce ul.products li.product > a,
+.woocommerce ul.products li.product > div {
+    width: 100%;
+}
+
+/* Responsive WooCommerce Grid */
+@media (max-width: 768px) {
+    .woocommerce ul.products {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .woocommerce ul.products li.product img {
+        height: 250px;
+    }
+}
