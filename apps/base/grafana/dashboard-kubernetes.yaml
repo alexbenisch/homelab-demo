@@ -28,7 +28,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
@@ -83,7 +83,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
@@ -138,7 +138,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
@@ -193,7 +193,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
@@ -256,7 +256,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
@@ -340,7 +340,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
@@ -429,7 +429,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
@@ -518,7 +518,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "cf62x4kkxvoqob"
           },
           "fieldConfig": {
             "defaults": {
