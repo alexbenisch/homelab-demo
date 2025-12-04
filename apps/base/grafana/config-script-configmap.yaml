@@ -134,7 +134,7 @@ data:
           "$GRAFANA_URL/api/datasources" 2>/dev/null)
 
         CREATE_CODE=$(echo "$RESULT" | tail -n1)
-        RESPONSE=$(echo "$RESULT" | sed '$d')
+        RESPONSE=$(echo "$RESULT" | head -n-1)
 
         if [ "$CREATE_CODE" = "200" ]; then
           echo "  ✓ Successfully created data source '$DS_NAME'"
