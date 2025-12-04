@@ -138,11 +138,59 @@ data:
 
         if [ "$CREATE_CODE" = "200" ]; then
           echo "  ✓ Successfully created data source '$DS_NAME'"
+          DS_CREATED=true
         elif [ "$CREATE_CODE" = "409" ]; then
           echo "  → Data source '$DS_NAME' already exists (409 conflict)"
+          DS_CREATED=false
         else
           echo "  ✗ Failed to create '$DS_NAME' (HTTP $CREATE_CODE)"
           echo "     Response: $RESPONSE"
+          DS_CREATED=false
+        fi
+
+        # Warm up datasource with an initial query (only for newly created datasources)
+        if [ "$DS_CREATED" = "true" ]; then
+          echo "  → Warming up datasource with test query..."
+
+          case $TYPE in
+            prometheus)
+              TEST_QUERY='{"queries":[{"refId":"A","expr":"up","range":true,"instant":false}],"from":"now-5m","to":"now"}'
+              ;;
+            loki)
+              TEST_QUERY='{"queries":[{"refId":"A","expr":"{job=~\".+\"}","queryType":"range"}],"from":"now-5m","to":"now"}'
+              ;;
+            tempo)
+              # Tempo just needs to be accessible, no specific query needed
+              TEST_QUERY='{"queries":[{"refId":"A","queryType":"noop"}],"from":"now-1h","to":"now"}'
+              ;;
+            *)
+              TEST_QUERY=""
+              ;;
+          esac
+
+          if [ -n "$TEST_QUERY" ]; then
+            # Get the datasource UID from the creation response
+            DS_UID=$(echo "$RESPONSE" | grep -o '"uid":"[^"]*"' | head -1 | cut -d'"' -f4)
+
+            if [ -n "$DS_UID" ]; then
+              # Add datasource UID to the query
+              TEST_QUERY=$(echo "$TEST_QUERY" | sed "s/\"refId\":\"A\"/\"refId\":\"A\",\"datasource\":{\"type\":\"$TYPE\",\"uid\":\"$DS_UID\"}/")
+
+              WARMUP_RESULT=$(curl -s -o /dev/null -w "%{http_code}" \
+                -u "$GRAFANA_USER:$GRAFANA_PASSWORD" \
+                -H "Content-Type: application/json" \
+                -d "$TEST_QUERY" \
+                "$GRAFANA_URL/api/ds/query" 2>/dev/null)
+
+              if [ "$WARMUP_RESULT" = "200" ]; then
+                echo "  ✓ Warmup query successful"
+              else
+                echo "  ⚠ Warmup query returned HTTP $WARMUP_RESULT (datasource may need time to initialize)"
+              fi
+            else
+              echo "  ⊘ Could not extract datasource UID for warmup"
+            fi
+          fi
         fi
       fi
     done

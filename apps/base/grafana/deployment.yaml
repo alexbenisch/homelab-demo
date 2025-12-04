@@ -17,6 +17,33 @@ spec:
         fsGroup: 472
         runAsUser: 472
         runAsNonRoot: true
+      initContainers:
+      - name: warmup-datasources
+        image: alpine:3.19
+        command: ["/bin/sh", "/scripts/warmup-datasources.sh"]
+        env:
+        - name: GRAFANA_URL
+          value: "http://127.0.0.1:3000"
+        - name: GRAFANA_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-credentials
+              key: admin-user
+        - name: GRAFANA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-credentials
+              key: admin-password
+        volumeMounts:
+        - name: warmup-scripts
+          mountPath: /scripts
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
       containers:
       - name: grafana
         image: grafana/grafana:latest
