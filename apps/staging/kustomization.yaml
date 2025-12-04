@@ -10,3 +10,5 @@ resources:
   - wordpress
   - grafana
   - prometheus
+  - node-exporter
+  - kube-state-metrics
