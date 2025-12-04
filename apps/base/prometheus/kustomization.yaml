@@ -11,3 +11,5 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - auth-secret.yaml
+  - middleware.yaml
