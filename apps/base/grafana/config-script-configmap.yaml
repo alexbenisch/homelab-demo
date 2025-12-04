@@ -12,12 +12,6 @@ data:
 
     set -e
 
-    # Install jq if not present
-    if ! command -v jq > /dev/null 2>&1; then
-      echo "Installing jq..."
-      apk add --no-cache jq curl > /dev/null 2>&1
-    fi
-
     # Kubernetes API setup
     TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
     CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt

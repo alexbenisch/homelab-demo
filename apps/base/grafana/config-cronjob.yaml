@@ -16,13 +16,9 @@ spec:
         spec:
           serviceAccountName: grafana-config
           restartPolicy: OnFailure
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 65534  # nobody user
-            fsGroup: 65534
           containers:
             - name: configure
-              image: alpine:3.19
+              image: nixery.dev/shell/jq/curl
               command: ["/bin/sh", "/scripts/configure-datasources.sh"]
               env:
                 - name: GRAFANA_URL
@@ -47,10 +43,6 @@ spec:
                   memory: 128Mi
               securityContext:
                 allowPrivilegeEscalation: false
-                readOnlyRootFilesystem: false  # Need to install jq
-                capabilities:
-                  drop:
-                    - ALL
           volumes:
             - name: scripts
               configMap:
