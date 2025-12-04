@@ -1,0 +1,159 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config-script
+  namespace: grafana
+data:
+  configure-datasources.sh: |
+    #!/bin/sh
+    # Grafana Data Source Auto-Configuration
+    # Discovers monitoring services in the cluster and automatically
+    # configures them as Grafana data sources.
+
+    set -e
+
+    # Install jq if not present
+    if ! command -v jq > /dev/null 2>&1; then
+      echo "Installing jq..."
+      apk add --no-cache jq curl > /dev/null 2>&1
+    fi
+
+    # Kubernetes API setup
+    TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+    CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    K8S_API="https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT"
+
+    # Grafana configuration
+    GRAFANA_URL="${GRAFANA_URL:-http://grafana.grafana.svc.cluster.local:3000}"
+    GRAFANA_USER="${GRAFANA_USER:-admin}"
+
+    if [ -z "$GRAFANA_PASSWORD" ]; then
+      echo "ERROR: GRAFANA_PASSWORD environment variable not set"
+      exit 1
+    fi
+
+    echo "=========================================="
+    echo "Grafana Data Source Auto-Configuration"
+    echo "=========================================="
+    echo ""
+    echo "Discovering monitoring services in cluster..."
+
+    # List all services across all namespaces
+    SERVICES=$(curl -s --cacert $CACERT \
+      -H "Authorization: Bearer $TOKEN" \
+      "$K8S_API/api/v1/services")
+
+    # Check if API call was successful
+    if [ $? -ne 0 ]; then
+      echo "ERROR: Failed to query Kubernetes API"
+      exit 1
+    fi
+
+    # Count discovered services
+    TOTAL_FOUND=0
+
+    # Extract and process Prometheus, Loki, and Tempo services
+    echo "$SERVICES" | jq -r '
+      .items[] |
+      select(.metadata.name | test("prometheus|loki|tempo"; "i")) |
+      {
+        name: .metadata.name,
+        namespace: .metadata.namespace,
+        port: .spec.ports[0].port,
+        type: (
+          if (.metadata.name | test("prometheus"; "i")) then "prometheus"
+          elif (.metadata.name | test("loki"; "i")) then "loki"
+          elif (.metadata.name | test("tempo"; "i")) then "tempo"
+          else "unknown" end
+        )
+      } | @json
+    ' | while read -r service; do
+      if [ -z "$service" ]; then
+        continue
+      fi
+
+      NAME=$(echo "$service" | jq -r '.name')
+      NAMESPACE=$(echo "$service" | jq -r '.namespace')
+      PORT=$(echo "$service" | jq -r '.port')
+      TYPE=$(echo "$service" | jq -r '.type')
+
+      TOTAL_FOUND=$((TOTAL_FOUND + 1))
+
+      echo ""
+      echo "Found: $TYPE service '$NAME' in namespace '$NAMESPACE' on port $PORT"
+
+      # Build data source configuration based on type
+      case $TYPE in
+        prometheus)
+          DS_NAME="Prometheus ($NAMESPACE)"
+          DS_TYPE="prometheus"
+          DS_URL="http://$NAME.$NAMESPACE.svc.cluster.local:$PORT"
+          DS_DEFAULT="true"
+          ;;
+        loki)
+          DS_NAME="Loki ($NAMESPACE)"
+          DS_TYPE="loki"
+          DS_URL="http://$NAME.$NAMESPACE.svc.cluster.local:$PORT"
+          DS_DEFAULT="false"
+          ;;
+        tempo)
+          DS_NAME="Tempo ($NAMESPACE)"
+          DS_TYPE="tempo"
+          DS_URL="http://$NAME.$NAMESPACE.svc.cluster.local:$PORT"
+          DS_DEFAULT="false"
+          ;;
+        *)
+          echo "  → Unknown type, skipping"
+          continue
+          ;;
+      esac
+
+      # Check if data source already exists in Grafana
+      EXISTING=$(curl -s -w "\n%{http_code}" -u "$GRAFANA_USER:$GRAFANA_PASSWORD" \
+        "$GRAFANA_URL/api/datasources/name/$(echo "$DS_NAME" | jq -sRr @uri)" 2>/dev/null || echo -e "\n404")
+
+      HTTP_CODE=$(echo "$EXISTING" | tail -n1)
+
+      if [ "$HTTP_CODE" = "200" ]; then
+        echo "  → Data source '$DS_NAME' already exists, skipping"
+      else
+        # Create data source
+        echo "  → Creating data source '$DS_NAME'..."
+
+        PAYLOAD=$(jq -n \
+          --arg name "$DS_NAME" \
+          --arg type "$DS_TYPE" \
+          --arg url "$DS_URL" \
+          --arg access "proxy" \
+          --argjson isDefault "$DS_DEFAULT" \
+          '{
+            name: $name,
+            type: $type,
+            url: $url,
+            access: $access,
+            isDefault: $isDefault
+          }')
+
+        RESULT=$(curl -s -w "\n%{http_code}" -u "$GRAFANA_USER:$GRAFANA_PASSWORD" \
+          -H "Content-Type: application/json" \
+          -d "$PAYLOAD" \
+          "$GRAFANA_URL/api/datasources" 2>/dev/null)
+
+        CREATE_CODE=$(echo "$RESULT" | tail -n1)
+        RESPONSE=$(echo "$RESULT" | sed '$d')
+
+        if [ "$CREATE_CODE" = "200" ]; then
+          echo "  ✓ Successfully created data source '$DS_NAME'"
+        elif [ "$CREATE_CODE" = "409" ]; then
+          echo "  → Data source '$DS_NAME' already exists (409 conflict)"
+        else
+          echo "  ✗ Failed to create '$DS_NAME' (HTTP $CREATE_CODE)"
+          echo "     Response: $RESPONSE"
+        fi
+      fi
+    done
+
+    echo ""
+    echo "=========================================="
+    echo "Configuration complete!"
+    echo "=========================================="

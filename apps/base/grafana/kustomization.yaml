@@ -10,3 +10,6 @@ resources:
   - service.yaml
   - ingress.yaml
   - secret.yaml
+  - config-script-configmap.yaml
+  - config-rbac.yaml
+  - config-cronjob.yaml

@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: grafana-datasource-sync
+  namespace: grafana
+spec:
+  schedule: "0 * * * *"  # Every hour
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: grafana-config
+        spec:
+          serviceAccountName: grafana-config
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534  # nobody user
+            fsGroup: 65534
+          containers:
+            - name: configure
+              image: alpine:3.19
+              command: ["/bin/sh", "/scripts/configure-datasources.sh"]
+              env:
+                - name: GRAFANA_URL
+                  value: "http://grafana.grafana.svc.cluster.local:3000"
+                - name: GRAFANA_USER
+                  value: "admin"
+                - name: GRAFANA_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-credentials
+                      key: admin-password
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false  # Need to install jq
+                capabilities:
+                  drop:
+                    - ALL
+          volumes:
+            - name: scripts
+              configMap:
+                name: grafana-config-script
+                defaultMode: 0755
