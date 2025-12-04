@@ -12,3 +12,6 @@ resources:
   - prometheus
   - node-exporter
   - kube-state-metrics
+  - loki
+  - promtail
+  - tempo
