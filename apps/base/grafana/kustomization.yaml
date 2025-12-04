@@ -13,3 +13,5 @@ resources:
   - config-script-configmap.yaml
   - config-rbac.yaml
   - config-cronjob.yaml
+  - dashboard-provisioning.yaml
+  - dashboard-kubernetes.yaml

@@ -42,6 +42,10 @@ spec:
         volumeMounts:
         - name: grafana-storage
           mountPath: /var/lib/grafana
+        - name: dashboard-provisioning
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
         resources:
           requests:
             cpu: 100m
@@ -65,3 +69,9 @@ spec:
       - name: grafana-storage
         persistentVolumeClaim:
           claimName: grafana-storage
+      - name: dashboard-provisioning
+        configMap:
+          name: grafana-dashboard-provisioning
+      - name: dashboards
+        configMap:
+          name: grafana-dashboard-kubernetes
