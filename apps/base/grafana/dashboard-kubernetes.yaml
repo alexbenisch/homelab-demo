@@ -601,6 +601,7 @@ data:
         }
       ],
       "refresh": "30s",
+      "liveNow": true,
       "schemaVersion": 38,
       "tags": ["kubernetes", "cluster"],
       "templating": {
