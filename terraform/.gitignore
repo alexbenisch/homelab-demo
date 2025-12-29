@@ -1,0 +1,28 @@
+# Terraform files
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+
+# Sensitive files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Plan files
+*.tfplan
+plan.txt
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# State files - INTENTIONALLY NOT IGNORED
+# We commit state to the repo for this simple setup
+# terraform.tfstate
+# terraform.tfstate.backup

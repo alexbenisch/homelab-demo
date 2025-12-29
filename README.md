@@ -4,12 +4,23 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
 
 ## 🏗️ Infrastructure
 
-- **Kubernetes**: k3s cluster (1 control plane + workers)
+- **Platform**: Hetzner Cloud (automated with Terraform via GitHub Actions)
+- **Kubernetes**: k3s cluster (1 control plane + 2 workers)
 - **GitOps**: Flux CD for automated deployments
 - **Ingress**: Traefik with automatic Let's Encrypt certificates
 - **DNS**: External-DNS with Hetzner webhook for automated DNS management
 - **Secrets**: SOPS with age encryption for secure secret management
 - **Domain**: k8s-demo.de
+
+### Infrastructure Deployment
+
+The cluster infrastructure is fully automated with Terraform and GitHub Actions:
+
+- **[Terraform Setup Guide](terraform/README.md)** - Deploy/destroy infrastructure via GitHub workflows
+- **[Migration Guide](docs/migration-strategy.md)** - Migrate from old cluster to Terraform + new DNS API
+- **Manual Setup** (legacy): [cloud-init/README.md](cloud-init/README.md)
+
+> **📋 Migrating?** See the complete [Migration Strategy](docs/migration-strategy.md) for moving from the current cluster to a Terraform-managed cluster with the new Hetzner Cloud DNS API.
 
 ## 📦 Deployed Applications
 
@@ -481,6 +492,13 @@ DNS records are automatically managed via external-dns with Hetzner webhook:
 
 ## 📚 Documentation
 
+### Infrastructure & Migration
+- [Migration Quick Start](docs/migration-quick-start.md) - ⚡ 30-second overview and quick reference
+- [Migration Strategy](docs/migration-strategy.md) - Complete guide for migrating to Terraform + new DNS API
+- [Migration Checklist](docs/migration-checklist.md) - Step-by-step checklist for tracking progress
+- [Migration Rollback](docs/migration-rollback.md) - Emergency rollback procedures
+
+### Application Deployment
 - [Deployment Guide](docs/deployment.md) - Detailed deployment instructions
 - [Testing Deployments](docs/testing-deployments.md) - How to test deployments
 - [Persistent Storage](docs/persistent-storage.md) - Storage configuration
@@ -526,7 +544,14 @@ homelab-demo/
 │   ├── Dockerfile
 │   └── pyproject.toml
 ├── docs/                  # Documentation
-├── cloud-init/            # Cloud-init configs for nodes
+├── terraform/             # Terraform infrastructure (GitHub Actions)
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── cloud-init/        # Cloud-init templates for Terraform
+├── cloud-init/            # Legacy manual cloud-init configs
+├── .github/workflows/     # GitHub Actions workflows
+│   └── terraform.yml      # Terraform deployment workflow
 └── .sops.yaml            # SOPS encryption config
 ```
 

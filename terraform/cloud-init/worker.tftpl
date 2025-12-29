@@ -1,0 +1,72 @@
+#cloud-config
+# Cloud-init configuration for k3s worker node
+# Managed by Terraform
+
+hostname: ${hostname}
+
+users:
+  - name: alex
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+    lock_passwd: false
+
+chpasswd:
+  list: |
+    root:${user_password}
+    alex:${user_password}
+  expire: True
+
+package_update: true
+package_upgrade: true
+packages:
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - net-tools
+
+write_files:
+  - path: /root/install-k3s-agent.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      set -e
+
+      # CONFIGURATION - UPDATE THESE VALUES!
+      K3S_URL="https://${control_plane_ip}:6443"
+      K3S_TOKEN="<K3S_TOKEN_FROM_CONTROL_PLANE>"
+
+      echo "Installing k3s agent..."
+
+      # Install k3s in agent mode
+      curl -sfL https://get.k3s.io | K3S_URL="$${K3S_URL}" K3S_TOKEN="$${K3S_TOKEN}" sh -s - agent \
+        --node-name ${node_name} \
+        --node-ip $(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
+      echo "k3s agent installation complete!"
+      echo "Run 'kubectl get nodes' on the control plane to verify"
+
+runcmd:
+  - echo "Cloud-init started for worker node ${node_name}"
+  - timedatectl set-timezone UTC
+  - systemctl enable systemd-timesyncd
+  - systemctl start systemd-timesyncd
+  - echo "Cloud-init completed for worker node ${node_name}"
+  - echo "MANUAL STEP REQUIRED: Edit /root/install-k3s-agent.sh with K3S token, then run it"
+
+final_message: |
+  Cloud-init for ${node_name} has completed!
+
+  NEXT STEPS:
+  1. SSH into this server: ssh alex@<server-ip>
+  2. Get the K3S_TOKEN from control plane: ssh control-plane 'sudo cat /var/lib/rancher/k3s/server/node-token'
+  3. Edit the installation script: sudo nano /root/install-k3s-agent.sh
+     - Replace <K3S_TOKEN_FROM_CONTROL_PLANE> with the actual token
+  4. Run: sudo /root/install-k3s-agent.sh
+  5. Verify on control plane: kubectl get nodes
+
+  Password: ${user_password} (change on first login!)

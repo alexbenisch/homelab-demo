@@ -1,5 +1,11 @@
 # Manual Server Setup with Cloud-Init
 
+> **⚠️ LEGACY APPROACH**: This manual setup is now deprecated in favor of automated Terraform deployment via GitHub Actions.
+>
+> **For automated deployment, see:** [`terraform/README.md`](../terraform/README.md)
+>
+> This directory is kept for reference and manual testing purposes.
+
 This directory contains cloud-init configuration files for manually creating k3s cluster servers on Hetzner Cloud.
 
 ## Prerequisites
