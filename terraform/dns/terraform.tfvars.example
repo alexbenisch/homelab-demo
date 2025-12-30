@@ -1,0 +1,71 @@
+# Example Terraform variables for DNS management
+# Copy this file to terraform.tfvars and update with your values
+
+zone_name   = "k8s-demo.de"
+default_ttl = 3600
+
+# IP address of your k3s cluster control plane
+cluster_ip = "your.cluster.ip.here"
+
+# Define your subdomains
+# Each subdomain can have type (A, AAAA, CNAME, TXT, MX), value, optional ttl, and optional comment
+subdomains = {
+  # Application subdomains pointing to cluster
+  "linkding" = {
+    type    = "A"
+    value   = "your.cluster.ip.here"  # Or use var.cluster_ip in main config
+    ttl     = 3600
+    comment = "Linkding bookmark manager"
+  }
+
+  "wordpress" = {
+    type    = "A"
+    value   = "your.cluster.ip.here"
+    ttl     = 3600
+    comment = "WordPress CMS"
+  }
+
+  "demo-django" = {
+    type    = "A"
+    value   = "your.cluster.ip.here"
+    ttl     = 3600
+    comment = "Demo Django application"
+  }
+
+  "demo-api" = {
+    type    = "A"
+    value   = "your.cluster.ip.here"
+    ttl     = 3600
+    comment = "Demo FastAPI application"
+  }
+
+  "grafana" = {
+    type    = "A"
+    value   = "your.cluster.ip.here"
+    ttl     = 3600
+    comment = "Grafana monitoring"
+  }
+
+  "tested-django" = {
+    type    = "A"
+    value   = "your.cluster.ip.here"
+    ttl     = 3600
+    comment = "Tested Django application"
+  }
+
+  # Example CNAME record
+  "www" = {
+    type    = "CNAME"
+    value   = "k8s-demo.de."
+    ttl     = 3600
+    comment = "WWW redirect"
+  }
+
+  # Example TXT record for domain verification
+  "_verification" = {
+    type    = "TXT"
+    value   = "verification-token-here"
+    ttl     = 300
+    comment = "Domain verification"
+  }
+}

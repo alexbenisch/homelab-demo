@@ -17,10 +17,13 @@ A GitOps-powered Kubernetes homelab running on k3s with Flux CD. This repository
 The cluster infrastructure is fully automated with Terraform and GitHub Actions:
 
 - **[Terraform Setup Guide](terraform/README.md)** - Deploy/destroy infrastructure via GitHub workflows
+- **[DNS Management](terraform/dns/README.md)** - Manage subdomains via GitHub Actions workflow
 - **[Migration Guide](docs/migration-strategy.md)** - Migrate from old cluster to Terraform + new DNS API
 - **Manual Setup** (legacy): [cloud-init/README.md](cloud-init/README.md)
 
 > **📋 Migrating?** See the complete [Migration Strategy](docs/migration-strategy.md) for moving from the current cluster to a Terraform-managed cluster with the new Hetzner Cloud DNS API.
+>
+> **🌐 Managing DNS?** Use the [DNS Management Workflow](terraform/dns/README.md) to create/update subdomains via GitHub Actions.
 
 ## 📦 Deployed Applications
 
@@ -498,6 +501,10 @@ DNS records are automatically managed via external-dns with Hetzner webhook:
 - [Migration Checklist](docs/migration-checklist.md) - Step-by-step checklist for tracking progress
 - [Migration Rollback](docs/migration-rollback.md) - Emergency rollback procedures
 
+### DNS Management
+- [DNS Workflow Quick Reference](docs/dns-workflow-quick-reference.md) - ⚡ Quick commands for creating subdomains
+- [DNS Management Guide](terraform/dns/README.md) - Complete guide for Terraform DNS management
+
 ### Application Deployment
 - [Deployment Guide](docs/deployment.md) - Detailed deployment instructions
 - [Testing Deployments](docs/testing-deployments.md) - How to test deployments
@@ -548,10 +555,15 @@ homelab-demo/
 │   ├── main.tf
 │   ├── variables.tf
 │   ├── outputs.tf
-│   └── cloud-init/        # Cloud-init templates for Terraform
+│   ├── cloud-init/        # Cloud-init templates for Terraform
+│   └── dns/               # DNS management with Terraform
+│       ├── main.tf
+│       ├── variables.tf
+│       └── README.md
 ├── cloud-init/            # Legacy manual cloud-init configs
 ├── .github/workflows/     # GitHub Actions workflows
-│   └── terraform.yml      # Terraform deployment workflow
+│   ├── terraform.yml      # Terraform deployment workflow
+│   └── dns-management.yml # DNS management workflow
 └── .sops.yaml            # SOPS encryption config
 ```
 

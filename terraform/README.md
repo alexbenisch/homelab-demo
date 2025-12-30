@@ -311,13 +311,32 @@ If you previously used manual cloud-init setup:
 3. Update DNS records with new IPs
 4. Redeploy applications to new cluster
 
+## DNS Management
+
+After deploying infrastructure, manage your DNS records:
+
+**Via GitHub Actions (recommended for single subdomains):**
+1. Go to **Actions** → **DNS Management**
+2. Create subdomain: `myapp` → automatically points to cluster IP
+3. See [DNS Management Guide](dns/README.md)
+
+**Via Terraform (for bulk operations):**
+```bash
+cd terraform/dns
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with all your subdomains
+terraform apply
+```
+
+Full documentation: [terraform/dns/README.md](dns/README.md)
+
 ## Next Steps
 
 After cluster is running:
 
-1. **Deploy Ingress Controller**: `kubectl apply -f kubernetes/infrastructure/ingress-nginx/`
-2. **Setup Cert-Manager**: Follow `kubernetes/infrastructure/cert-manager/README.md`
-3. **Configure DNS**: Point your domain to control plane IP
+1. **Manage DNS**: Use [DNS Management Workflow](dns/README.md) to create subdomains
+2. **Deploy Ingress Controller**: `kubectl apply -f kubernetes/infrastructure/ingress-nginx/`
+3. **Setup Cert-Manager**: Follow `kubernetes/infrastructure/cert-manager/README.md`
 4. **Deploy Applications**: `kubectl apply -f kubernetes/apps/`
 
 ## Support

@@ -1,0 +1,28 @@
+# Terraform files
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+
+# Sensitive files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Plan files
+*.tfplan
+plan.txt
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# State files - INTENTIONALLY NOT IGNORED for this simple setup
+# Uncomment these if using remote state backend
+# terraform.tfstate
+# terraform.tfstate.backup

@@ -8,6 +8,7 @@ resources:
   - demo-django
   - tested-django
   - wordpress
+  - freelance-radar
   - grafana
   - prometheus
   - node-exporter

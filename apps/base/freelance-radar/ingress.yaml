@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: freelance-radar
+  namespace: freelance-radar
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: freelance-radar.k8s-demo.de
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+spec:
+  rules:
+    - host: freelance-radar.k8s-demo.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: freelance-radar
+                port:
+                  number: 80

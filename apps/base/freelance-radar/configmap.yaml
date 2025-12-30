@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: freelance-radar
+data:
+  DATABASE_HOST: postgres
+  DATABASE_NAME: radar

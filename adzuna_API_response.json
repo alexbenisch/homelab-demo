@@ -1,0 +1,591 @@
+{
+  "results": [
+    {
+      "redirect_url": "https://www.adzuna.es/details/5543164557?utm_medium=api&utm_source=4e3f3a9d",
+      "id": "5543164557",
+      "created": "2025-12-15T19:19:32Z",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTQzMTY0NTU3In0.05krfYLaMXjj8pVyRvN4oBMQpRJUaFvGm-Fa31smF8U",
+      "category": {
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown",
+        "tag": "unknown"
+      },
+      "longitude": -3.724726,
+      "title": "Devops engineer",
+      "latitude": 40.429254,
+      "location": {
+        "area": [
+          "España",
+          "Comunidad de Madrid",
+          "Madrid",
+          "Madrid"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "display_name": "Madrid"
+      },
+      "description": "Madrid Devops engineer Capgemini Engineering, líder mundial en servicios de ingeniería, reúne a equipos de Ingeniería, Ciencia y Arquitectura para ayudar a las empresas más innovadoras del mundo a liberar su potencial y contribuir a un futuro mejor. Desde coches autónomos hasta robots que salvan vidas, nuestros/as expertos/as en tecnologías digitales y software se salen de lo convencional, proporcionando servicios únicos de ID e ingeniería en todos los sectores de actividad. Actualmente, estamo…",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0",
+      "company": {
+        "__CLASS__": "Adzuna::API::Response::Company",
+        "display_name": "Capgemini"
+      }
+    },
+    {
+      "company": {
+        "display_name": "Orchard",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "description": "Job Description DevOps Engineer (CloudOps) Málaga / Madrid Permanent €60,000 – €68,000 We’re looking for someone who can prevent problems from arising in the first place. Someone who thinks automation isn’t just a buzzword but the best way to make developers’ lives (and yours) a whole lot easier. Our client are an IT Consultancy who build and deliver software on a global scale. Your job? Make sure all that code runs smoothly from local dev machines through test, pre-prod, and production. Less b…",
+      "location": {
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "area": [
+          "España",
+          "Andalucía",
+          "Málaga",
+          "Alhaurín de la Torre"
+        ],
+        "display_name": "Alhaurín de la Torre, Málaga"
+      },
+      "latitude": 36.726772,
+      "title": "DevOps Engineer",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NDg5NDcwMDg5In0.ax75qH-8Lx1-eDAsFTLJSkLM66Aartl1u7ZvWO4lkRI",
+      "category": {
+        "tag": "unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown"
+      },
+      "longitude": -4.540769,
+      "redirect_url": "https://www.adzuna.es/details/5489470089?utm_medium=api&utm_source=4e3f3a9d",
+      "id": "5489470089",
+      "created": "2025-11-10T16:11:10Z"
+    },
+    {
+      "company": {
+        "display_name": "European Recruitment",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "description": "DevOps/DevSecOps Manager | AI Start-up | 9-Month fixed-term ContractJoin a European deep-tech leader in quantum and AI. A well-funded, fast-growing company backed by major global investors with its groundbreaking technology is already transforming AI, compressing large language models by up to 95% and cutting inference costs by %. This is your chance to be part of a team often described as a \"quantum-AI unicorn in the making.\"This is a Hybrid opportunity working out of Barcelona or Zaragoza.Key…",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "title": "Devops Manager",
+      "location": {
+        "display_name": "Málaga",
+        "area": [
+          "España",
+          "Andalucía",
+          "Málaga",
+          "Málaga"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location"
+      },
+      "latitude": 36.715155,
+      "created": "2025-12-28T20:22:58Z",
+      "id": "5558312776",
+      "redirect_url": "https://www.adzuna.es/details/5558312776?utm_medium=api&utm_source=4e3f3a9d",
+      "category": {
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown",
+        "tag": "unknown"
+      },
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTU4MzEyNzc2In0.DVxC9zOZZ5qx9yxWLlW2w_-ENK6AhiUPiBkS7Ys3A2g",
+      "longitude": -4.423413
+    },
+    {
+      "category": {
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown",
+        "tag": "unknown"
+      },
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTQ2NjQ1Njg5MyIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.VPxeEerBoOzd6efiGAYG4fiV5yceX0_maEcio2ffXuw",
+      "redirect_url": "https://www.adzuna.es/details/5466456893?utm_medium=api&utm_source=4e3f3a9d",
+      "id": "5466456893",
+      "created": "2025-10-27T18:59:09Z",
+      "location": {
+        "display_name": "España",
+        "area": [
+          "España"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location"
+      },
+      "title": "DevOps Engineer",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0",
+      "description": "If you are interested , please attach your CV in English. A Little Bit about Us VarSome.com is the world’s leading website for professional human genetics. With more than 5 000 citations in scientific papers, 60 000 registered professional users , we are seeking to bring together all the human expertise in molecular genetics. VarSome Clinical is a comprehensive decision support software platform for genetic testing. VarSome is created by Saphetor, a Switzerland-based precision medicine company …",
+      "company": {
+        "display_name": "Saphetor",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      }
+    },
+    {
+      "company": {
+        "__CLASS__": "Adzuna::API::Response::Company",
+        "display_name": "FeverUp"
+      },
+      "description": "Hey there! We're Fever, the world's leading tech platform for culture and live entertainment, Our mission? To democratize access to culture and entertainment. With our proprietary cutting-edge technology and data-driven approach, we're revolutionizing the way people engage with live entertainment. Every month, our platform inspires over 300 million people in 40 countries (and counting) to discover unforgettable experiences while also empowering event creators with our data and technology, helpi…",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "title": "Devops Engineer",
+      "location": {
+        "display_name": "Valencia",
+        "area": [
+          "España",
+          "Comunidad Valenciana",
+          "Valencia",
+          "Valencia"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location"
+      },
+      "latitude": 39.458652,
+      "id": "5511405669",
+      "created": "2025-11-24T18:40:07Z",
+      "redirect_url": "https://www.adzuna.es/details/5511405669?utm_medium=api&utm_source=4e3f3a9d",
+      "category": {
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "tag": "unknown"
+      },
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTUxMTQwNTY2OSIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.JKYcIiA4hjlzWxfFV6LcIDPpsOmM1YnsAvR4MRo1_Ig",
+      "longitude": -0.37423
+    },
+    {
+      "company": {
+        "display_name": "NPAW",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "description": "NPAW is the leading video intelligence company helping online streaming services grow and the biggest company in the world in terms of video data processing. As a global pioneer in its space, NPAW has over a decade of experience developing ground-breaking, scalable analytics solutions to optimize performance and user engagement, building media experiences that maximize revenue. Our suite of analytics apps provides advanced visibility of platform performance, audience behavior, advertising and c…",
+      "latitude": 41.399672,
+      "location": {
+        "display_name": "Sant Adrià de Besòs, Barcelona",
+        "area": [
+          "España",
+          "Cataluña",
+          "Barcelona",
+          "Sant Adrià de Besòs"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location"
+      },
+      "title": "DevOps Engineer",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTQyMzczMDAzNyIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.gHDjwwPhMsjctzqaOxC-_KRDNDD-gtSLdXf7aADwGOw",
+      "category": {
+        "tag": "unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown"
+      },
+      "longitude": 2.20397,
+      "redirect_url": "https://www.adzuna.es/details/5423730037?utm_medium=api&utm_source=4e3f3a9d",
+      "created": "2025-10-01T12:30:10Z",
+      "id": "5423730037"
+    },
+    {
+      "company": {
+        "__CLASS__": "Adzuna::API::Response::Company",
+        "display_name": "INNOCV Solutions S.L.U."
+      },
+      "description": "Who are we? We are a company expert in helping others grow through our technological expertise, solving complex technological challenges, and focusing on operational excellence. We are digital natives and technology-neutral thanks to our rapid adaptation capabilities and problem-solving skills in any business situation. We are passionate about technology challenges that have a significant impact on business. To address these, we have high-performance teams and the ability to quickly and effecti…",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0",
+      "title": "DevOps Engineer",
+      "location": {
+        "display_name": "Madrid",
+        "area": [
+          "España",
+          "Comunidad de Madrid",
+          "Madrid",
+          "Madrid"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location"
+      },
+      "latitude": 40.424559,
+      "id": "4656879278",
+      "created": "2024-04-19T19:54:13Z",
+      "redirect_url": "https://www.adzuna.es/details/4656879278?utm_medium=api&utm_source=4e3f3a9d",
+      "category": {
+        "tag": "unknown",
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category"
+      },
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNDY1Njg3OTI3OCIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.98dK17b5sgHYwfWv_l0rZ3DwEeRobGBC2fkN_wZt7H0",
+      "longitude": -3.701568
+    },
+    {
+      "company": {
+        "display_name": "CrowdStrike",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0",
+      "description": "* Embed security controls throughout the entire DevOps lifecycle, from code commit to production deployment* Design and implement automated security gates within CI/CD pipelines using tools like GitHub Actions, Jenkins, or GitLab CI* Build security-as-code frameworks that make secure practices the default path for developers* Automate compliance checks and security policy enforcement across cloud infrastructure (AWS, GCP)* Develop custom security tooling to address Onum specific security requir…",
+      "latitude": 40.429254,
+      "location": {
+        "display_name": "Madrid",
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "area": [
+          "España",
+          "Comunidad de Madrid",
+          "Madrid",
+          "Madrid"
+        ]
+      },
+      "title": "Devops Engineer",
+      "longitude": -3.724726,
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTU1ODMxMjQ0OSIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.gJ3zQU-qOHgzpafxhNw-9eF2D5k4JTKkMYYW8rLajpY",
+      "category": {
+        "tag": "unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown"
+      },
+      "created": "2025-12-28T20:22:51Z",
+      "id": "5558312449",
+      "redirect_url": "https://www.adzuna.es/details/5558312449?utm_medium=api&utm_source=4e3f3a9d"
+    },
+    {
+      "company": {
+        "__CLASS__": "Adzuna::API::Response::Company",
+        "display_name": "Assaia"
+      },
+      "description": "Your job Assaia International AG provides AI-based software solutions for global airports and airlines. We were founded in February 2018 in Switzerland, headquartered in Zurich and New York and we have a fast-growing team located across Europe and North America. Assaia offers AI-based computer-vision solutions that monitor and analyse aircraft turnaround processes from video streams. Assaia’s solutions help airports and airlines improve on-time performance, efficiency, safety, and sustainabilit…",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0",
+      "title": "DevOps Engineer",
+      "location": {
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "area": [
+          "España"
+        ],
+        "display_name": "España"
+      },
+      "id": "5549132907",
+      "created": "2025-12-19T20:43:38Z",
+      "redirect_url": "https://www.adzuna.es/details/5549132907?utm_medium=api&utm_source=4e3f3a9d",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTQ5MTMyOTA3In0.JUJCbwoJDoQ4V9MLuTDt_pj4x6s_4FQ4uL6xcnq4Cd0",
+      "category": {
+        "tag": "unknown",
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category"
+      }
+    },
+    {
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTQ3Njg1ODM5In0.B4FINvkeJGh0ZmfFhwFTQ8nvaMjxESp0YnDJ9_WdFD4",
+      "category": {
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown",
+        "tag": "unknown"
+      },
+      "created": "2025-12-18T20:41:49Z",
+      "id": "5547685839",
+      "redirect_url": "https://www.adzuna.es/details/5547685839?utm_medium=api&utm_source=4e3f3a9d",
+      "location": {
+        "area": [
+          "España"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "display_name": "España"
+      },
+      "title": "Devops Engineer",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "description": "Somos una compañía global, líder en el desarrollo de infraestructuras regenerativas que generan un impacto positivo en la sociedad. Nuestra plantilla, formada por más de 65.000 profesionales y presente en más de 40 países de los cinco continentes, contribuye a nuestra misión de diseñar un planeta mejor. Buscamos personas que quieran marcar la diferencia, promover el desarrollo sostenible y encontrar soluciones a los mayores desafíos globales, incluidos el cambio climático, la sobrepoblación y l…",
+      "company": {
+        "__CLASS__": "Adzuna::API::Response::Company",
+        "display_name": "ACCIONA Construcción"
+      }
+    },
+    {
+      "title": "DevOps Expert.",
+      "location": {
+        "area": [
+          "España"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "display_name": "España"
+      },
+      "created": "2025-07-15T00:07:09Z",
+      "id": "5302689641",
+      "redirect_url": "https://www.adzuna.es/details/5302689641?utm_medium=api&utm_source=4e3f3a9d",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTMwMjY4OTY0MSIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.G27rWIwrFItmbht7ELeUVBFogX8LK6nJoVHSjxW3VZU",
+      "category": {
+        "tag": "unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown"
+      },
+      "company": {
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "description": "Reference: Publication Date: DevOps Expert. Location: Madrid, Spain Mission Your Mission As part of our Infrastructure Engineering team, your mission will be to design, build and maintain highly available and resilient cloud infrastructures that supports Kudelski Security’s business. The ideal candidate is someone who enjoys working in a high-paced, and highly technical environment, is security-minded, familiar with the DevOps culture of “you build it, you run it” and the open-source world. If …",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0"
+    },
+    {
+      "description": "NEORIS ahora parte de EPAM es un acelerador Digital que ayuda a las compañías a entrar en el futuro, con más de 20 años de experiencia como Socios Digitales de algunas de las compañías más importantes del mundo. Somos más de 4,000 profesionales en 11 países, con una cultura multicultural y de startup donde fomentamos la innovación, el aprendizaje continuo y la generación de soluciones de alto impacto para nuestros clientes. Estamos en búsqueda de: DevOps Engineer – AI Factory Principales respon…",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "company": {
+        "__CLASS__": "Adzuna::API::Response::Company",
+        "display_name": "en NEORIS"
+      },
+      "created": "2025-12-19T20:46:12Z",
+      "id": "5549145585",
+      "redirect_url": "https://www.adzuna.es/details/5549145585?utm_medium=api&utm_source=4e3f3a9d",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTU0OTE0NTU4NSIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.5ROiNdSEvWIYi-dbziF36HSmHnxw2JiZX_YoVkxcoGU",
+      "category": {
+        "tag": "unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown"
+      },
+      "title": "DevOps Cloud",
+      "location": {
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "area": [
+          "España"
+        ],
+        "display_name": "España"
+      }
+    },
+    {
+      "title": "DevOps (Banca)",
+      "location": {
+        "display_name": "Torrelodones, Madrid",
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "area": [
+          "España",
+          "Comunidad de Madrid",
+          "Madrid",
+          "Torrelodones"
+        ]
+      },
+      "latitude": 40.545784,
+      "id": "3003105670",
+      "created": "2022-03-27T18:24:42Z",
+      "redirect_url": "https://www.adzuna.es/details/3003105670?utm_medium=api&utm_source=4e3f3a9d",
+      "longitude": -3.884649,
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiMzAwMzEwNTY3MCIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.5_ZWp4c1wknY3y5f7hMPXwLv62l6Y0O5b-OO_rFOfgk",
+      "category": {
+        "tag": "unknown",
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category"
+      },
+      "company": {
+        "display_name": "Common Management Solutions",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "description": "Somos una Consultora Tecnológica con una importante presencia en las principales entidades financieras europeas. Nuestro expertise abarca principalmente el sector Banca Mayorista \" Corporate & Investment Banking \" tanto desde un punto de vista técnico como funcional, con especial foco en el en \" Front-to-Back \" es decir todo el flujo de una transacción, desde que se ejecuta hasta que se contabiliza una operación. Actualmente nos encontramos en proceso de crecimiento en varios áreas con proyecto…",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0"
+    },
+    {
+      "company": {
+        "display_name": "ANYbotics",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "description": "ANYbotics is a fast-growing tech company dedicated to shaping the future of mobile robotics across multiple industries. Join our highly talented and motivated team of more than 200 people and work on cutting-edge robot technology. The Opportunity We are seeking a motivated and skilled member to join our Workforce Team, responsible for the development, deployment, and maintenance of the Workforce Suite—including Data Navigator, Mission Controller, and Field Operator App. These applications empow…",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "title": "DevOps Engineer",
+      "location": {
+        "area": [
+          "España"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "display_name": "España"
+      },
+      "redirect_url": "https://www.adzuna.es/details/5529781570?utm_medium=api&utm_source=4e3f3a9d",
+      "created": "2025-12-05T19:56:54Z",
+      "id": "5529781570",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTI5NzgxNTcwIn0.nDFB2x1-57lNZoYF1Q2Up388lT-s5mzkX5MC7LEOXPY",
+      "category": {
+        "tag": "unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown"
+      }
+    },
+    {
+      "title": "Devops Manager",
+      "latitude": 41.652134,
+      "location": {
+        "area": [
+          "España",
+          "Aragón",
+          "Zaragoza",
+          "Zaragoza"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "display_name": "Zaragoza"
+      },
+      "redirect_url": "https://www.adzuna.es/details/5557356679?utm_medium=api&utm_source=4e3f3a9d",
+      "id": "5557356679",
+      "created": "2025-12-27T20:07:33Z",
+      "longitude": -0.880943,
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTU3MzU2Njc5In0.gk97hZWIBo19XYfOlutvyd-XHA1ng3duYD97P-66V8c",
+      "category": {
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "tag": "unknown"
+      },
+      "company": {
+        "display_name": "European Recruitment",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "description": "DevSecOps Engineer | Tech Start up (€200m raised) | Immediate Start | Zaragoza (Hybrid) Responisibilities Lead the DevSecOps practices and processes within the organization Develop and implement DevSecOps strategies for the organization. Mentor other engineers in the adoption of Cybersecurity best practices. Work with development and operations teams to automate security-based principles. Identify and implement tools and processes to improve software development and delivery. Actively seek solu…",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job"
+    },
+    {
+      "description": "DevSecOps Engineer | Tech Start up (€200m raised) | Immediate Start | Zaragoza (Hybrid)ResponisibilitiesLead the DevSecOps practices and processes within the organizationDevelop and implement DevSecOps strategies for the organization.Mentor other engineers in the adoption of Cybersecurity best practices.Work with development and operations teams to automate security-based principles.Identify and implement tools and processes to improve software development and delivery.Actively seek solutions t…",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "company": {
+        "display_name": "European Recruitment",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "redirect_url": "https://www.adzuna.es/details/5558311820?utm_medium=api&utm_source=4e3f3a9d",
+      "id": "5558311820",
+      "created": "2025-12-28T20:22:37Z",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTU1ODMxMTgyMCIsInMiOiIwTjU0dElmbDhCR05LZkktSFBSd2J3In0.1iUSLz2cYlTG-_4D-ylVxQfgZnOuqk-RKnYGgzB4cqE",
+      "longitude": -4.77637,
+      "category": {
+        "tag": "unknown",
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category"
+      },
+      "title": "Devops Manager",
+      "latitude": 37.889667,
+      "location": {
+        "area": [
+          "España",
+          "Andalucía",
+          "Córdoba",
+          "Córdoba"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "display_name": "Córdoba"
+      }
+    },
+    {
+      "company": {
+        "display_name": "European Recruitment",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "description": "DevSecOps Engineer | Tech Start up (€200m raised) | Immediate Start | Zaragoza (Hybrid)ResponisibilitiesLead the DevSecOps practices and processes within the organizationDevelop and implement DevSecOps strategies for the organization.Mentor other engineers in the adoption of Cybersecurity best practices.Work with development and operations teams to automate security-based principles.Identify and implement tools and processes to improve software development and delivery.Actively seek solutions t…",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0",
+      "title": "Devops Manager",
+      "location": {
+        "area": [
+          "España",
+          "Aragón",
+          "Zaragoza",
+          "Zaragoza"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "display_name": "Zaragoza"
+      },
+      "latitude": 41.652134,
+      "redirect_url": "https://www.adzuna.es/details/5558311955?utm_medium=api&utm_source=4e3f3a9d",
+      "id": "5558311955",
+      "created": "2025-12-28T20:22:40Z",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTU4MzExOTU1In0.9wvwV2CIrnNmYQX6zSGD4fx-aEjlS47kuE_sPX8tgTQ",
+      "category": {
+        "tag": "unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown"
+      },
+      "longitude": -0.880943
+    },
+    {
+      "company": {
+        "display_name": "European Recruitment",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "description": "Join a European deep-tech leader in quantum and AI. A well-funded, fast-growing company backed by major global investors with its groundbreaking technology is already transforming AI, compressing large language models by up to 95% and cutting inference costs by %. This is your chance to be part of a team often described as a \"quantum-AI unicorn in the making. \" This is a Hybrid opportunity working out of Barcelona or Zaragoza. Key Responsibilities Security Leadership: Define and lead DevOps/Dev…",
+      "location": {
+        "display_name": "Zaragoza",
+        "__CLASS__": "Adzuna::API::Response::Location",
+        "area": [
+          "España",
+          "Aragón",
+          "Zaragoza",
+          "Zaragoza"
+        ]
+      },
+      "latitude": 41.652134,
+      "title": "Devops Manager",
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTU5MTk2NDUxIn0.kXhNYqZJ2FbFNWVy_hXEAesDebwgGEHjCX66xYCXA4k",
+      "longitude": -0.880943,
+      "category": {
+        "tag": "unknown",
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category"
+      },
+      "redirect_url": "https://www.adzuna.es/details/5559196451?utm_medium=api&utm_source=4e3f3a9d",
+      "created": "2025-12-29T20:42:12Z",
+      "id": "5559196451"
+    },
+    {
+      "company": {
+        "display_name": "European Recruitment",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "salary_is_predicted": "0",
+      "description": "Join a European deep-tech leader in quantum and AI. A well-funded, fast-growing company backed by major global investors with its groundbreaking technology is already transforming AI, compressing large language models by up to 95% and cutting inference costs by %. This is your chance to be part of a team often described as a \"quantum-AI unicorn in the making. \" This is a Hybrid opportunity working out of Barcelona or Zaragoza. Key Responsibilities Security Leadership: Define and lead DevOps/Dev…",
+      "latitude": 41.380002,
+      "location": {
+        "display_name": "Barcelona",
+        "area": [
+          "España",
+          "Cataluña",
+          "Barcelona",
+          "Barcelona"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location"
+      },
+      "title": "Devops Manager",
+      "longitude": 2.168131,
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTU5MTk2NTQ2In0.uqcevhkRv68DvfeDAjMwcctKKt3oXXqRVc0t3fxuuQc",
+      "category": {
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "label": "Unknown",
+        "tag": "unknown"
+      },
+      "id": "5559196546",
+      "created": "2025-12-29T20:42:13Z",
+      "redirect_url": "https://www.adzuna.es/details/5559196546?utm_medium=api&utm_source=4e3f3a9d"
+    },
+    {
+      "description": "As a global leader in cybersecurity, CrowdStrike protects the people, processes and technologies that drive modern organizations. Since 2011, our mission hasn’t changed — we’re here to stop breaches, and we’ve redefined modern security with the world’s most advanced AI-native platform. We work on large scale distributed systems, processing almost 3 trillion events per day and this traffic is growing daily . Our customers span all industries, and they count on CrowdStrike to keep their businesse…",
+      "salary_is_predicted": "0",
+      "__CLASS__": "Adzuna::API::Response::Job",
+      "company": {
+        "display_name": "CrowdStrike",
+        "__CLASS__": "Adzuna::API::Response::Company"
+      },
+      "redirect_url": "https://www.adzuna.es/details/5538329718?utm_medium=api&utm_source=4e3f3a9d",
+      "id": "5538329718",
+      "created": "2025-12-11T20:31:45Z",
+      "category": {
+        "label": "Unknown",
+        "__CLASS__": "Adzuna::API::Response::Category",
+        "tag": "unknown"
+      },
+      "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiME41NHRJZmw4QkdOS2ZJLUhQUndidyIsImkiOiI1NTM4MzI5NzE4In0.e1zjsMSIkMWVBMLSrdzylbwUFk-k9-lbAu9tMgbWJ4g",
+      "title": "DevOps Engineer",
+      "location": {
+        "display_name": "España",
+        "area": [
+          "España"
+        ],
+        "__CLASS__": "Adzuna::API::Response::Location"
+      }
+    }
+  ],
+  "__CLASS__": "Adzuna::API::Response::JobSearchResults",
+  "mean": 84443.51,
+  "count": 2288
+}

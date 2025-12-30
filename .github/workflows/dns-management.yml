@@ -1,0 +1,195 @@
+name: DNS Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+        default: 'plan'
+
+      subdomain:
+        description: 'Subdomain name (without domain, e.g., "myapp" for myapp.k8s-demo.de)'
+        required: false
+        type: string
+
+      record_type:
+        description: 'DNS record type'
+        required: false
+        type: choice
+        options:
+          - A
+          - AAAA
+          - CNAME
+          - TXT
+          - MX
+        default: 'A'
+
+      record_value:
+        description: 'Record value (IP address, hostname, or text)'
+        required: false
+        type: string
+
+      ttl:
+        description: 'TTL in seconds (leave empty for default 3600)'
+        required: false
+        type: string
+
+      comment:
+        description: 'Comment for the DNS record'
+        required: false
+        type: string
+
+      use_cluster_ip:
+        description: 'Use cluster control plane IP (for A records only)'
+        required: false
+        type: boolean
+        default: true
+
+env:
+  TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
+
+jobs:
+  dns-management:
+    name: DNS ${{ inputs.action }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/dns
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Get Cluster IP
+        if: inputs.use_cluster_ip == true && inputs.record_type == 'A' && inputs.subdomain != ''
+        id: cluster-ip
+        run: |
+          # Get cluster IP from infrastructure terraform state
+          if [ -f "../terraform.tfstate" ]; then
+            CLUSTER_IP=$(terraform -chdir=.. output -raw control_plane_ipv4 2>/dev/null || echo "")
+            if [ -n "$CLUSTER_IP" ]; then
+              echo "cluster_ip=$CLUSTER_IP" >> $GITHUB_OUTPUT
+              echo "Found cluster IP: $CLUSTER_IP"
+            else
+              echo "Could not determine cluster IP from terraform state"
+              echo "cluster_ip=" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No infrastructure terraform state found"
+            echo "cluster_ip=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Prepare Terraform Variables
+        if: inputs.subdomain != ''
+        run: |
+          # Create or update terraform.tfvars
+          cat > terraform.tfvars <<EOF
+          zone_name = "k8s-demo.de"
+          default_ttl = 3600
+
+          cluster_ip = "${{ steps.cluster-ip.outputs.cluster_ip || inputs.record_value }}"
+
+          subdomains = {
+            "${{ inputs.subdomain }}" = {
+              type    = "${{ inputs.record_type }}"
+              value   = "${{ steps.cluster-ip.outputs.cluster_ip || inputs.record_value }}"
+              ttl     = ${{ inputs.ttl || 'null' }}
+              comment = "${{ inputs.comment || format('Managed by GitHub Actions - {0}', inputs.subdomain) }}"
+            }
+          }
+          EOF
+
+          echo "Generated terraform.tfvars:"
+          cat terraform.tfvars
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: inputs.action == 'plan' || inputs.action == 'apply'
+        run: |
+          terraform plan -no-color | tee plan.txt
+        continue-on-error: false
+
+      - name: Upload Plan
+        if: inputs.action == 'plan'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dns-plan
+          path: terraform/dns/plan.txt
+
+      - name: Terraform Apply
+        if: inputs.action == 'apply'
+        run: terraform apply -auto-approve -no-color
+
+      - name: Terraform Destroy
+        if: inputs.action == 'destroy'
+        run: terraform destroy -auto-approve -no-color
+
+      - name: Terraform Output
+        if: inputs.action == 'apply'
+        run: |
+          echo "=== DNS Configuration ==="
+          terraform output -no-color dns_summary
+
+      - name: Commit State File
+        if: inputs.action == 'apply' || inputs.action == 'destroy'
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+
+          cd ../..
+          git add terraform/dns/terraform.tfstate terraform/dns/terraform.tfstate.backup terraform/dns/terraform.tfvars || true
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update DNS Terraform state
+
+            Action: ${{ inputs.action }}
+            Subdomain: ${{ inputs.subdomain || 'N/A' }}
+            Type: ${{ inputs.record_type || 'N/A' }}
+            Value: ${{ inputs.record_value || steps.cluster-ip.outputs.cluster_ip || 'cluster IP' }}
+            "
+            git push
+          fi
+        continue-on-error: true
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## DNS Management Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action:** ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
+
+          if [ -n "${{ inputs.subdomain }}" ]; then
+            echo "**Subdomain:** ${{ inputs.subdomain }}.k8s-demo.de" >> $GITHUB_STEP_SUMMARY
+            echo "**Type:** ${{ inputs.record_type }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Value:** ${{ inputs.record_value || steps.cluster-ip.outputs.cluster_ip || 'cluster IP' }}" >> $GITHUB_STEP_SUMMARY
+            echo "**TTL:** ${{ inputs.ttl || '3600 (default)' }}" >> $GITHUB_STEP_SUMMARY
+
+            if [ -n "${{ inputs.comment }}" ]; then
+              echo "**Comment:** ${{ inputs.comment }}" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "No subdomain specified - managing existing DNS configuration" >> $GITHUB_STEP_SUMMARY
+          fi
