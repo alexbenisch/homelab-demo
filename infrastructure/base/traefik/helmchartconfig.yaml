@@ -5,13 +5,21 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
-    # Enable ACME (Let's Encrypt)
+    # Enable ACME (Let's Encrypt) with Cloudflare DNS challenge
     additionalArguments:
       - "--certificatesresolvers.letsencrypt.acme.email=alexander.benisch@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      # Use staging for testing, remove this line for production
-      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+
+    # Cloudflare API token from secret
+    env:
+      - name: CF_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: cloudflare-traefik
+            key: CF_API_TOKEN
 
     # Ensure persistent storage for certificates
     persistence:
