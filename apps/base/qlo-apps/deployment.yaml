@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qlo-apps
+  namespace: qlo-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qlo-apps
+  template:
+    metadata:
+      labels:
+        app: qlo-apps
+    spec:
+      securityContext:
+        fsGroup: 33
+      containers:
+        - name: qlo-apps
+          image: webkul/qloapps:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_SERVER
+              value: "mysql"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: DB_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: PS_DOMAIN
+              value: "qloapps.kubetest.uk"
+            - name: PS_ENABLE_SSL
+              value: "1"
+            - name: ADMIN_MAIL
+              valueFrom:
+                secretKeyRef:
+                  name: qlo-apps-secret
+                  key: ADMIN_MAIL
+            - name: ADMIN_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: qlo-apps-secret
+                  key: ADMIN_PASSWD
+          volumeMounts:
+            - name: qlo-apps-data
+              mountPath: /var/www/html
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: qlo-apps-data
+          persistentVolumeClaim:
+            claimName: qlo-apps-data-pvc

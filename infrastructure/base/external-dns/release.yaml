@@ -16,33 +16,15 @@ spec:
       interval: 12h
   values:
     provider:
-      name: webhook
-      webhook:
-        image:
-          repository: ghcr.io/mconfalonieri/external-dns-hetzner-webhook
-          tag: v0.7.0
-        env:
-          - name: HETZNER_API_KEY
-            valueFrom:
-              secretKeyRef:
-                name: hetzner-dns-api
-                key: HOMELAB_HETZNER_DNS_API_KEY
-          - name: LOG_LEVEL
-            value: debug
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 10
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 8080
-          initialDelaySeconds: 10
-          timeoutSeconds: 5
+      name: cloudflare
+    env:
+      - name: CF_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: cloudflare-api
+            key: CF_API_TOKEN
     domainFilters:
-      - "k8s-demo.de"
+      - "kubetest.uk"
     policy: upsert-only
     txtOwnerId: "homelab"
     sources:

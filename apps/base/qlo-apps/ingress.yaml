@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qlo-apps
+  namespace: qlo-apps
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: qloapps.kubetest.uk
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+spec:
+  rules:
+    - host: qloapps.kubetest.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: qlo-apps
+                port:
+                  number: 80

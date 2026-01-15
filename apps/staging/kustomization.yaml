@@ -16,3 +16,7 @@ resources:
   - loki
   - promtail
   - tempo
+  - paperless-ngx
+  - nextcloud
+  - mattermost
+  - qlo-apps
