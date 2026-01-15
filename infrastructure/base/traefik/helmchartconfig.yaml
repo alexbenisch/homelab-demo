@@ -15,7 +15,7 @@ spec:
 
     # Cloudflare API token from secret
     env:
-      - name: CF_API_TOKEN
+      - name: CLOUDFLARE_DNS_API_TOKEN
         valueFrom:
           secretKeyRef:
             name: cloudflare-traefik
