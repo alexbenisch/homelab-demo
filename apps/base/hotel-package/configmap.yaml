@@ -1,0 +1,244 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: landing-page
+  namespace: hotel-package
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Hotel Management Suite | Self-Hosted Solutions</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+          min-height: 100vh;
+          color: #fff;
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+        header {
+          text-align: center;
+          padding: 4rem 0;
+        }
+        header h1 {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+          background: linear-gradient(90deg, #e94560, #ff6b6b);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        header p {
+          font-size: 1.3rem;
+          color: #a0a0a0;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .apps-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 2rem;
+          margin-top: 3rem;
+        }
+        .app-card {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 16px;
+          padding: 2rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .app-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          border-color: #e94560;
+        }
+        .app-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.8rem;
+          margin-bottom: 1.5rem;
+        }
+        .app-card:nth-child(1) .app-icon { background: linear-gradient(135deg, #00b894, #00cec9); }
+        .app-card:nth-child(2) .app-icon { background: linear-gradient(135deg, #0984e3, #74b9ff); }
+        .app-card:nth-child(3) .app-icon { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+        .app-card:nth-child(4) .app-icon { background: linear-gradient(135deg, #e17055, #fab1a0); }
+        .app-card h3 {
+          font-size: 1.4rem;
+          margin-bottom: 0.75rem;
+        }
+        .app-card p {
+          color: #a0a0a0;
+          line-height: 1.6;
+          margin-bottom: 1.5rem;
+        }
+        .app-card ul {
+          list-style: none;
+          margin-bottom: 1.5rem;
+        }
+        .app-card li {
+          padding: 0.4rem 0;
+          color: #ccc;
+          font-size: 0.9rem;
+        }
+        .app-card li::before {
+          content: "✓";
+          color: #00b894;
+          margin-right: 0.5rem;
+        }
+        .app-link {
+          display: inline-block;
+          padding: 0.75rem 1.5rem;
+          background: linear-gradient(90deg, #e94560, #ff6b6b);
+          color: #fff;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: 600;
+          transition: opacity 0.3s ease;
+        }
+        .app-link:hover {
+          opacity: 0.9;
+        }
+        .features {
+          margin-top: 4rem;
+          text-align: center;
+          padding: 3rem;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 16px;
+        }
+        .features h2 {
+          font-size: 2rem;
+          margin-bottom: 2rem;
+        }
+        .feature-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 2rem;
+          margin-top: 2rem;
+        }
+        .feature-item {
+          padding: 1rem;
+        }
+        .feature-item h4 {
+          color: #e94560;
+          margin-bottom: 0.5rem;
+        }
+        .feature-item p {
+          color: #a0a0a0;
+          font-size: 0.95rem;
+        }
+        footer {
+          text-align: center;
+          padding: 3rem 0;
+          color: #666;
+        }
+        footer a {
+          color: #e94560;
+          text-decoration: none;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <header>
+          <h1>Hotel Management Suite</h1>
+          <p>A complete self-hosted solution for modern hotel operations. Manage documents, collaborate with your team, and streamline bookings.</p>
+        </header>
+
+        <div class="apps-grid">
+          <div class="app-card">
+            <div class="app-icon">📄</div>
+            <h3>Paperless-ngx</h3>
+            <p>Transform your hotel's paper chaos into a searchable digital archive. OCR-powered document management.</p>
+            <ul>
+              <li>Automatic document scanning & OCR</li>
+              <li>Smart tagging & categorization</li>
+              <li>Full-text search across all documents</li>
+              <li>Secure document storage</li>
+            </ul>
+            <a href="https://paperless.kubetest.uk" class="app-link" target="_blank">Open Paperless</a>
+          </div>
+
+          <div class="app-card">
+            <div class="app-icon">☁️</div>
+            <h3>Nextcloud</h3>
+            <p>Your private cloud for file sharing, calendars, and collaboration. Keep your data under your control.</p>
+            <ul>
+              <li>File sync across all devices</li>
+              <li>Shared calendars & contacts</li>
+              <li>Real-time document collaboration</li>
+              <li>Guest sharing for external partners</li>
+            </ul>
+            <a href="https://nextcloud.kubetest.uk" class="app-link" target="_blank">Open Nextcloud</a>
+          </div>
+
+          <div class="app-card">
+            <div class="app-icon">💬</div>
+            <h3>Mattermost</h3>
+            <p>Secure team messaging for your hotel staff. Coordinate housekeeping, front desk, and management seamlessly.</p>
+            <ul>
+              <li>Real-time messaging & channels</li>
+              <li>File sharing & search</li>
+              <li>Mobile apps for staff on the go</li>
+              <li>Integrations with other tools</li>
+            </ul>
+            <a href="https://mattermost.kubetest.uk" class="app-link" target="_blank">Open Mattermost</a>
+          </div>
+
+          <div class="app-card">
+            <div class="app-icon">🏨</div>
+            <h3>QloApps</h3>
+            <p>Complete hotel booking and reservation system. Manage rooms, rates, and guest bookings effortlessly.</p>
+            <ul>
+              <li>Online booking engine</li>
+              <li>Room & rate management</li>
+              <li>Multi-channel distribution</li>
+              <li>Guest management & reporting</li>
+            </ul>
+            <a href="https://qloapps.kubetest.uk" class="app-link" target="_blank">Open QloApps</a>
+          </div>
+        </div>
+
+        <div class="features">
+          <h2>Why Choose Our Suite?</h2>
+          <div class="feature-grid">
+            <div class="feature-item">
+              <h4>Self-Hosted</h4>
+              <p>Your data stays on your infrastructure. Full control and privacy.</p>
+            </div>
+            <div class="feature-item">
+              <h4>Integrated</h4>
+              <p>All tools work together for seamless hotel operations.</p>
+            </div>
+            <div class="feature-item">
+              <h4>Scalable</h4>
+              <p>From boutique hotels to large chains. Grows with your business.</p>
+            </div>
+            <div class="feature-item">
+              <h4>Cost-Effective</h4>
+              <p>No per-user fees. One package, unlimited potential.</p>
+            </div>
+          </div>
+        </div>
+
+        <footer>
+          <p>Interested in deploying this suite for your hotel? <a href="mailto:contact@kubetest.uk">Contact us</a></p>
+        </footer>
+      </div>
+    </body>
+    </html>
