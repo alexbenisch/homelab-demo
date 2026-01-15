@@ -17,7 +17,7 @@ spec:
         fsGroup: 33
       containers:
         - name: qlo-apps
-          image: webkul/qloapps:latest
+          image: webkul/qloapps_docker:latest
           ports:
             - containerPort: 80
           env:
