@@ -69,24 +69,16 @@ spec:
               value: "False"
 
           livenessProbe:
-            httpGet:
-              path: /admin/login/
+            tcpSocket:
               port: 8000
-              httpHeaders:
-                - name: Host
-                  value: immomo.kubetest.uk
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 3
 
           readinessProbe:
-            httpGet:
-              path: /admin/login/
+            tcpSocket:
               port: 8000
-              httpHeaders:
-                - name: Host
-                  value: immomo.kubetest.uk
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
