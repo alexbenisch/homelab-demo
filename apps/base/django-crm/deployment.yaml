@@ -70,11 +70,11 @@ spec:
 
           livenessProbe:
             httpGet:
-              path: /
+              path: /admin/login/
               port: 8000
               httpHeaders:
                 - name: Host
-                  value: localhost
+                  value: immomo.kubetest.uk
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 10
@@ -82,11 +82,11 @@ spec:
 
           readinessProbe:
             httpGet:
-              path: /
+              path: /admin/login/
               port: 8000
               httpHeaders:
                 - name: Host
-                  value: localhost
+                  value: immomo.kubetest.uk
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
