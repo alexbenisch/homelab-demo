@@ -21,3 +21,4 @@ resources:
   - mattermost
   - qlo-apps
   - hotel-package
+  - django-crm
