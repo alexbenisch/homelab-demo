@@ -43,8 +43,8 @@ RUN chmod +x /app/entrypoint.sh
 # Collect static files
 RUN python manage.py collectstatic --noinput --settings=webcrm.settings || true
 
-# Change ownership
-RUN chown -R crm:crm /app
+# Change ownership and fix /tmp permissions for lock files
+RUN chown -R crm:crm /app && chmod 1777 /tmp
 
 # Switch to non-root user
 USER crm
