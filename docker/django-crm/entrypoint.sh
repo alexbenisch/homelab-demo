@@ -13,6 +13,17 @@ if [ -n "$DJANGO_SECRET_KEY" ]; then
     sed -i "s/^SECRET_KEY = .*/SECRET_KEY = '$DJANGO_SECRET_KEY'/" /app/webcrm/settings.py
 fi
 
+# Add WhiteNoise middleware for static files
+echo "Adding WhiteNoise middleware..."
+sed -i "s/'django.middleware.security.SecurityMiddleware',/'django.middleware.security.SecurityMiddleware',\n    'whitenoise.middleware.WhiteNoiseMiddleware',/" /app/webcrm/settings.py
+
+# Add CSRF trusted origins
+if [ -n "$DJANGO_ALLOWED_HOSTS" ]; then
+    echo "Adding CSRF_TRUSTED_ORIGINS..."
+    CSRF_ORIGINS=$(echo "$DJANGO_ALLOWED_HOSTS" | sed "s/,/', 'https:\/\//g" | sed "s/^/'https:\/\//;s/$/'/")
+    echo "CSRF_TRUSTED_ORIGINS = [$CSRF_ORIGINS]" >> /app/webcrm/settings.py
+fi
+
 # Configure PostgreSQL database
 if [ -n "$POSTGRES_HOST" ]; then
     echo "Patching DATABASE settings for PostgreSQL..."
@@ -75,10 +86,17 @@ username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
 email = os.environ.get('DJANGO_SUPERUSER_EMAIL')
 password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
 if not User.objects.filter(username=username).exists():
-    User.objects.create_superuser(username, email, password)
-    print('Superuser created.')
+    user = User.objects.create_superuser(username, email, password)
+    # Create UserProfile for the superuser
+    from common.models import UserProfile
+    UserProfile.objects.get_or_create(user=user)
+    print('Superuser and profile created.')
 else:
-    print('Superuser already exists.')
+    # Ensure profile exists for existing superuser
+    user = User.objects.get(username=username)
+    from common.models import UserProfile
+    UserProfile.objects.get_or_create(user=user)
+    print('Superuser already exists, profile ensured.')
 " || true
 fi
 
