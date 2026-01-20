@@ -148,6 +148,22 @@ The cluster infrastructure is fully automated with Terraform and GitHub Actions:
   - SOPS-encrypted admin credentials
   - Ready for cluster monitoring setup
 
+### [Django CRM](apps/base/django-crm/)
+**Customer Relationship Management** - Open-source CRM for managing contacts, leads, and opportunities
+
+- **URL**: https://immomo.kubetest.uk
+- **Image**: `ghcr.io/alexbenisch/django-crm:latest` (GitHub Container Registry)
+- **Database**: PostgreSQL 16 with persistent storage (5Gi)
+- **Access**: Public (via Traefik ingress)
+- **Features**:
+  - Contact and account management
+  - Lead tracking and conversion
+  - Opportunity pipeline management
+  - Task and activity tracking
+  - Team collaboration features
+  - Django admin interface
+  - SOPS-encrypted credentials
+
 ---
 
 ## 🏨 Hotel Management Package
@@ -666,6 +682,7 @@ homelab-demo/
 │   │   ├── cluster-dashboard/ # Cluster dashboard app
 │   │   ├── demo-api/      # Demo FastAPI application
 │   │   ├── demo-django/   # Demo Django application
+│   │   ├── django-crm/    # Django CRM application
 │   │   ├── grafana/       # Grafana monitoring
 │   │   ├── hotel-package/ # Hotel suite landing page
 │   │   ├── linkding/      # Linkding bookmark manager
