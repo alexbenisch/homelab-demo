@@ -15,5 +15,6 @@ spec:
             solverName: hetzner
             config:
               secretName: hetzner-secret
+              secretNamespace: cert-manager
               zoneName: k8s-demo.de
               apiUrl: https://api.hetzner.cloud/v1
