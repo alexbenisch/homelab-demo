@@ -4,3 +4,6 @@ resources:
   - namespace.yaml
   - repository.yaml
   - release.yaml
+  - webhook-repository.yaml
+  - webhook-release.yaml
+  - hetzner-secret.yaml
