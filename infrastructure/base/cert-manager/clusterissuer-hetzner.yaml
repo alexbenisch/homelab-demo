@@ -16,4 +16,4 @@ spec:
             config:
               secretName: hetzner-secret
               zoneName: k8s-demo.de
-              apiUrl: https://dns.hetzner.com/api/v1
+              apiUrl: https://api.hetzner.cloud/v1
