@@ -5,9 +5,9 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
-    # Enable ACME (Let's Encrypt) with multiple DNS challenge providers
+    # Enable ACME (Let's Encrypt) certificate resolvers
     additionalArguments:
-      # Cloudflare resolver (for kubetest.uk and legacy k8s-demo.de certs)
+      # Cloudflare resolver (for kubetest.uk domains only)
       - "--certificatesresolvers.letsencrypt.acme.email=alexander.benisch@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"

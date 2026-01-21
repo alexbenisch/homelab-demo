@@ -4,6 +4,16 @@
 
 Migrate TLS certificate management from Traefik's built-in ACME to cert-manager with Hetzner DNS webhook for `k8s-demo.de` domains.
 
+## Migration Status: COMPLETE
+
+| Phase | Status |
+|-------|--------|
+| 1. Install cert-manager | Done |
+| 2. Install Hetzner webhook | Done |
+| 3. Create ClusterIssuer | Done |
+| 4. Migrate ingresses | Done (8 services) |
+| 5. Cleanup | Done |
+
 ## Current State
 
 ### Certificate Resolvers (Traefik)
@@ -201,10 +211,12 @@ spec:
 
 **Task:** `homelab-demo-4ms`
 
-1. Remove Traefik Cloudflare certresolver config (keep for kubetest.uk or migrate too)
-2. Delete old acme.json entries for k8s-demo.de
-3. Remove hetzner-secret.yaml from Traefik (no longer needed)
-4. Update documentation
+**Completed:**
+- [x] Keep Traefik Cloudflare certresolver for kubetest.uk domains
+- [x] Remove hetzner-secret.yaml from Traefik (was unused)
+- [x] Remove helmchartconfig.yaml.backup
+- [x] Update helmchartconfig.yaml comments to clarify Cloudflare is kubetest.uk only
+- [ ] Delete old acme.json entries for k8s-demo.de (manual task on cluster)
 
 ## Rollback Plan
 
