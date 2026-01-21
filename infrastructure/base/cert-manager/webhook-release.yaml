@@ -16,5 +16,3 @@ spec:
         name: cert-manager-webhook-hetzner
         namespace: cert-manager
       interval: 12h
-  values:
-    groupName: acme.k8s-demo.de

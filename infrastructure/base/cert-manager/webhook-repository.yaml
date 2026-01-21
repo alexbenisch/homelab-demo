@@ -5,4 +5,4 @@ metadata:
   namespace: cert-manager
 spec:
   interval: 24h
-  url: https://vadimkim.github.io/cert-manager-webhook-hetzner
+  url: https://charts.hetzner.cloud

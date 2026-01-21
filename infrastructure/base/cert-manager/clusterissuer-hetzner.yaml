@@ -11,10 +11,9 @@ spec:
     solvers:
       - dns01:
           webhook:
-            groupName: acme.k8s-demo.de
+            groupName: acme.hetzner.com
             solverName: hetzner
             config:
-              secretName: hetzner-secret
-              secretNamespace: cert-manager
-              zoneName: k8s-demo.de
-              apiUrl: https://api.hetzner.cloud/v1
+              tokenSecretKeyRef:
+                name: hetzner-secret
+                key: token
