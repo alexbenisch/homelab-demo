@@ -5,8 +5,12 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: demo-django.k8s-demo.de
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-hetzner
 spec:
+  tls:
+    - hosts:
+        - demo-django.k8s-demo.de
+      secretName: demo-django-tls
   rules:
     - host: demo-django.k8s-demo.de
       http:

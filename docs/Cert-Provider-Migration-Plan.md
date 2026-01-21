@@ -183,19 +183,19 @@ spec:
 
 **Migration checklist:**
 
-- [ ] linkding.k8s-demo.de
-- [ ] demo-api.k8s-demo.de
-- [ ] demo-django.k8s-demo.de
-- [ ] tested-django.k8s-demo.de
-- [ ] wordpress.k8s-demo.de
-- [ ] grafana.k8s-demo.de
-- [ ] prometheus.k8s-demo.de
-- [ ] freelance-radar.k8s-demo.de
-- [ ] nexus.k8s-demo.de
-- [ ] registry.k8s-demo.de
-- [ ] dashboard.k8s-demo.de
-- [ ] docker.nexus.k8s-demo.de
-- [ ] docker-registry.k8s-demo.de
+- [x] linkding.k8s-demo.de
+- [x] demo-api.k8s-demo.de
+- [x] demo-django.k8s-demo.de
+- [x] tested-django.k8s-demo.de
+- [x] wordpress.k8s-demo.de
+- [x] grafana.k8s-demo.de
+- [x] prometheus.k8s-demo.de
+- [x] freelance-radar.k8s-demo.de
+- [ ] ~~nexus.k8s-demo.de~~ (not found in repo)
+- [ ] ~~registry.k8s-demo.de~~ (not found in repo)
+- [ ] ~~dashboard.k8s-demo.de~~ (not found in repo)
+- [ ] ~~docker.nexus.k8s-demo.de~~ (not found in repo)
+- [ ] ~~docker-registry.k8s-demo.de~~ (not found in repo)
 
 ### Phase 5: Cleanup
 

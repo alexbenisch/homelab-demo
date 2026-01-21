@@ -5,8 +5,12 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: wordpress.k8s-demo.de
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-hetzner
 spec:
+  tls:
+    - hosts:
+        - wordpress.k8s-demo.de
+      secretName: wordpress-tls
   rules:
     - host: wordpress.k8s-demo.de
       http:

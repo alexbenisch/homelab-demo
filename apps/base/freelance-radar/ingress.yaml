@@ -6,8 +6,12 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: freelance-radar.k8s-demo.de
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-hetzner
 spec:
+  tls:
+    - hosts:
+        - freelance-radar.k8s-demo.de
+      secretName: freelance-radar-tls
   rules:
     - host: freelance-radar.k8s-demo.de
       http:

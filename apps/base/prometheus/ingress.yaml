@@ -6,9 +6,13 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: prometheus.k8s-demo.de
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
     traefik.ingress.kubernetes.io/router.middlewares: prometheus-prometheus-auth@kubernetescrd
+    cert-manager.io/cluster-issuer: letsencrypt-hetzner
 spec:
+  tls:
+    - hosts:
+        - prometheus.k8s-demo.de
+      secretName: prometheus-tls
   rules:
     - host: prometheus.k8s-demo.de
       http:
