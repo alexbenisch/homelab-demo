@@ -5,8 +5,12 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: immomo.kubetest.uk
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
+  tls:
+    - hosts:
+        - immomo.kubetest.uk
+      secretName: django-crm-tls
   rules:
     - host: immomo.kubetest.uk
       http:

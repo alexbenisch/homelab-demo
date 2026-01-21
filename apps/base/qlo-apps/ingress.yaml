@@ -6,8 +6,12 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: qloapps.kubetest.uk
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
+  tls:
+    - hosts:
+        - qloapps.kubetest.uk
+      secretName: qlo-apps-tls
   rules:
     - host: qloapps.kubetest.uk
       http:

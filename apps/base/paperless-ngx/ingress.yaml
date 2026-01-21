@@ -6,8 +6,12 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: paperless.kubetest.uk
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
+  tls:
+    - hosts:
+        - paperless.kubetest.uk
+      secretName: paperless-ngx-tls
   rules:
     - host: paperless.kubetest.uk
       http:

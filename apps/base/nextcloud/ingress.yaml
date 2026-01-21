@@ -6,8 +6,12 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: nextcloud.kubetest.uk
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
+  tls:
+    - hosts:
+        - nextcloud.kubetest.uk
+      secretName: nextcloud-tls
   rules:
     - host: nextcloud.kubetest.uk
       http:
