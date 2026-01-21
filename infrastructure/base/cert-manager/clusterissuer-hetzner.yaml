@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-hetzner
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: alexander.benisch@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-hetzner-account-key
+    solvers:
+      - dns01:
+          webhook:
+            groupName: acme.k8s-demo.de
+            solverName: hetzner
+            config:
+              secretName: hetzner-secret
+              zoneName: k8s-demo.de
+              apiUrl: https://dns.hetzner.com/api/v1

@@ -7,3 +7,5 @@ resources:
   - webhook-repository.yaml
   - webhook-release.yaml
   - hetzner-secret.yaml
+  - clusterissuer-hetzner.yaml
+  - clusterissuer-hetzner-staging.yaml
