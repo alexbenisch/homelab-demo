@@ -13,12 +13,11 @@ spec:
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
-      # Hetzner Cloud resolver (for k8s-demo.de - new certs)
-      - "--certificatesresolvers.letsencrypt-hetzner.acme.email=alexander.benisch@gmail.com"
-      - "--certificatesresolvers.letsencrypt-hetzner.acme.storage=/data/acme-hetzner.json"
-      - "--certificatesresolvers.letsencrypt-hetzner.acme.dnschallenge=true"
-      - "--certificatesresolvers.letsencrypt-hetzner.acme.dnschallenge.provider=hcloud"
-      - "--certificatesresolvers.letsencrypt-hetzner.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+      # HTTP-01 resolver (for k8s-demo.de - new certs, no DNS provider needed)
+      - "--certificatesresolvers.letsencrypt-http.acme.email=alexander.benisch@gmail.com"
+      - "--certificatesresolvers.letsencrypt-http.acme.storage=/data/acme-http.json"
+      - "--certificatesresolvers.letsencrypt-http.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt-http.acme.httpchallenge.entrypoint=web"
 
     # API tokens from secrets
     env:
@@ -27,11 +26,6 @@ spec:
           secretKeyRef:
             name: cloudflare-traefik
             key: CF_API_TOKEN
-      - name: HCLOUD_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: hetzner-traefik
-            key: HCLOUD_TOKEN
 
     # Ensure persistent storage for certificates
     persistence:
