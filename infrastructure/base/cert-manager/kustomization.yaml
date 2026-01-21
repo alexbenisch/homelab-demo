@@ -9,3 +9,5 @@ resources:
   - hetzner-secret.yaml
   - clusterissuer-hetzner.yaml
   - clusterissuer-hetzner-staging.yaml
+  - cloudflare-secret.yaml
+  - clusterissuer-cloudflare.yaml
