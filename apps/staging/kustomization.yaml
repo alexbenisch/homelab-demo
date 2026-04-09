@@ -20,7 +20,7 @@ resources:
   - nextcloud
   - mattermost
   - qlo-apps
-  - hotel-package
+
   - django-crm
   - wp-ai-chatbot-redirect
   - keycloak
