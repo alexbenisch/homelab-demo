@@ -5,3 +5,5 @@ resources:
   - repository.yaml
   - release.yaml
   - cloudflare-secret.yaml
+  - hetzner-secret.yaml
+  - release-hetzner.yaml
