@@ -18,7 +18,7 @@ resources:
   - tempo
   - paperless-ngx
   - nextcloud
-  - mattermost
+
   - qlo-apps
 
   - django-crm
