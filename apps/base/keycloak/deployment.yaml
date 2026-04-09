@@ -50,19 +50,19 @@ spec:
               memory: 1Gi
           startupProbe:
             httpGet:
-              path: /health/ready
+              path: /realms/master
               port: 8080
             failureThreshold: 60
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /health/ready
+              path: /realms/master
               port: 8080
             periodSeconds: 10
             failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /health/live
+              path: /realms/master
               port: 8080
             periodSeconds: 15
           volumeMounts:
