@@ -32,3 +32,8 @@ spec:
       enabled: true
       path: /data
       size: 128Mi
+
+    # Preserve real client IP through the load balancer
+    service:
+      spec:
+        externalTrafficPolicy: Local
