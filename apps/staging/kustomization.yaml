@@ -6,8 +6,6 @@ resources:
   - demo-api
   - cluster-dashboard
   - demo-django
-  - tested-django
-  - wordpress
   - freelance-radar
   - grafana
   - prometheus
@@ -15,7 +13,6 @@ resources:
   - kube-state-metrics
   - loki
   - promtail
-  - tempo
 
   - wp-ai-chatbot-redirect
   - keycloak
