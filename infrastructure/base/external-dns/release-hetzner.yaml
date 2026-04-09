@@ -26,9 +26,9 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: hetzner-dns-api
-                key: HETZNER_TOKEN
-          - name: HETZNER_ZONE_ID
-            value: "733578"
+                key: api-key
+          - name: USE_CLOUD_API
+            value: "true"
         livenessProbe:
           httpGet:
             path: /healthz
