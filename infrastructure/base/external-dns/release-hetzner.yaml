@@ -31,13 +31,13 @@ spec:
             value: "true"
         livenessProbe:
           httpGet:
-            path: /healthz
+            path: /health
             port: http-webhook
           initialDelaySeconds: 10
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /readyz
+            path: /ready
             port: http-webhook
           initialDelaySeconds: 10
           timeoutSeconds: 5
@@ -48,3 +48,5 @@ spec:
     sources:
       - ingress
     interval: 2m
+    extraArgs:
+      - "--txt-prefix=reg-%{record_type}."
