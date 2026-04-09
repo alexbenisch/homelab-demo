@@ -23,7 +23,4 @@ spec:
       name: tailscale-oauth
       valuesKey: client_secret
       targetPath: oauth.clientSecret
-  values:
-    operatorConfig:
-      defaultTags:
-        - tag:homelab-demo
+  values: {}
