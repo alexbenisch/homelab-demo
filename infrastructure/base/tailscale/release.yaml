@@ -14,16 +14,16 @@ spec:
         name: tailscale
         namespace: tailscale
       interval: 24h
+  valuesFrom:
+    - kind: Secret
+      name: tailscale-oauth
+      valuesKey: client_id
+      targetPath: oauth.clientId
+    - kind: Secret
+      name: tailscale-oauth
+      valuesKey: client_secret
+      targetPath: oauth.clientSecret
   values:
-    oauth:
-      clientId:
-        secretKeyRef:
-          name: tailscale-oauth
-          key: client_id
-      clientSecret:
-        secretKeyRef:
-          name: tailscale-oauth
-          key: client_secret
     operatorConfig:
       defaultTags:
         - tag:homelab-demo
