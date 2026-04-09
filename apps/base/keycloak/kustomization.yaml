@@ -9,5 +9,5 @@ resources:
   - secret.yaml
   - deployment.yaml
   - service.yaml
-  - middleware-tailscale.yaml
+  - middlewares.yaml
   - ingress.yaml

@@ -37,3 +37,9 @@ spec:
     service:
       spec:
         externalTrafficPolicy: Local
+
+    # Redirect all HTTP to HTTPS globally
+    ports:
+      web:
+        redirectTo:
+          port: websecure
