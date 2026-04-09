@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tailscale-operator
+  namespace: tailscale
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: tailscale-operator
+      version: "1.x"
+      sourceRef:
+        kind: HelmRepository
+        name: tailscale
+        namespace: tailscale
+      interval: 24h
+  values:
+    oauth:
+      clientId:
+        secretKeyRef:
+          name: tailscale-oauth
+          key: client_id
+      clientSecret:
+        secretKeyRef:
+          name: tailscale-oauth
+          key: client_secret
+    operatorConfig:
+      defaultTags:
+        - tag:homelab-demo

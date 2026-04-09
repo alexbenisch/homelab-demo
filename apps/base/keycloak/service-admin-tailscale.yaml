@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-admin-tailscale
+  namespace: keycloak
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: keycloak-admin
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    app: keycloak
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

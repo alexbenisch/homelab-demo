@@ -11,3 +11,4 @@ resources:
   - service.yaml
   - middlewares.yaml
   - ingress.yaml
+  - service-admin-tailscale.yaml
