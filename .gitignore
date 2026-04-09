@@ -36,6 +36,7 @@ override.tf.json
 # example: *tfplan*
 
 DOCKER-REGISTRY-SETUP.md
+docs/keycloak-deployment-manifest-v2.md
 
 # Ignore CLI configuration files
 .terraformrc
