@@ -16,11 +16,6 @@ resources:
   - loki
   - promtail
   - tempo
-  - paperless-ngx
-  - nextcloud
 
-  - qlo-apps
-
-  - django-crm
   - wp-ai-chatbot-redirect
   - keycloak
