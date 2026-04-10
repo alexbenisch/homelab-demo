@@ -1,22 +1,15 @@
 apiVersion: v1
-kind: ConfigMap
+kind: Service
 metadata:
-  name: cluster-dashboard-tailscale-config
-data:
-  serve.json: |
-    {
-      "TCP": {
-        "443": {
-          "HTTPS": true
-        }
-      },
-      "Web": {
-        "cluster-dashboard.tail55277.ts.net:443": {
-          "Handlers": {
-            "/": {
-              "Proxy": "http://127.0.0.1:8000"
-            }
-          }
-        }
-      }
-    }
+  name: cluster-dashboard-tailscale
+  annotations:
+    tailscale.com/hostname: cluster-dashboard
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    app: cluster-dashboard
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8000

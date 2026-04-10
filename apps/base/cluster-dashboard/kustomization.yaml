@@ -9,5 +9,4 @@ resources:
   - rbac.yaml
   - deployment.yaml
   - service.yaml
-  - secret.yaml
   - tailscale-config.yaml
