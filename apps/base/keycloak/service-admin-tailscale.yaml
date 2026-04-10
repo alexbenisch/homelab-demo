@@ -1,17 +1,21 @@
-apiVersion: v1
-kind: Service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: keycloak-admin-tailscale
-  namespace: keycloak
   annotations:
-    tailscale.com/expose: "true"
     tailscale.com/hostname: keycloak-admin
 spec:
-  type: LoadBalancer
-  loadBalancerClass: tailscale
-  selector:
-    app: keycloak
-  ports:
-    - name: https
-      port: 443
-      targetPort: 8080
+  ingressClassName: tailscale
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - keycloak-admin
