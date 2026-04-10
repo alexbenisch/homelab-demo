@@ -38,8 +38,6 @@ spec:
               value: auth.kubetest.uk
             - name: KC_HOSTNAME_STRICT
               value: "true"
-            - name: KC_HOSTNAME_ADMIN
-              value: keycloak-admin.tail55277.ts.net
             - name: KC_DB
               value: postgres
             - name: KC_DB_URL
