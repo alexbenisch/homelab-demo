@@ -30,5 +30,4 @@ spec:
     stsPreload: true
     contentTypeNosniff: true
     browserXssFilter: true
-    frameDeny: true
     referrerPolicy: strict-origin-when-cross-origin
