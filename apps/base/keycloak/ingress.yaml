@@ -6,7 +6,7 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: auth.kubetest.uk
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.middlewares: keycloak-keycloak-ratelimit@kubernetescrd,keycloak-keycloak-headers@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: keycloak-keycloak-headers@kubernetescrd
     cert-manager.io/cluster-issuer: letsencrypt-cloudflare
 spec:
   tls:
@@ -25,6 +25,32 @@ spec:
                 port:
                   number: 8080
           - path: /resources
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloak-token-ratelimit
+  namespace: keycloak
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: keycloak-keycloak-headers@kubernetescrd,keycloak-keycloak-ratelimit@kubernetescrd
+    traefik.ingress.kubernetes.io/router.priority: "10"
+spec:
+  tls:
+    - hosts:
+        - auth.kubetest.uk
+      secretName: keycloak-tls
+  rules:
+    - host: auth.kubetest.uk
+      http:
+        paths:
+          - path: /realms/demo/protocol/openid-connect/token
             pathType: Prefix
             backend:
               service:
