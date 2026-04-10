@@ -37,7 +37,7 @@ spec:
             - name: KC_HOSTNAME_STRICT
               value: "true"
             - name: KC_HOSTNAME_ADMIN
-              value: http://keycloak-admin.tail55277.ts.net:8080
+              value: keycloak-admin.tail55277.ts.net
             - name: KC_DB
               value: postgres
             - name: KC_DB_URL
