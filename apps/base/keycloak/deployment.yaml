@@ -36,6 +36,8 @@ spec:
               value: https://auth.kubetest.uk
             - name: KC_HOSTNAME_STRICT
               value: "true"
+            - name: KC_HOSTNAME_ADMIN
+              value: http://keycloak-admin.tail55277.ts.net:8080
             - name: KC_DB
               value: dev-file
           ports:
