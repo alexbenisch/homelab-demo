@@ -24,7 +24,7 @@ spec:
                 name: keycloak
                 port:
                   number: 8080
-          - path: /realms/master/protocol/openid-connect
+          - path: /realms/master
             pathType: Prefix
             backend:
               service:
