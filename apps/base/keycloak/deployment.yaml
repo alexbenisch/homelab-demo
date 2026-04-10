@@ -28,6 +28,8 @@ spec:
                 secretKeyRef:
                   name: keycloak-credentials
                   key: admin-password
+            - name: KC_LOG_LEVEL
+              value: "DEBUG"
             - name: KC_HTTP_ENABLED
               value: "true"
             - name: KC_PROXY_HEADERS
