@@ -1,0 +1,659 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: no-deposit-html
+  namespace: no-deposit
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP Concept — No-Deposit Rental Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --ink: #0f1117;
+        --paper: #f5f2eb;
+        --accent: #2d5a3d;
+        --accent-light: #4a8c61;
+        --gold: #c8a84b;
+        --muted: #6b6b6b;
+        --border: #d4cfc4;
+        --code-bg: #1a1d23;
+        --code-text: #a8d5b5;
+        --tag-bg: #e8f0eb;
+        --tag-text: #2d5a3d;
+        --warn: #8b4513;
+        --warn-bg: #fdf3e7;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.7; font-size: 15px; }
+      header { background: var(--ink); color: var(--paper); padding: 3rem 4rem 2.5rem; position: relative; overflow: hidden; }
+      header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; border: 1px solid rgba(200,168,75,0.2); }
+      header::after { content: ''; position: absolute; top: -30px; right: -30px; width: 200px; height: 200px; border-radius: 50%; border: 1px solid rgba(200,168,75,0.12); }
+      .header-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; margin-bottom: 1rem; }
+      header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.15; font-weight: 400; margin-bottom: 1.5rem; max-width: 700px; }
+      header h1 em { font-style: italic; color: var(--gold); }
+      .header-meta { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+      .meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+      .meta-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: rgba(245,242,235,0.4); text-transform: uppercase; }
+      .meta-value { font-size: 14px; color: var(--paper); font-weight: 500; }
+      main { max-width: 960px; margin: 0 auto; padding: 4rem 2rem; }
+      section { margin-bottom: 4rem; animation: fadeUp 0.5s ease both; }
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+      section:nth-child(1) { animation-delay: 0.05s; }
+      section:nth-child(2) { animation-delay: 0.1s; }
+      section:nth-child(3) { animation-delay: 0.15s; }
+      section:nth-child(4) { animation-delay: 0.2s; }
+      section:nth-child(5) { animation-delay: 0.25s; }
+      section:nth-child(6) { animation-delay: 0.3s; }
+      .section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.6rem; }
+      .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); max-width: 80px; }
+      h2 { font-family: 'DM Serif Display', serif; font-size: 1.9rem; font-weight: 400; margin-bottom: 1.5rem; line-height: 1.25; }
+      h3 { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.75rem; margin-top: 1.5rem; }
+      p { margin-bottom: 1rem; color: #2a2a2a; }
+      .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+      .card { background: white; border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; position: relative; transition: box-shadow 0.2s, transform 0.2s; }
+      .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+      .card-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+      .card h4 { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--ink); }
+      .card p { font-size: 0.85rem; color: var(--muted); margin-bottom: 0; line-height: 1.6; }
+      .card .tag { position: absolute; top: 1rem; right: 1rem; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--tag-bg); color: var(--tag-text); padding: 2px 6px; border-radius: 2px; }
+      .stack-table { width: 100%; border-collapse: collapse; margin-top: 1.25rem; font-size: 0.88rem; }
+      .stack-table th { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0.5rem 1rem 0.5rem 0; border-bottom: 1px solid var(--border); }
+      .stack-table td { padding: 0.75rem 1rem 0.75rem 0; border-bottom: 1px solid var(--border); vertical-align: top; color: #2a2a2a; }
+      .stack-table tr:last-child td { border-bottom: none; }
+      .stack-table td:first-child { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--accent); white-space: nowrap; padding-right: 2rem; font-weight: 500; }
+      .stack-table td:nth-child(2) { font-weight: 500; color: var(--ink); white-space: nowrap; padding-right: 2rem; }
+      .code-block { background: var(--code-bg); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1rem 0; overflow-x: auto; }
+      .code-block pre { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--code-text); line-height: 1.8; white-space: pre; }
+      .code-comment { color: #4a6b55; }
+      .code-key { color: #7ec8a0; }
+      .code-val { color: #d4a860; }
+      .code-str { color: #c3dfa8; }
+      .code-kw { color: #8fbcbb; }
+      .timeline { margin-top: 1.5rem; position: relative; }
+      .timeline::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+      .tl-item { display: flex; gap: 1.5rem; margin-bottom: 2rem; position: relative; }
+      .tl-dot { width: 48px; height: 48px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 500; flex-shrink: 0; position: relative; z-index: 1; }
+      .tl-dot.phase-1 { background: var(--accent); }
+      .tl-dot.phase-2 { background: #3a5a8c; }
+      .tl-dot.phase-3 { background: var(--gold); color: var(--ink); }
+      .tl-content { padding-top: 0.6rem; flex: 1; }
+      .tl-content h4 { font-family: 'DM Sans', sans-serif; font-weight: 500; margin-bottom: 0.3rem; }
+      .tl-content ul { padding-left: 1.2rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+      .tl-duration { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+      .arch-diagram { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 2rem; margin-top: 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; line-height: 2; color: var(--ink); overflow-x: auto; }
+      .arch-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.4rem 0; flex-wrap: wrap; }
+      .arch-box { background: var(--tag-bg); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 3px; border: 1px solid var(--border); white-space: nowrap; font-size: 0.72rem; }
+      .arch-box.k8s { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+      .arch-box.keycloak { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+      .arch-box.db { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+      .arch-box.django { background: #fce4ec; color: #880e4f; border-color: #f48fb1; }
+      .arch-box.proxy { background: #ede7f6; color: #512da8; border-color: #c5b8e8; }
+      .arch-arrow { color: var(--muted); font-size: 1rem; }
+      .notice { background: var(--warn-bg); border-left: 3px solid var(--gold); border-radius: 0 4px 4px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: var(--warn); }
+      .notice strong { display: block; margin-bottom: 0.3rem; color: var(--warn); }
+      .endpoint-list { margin-top: 1rem; }
+      .endpoint { display: flex; align-items: baseline; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+      .endpoint:last-child { border-bottom: none; }
+      .method { font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 500; padding: 2px 6px; border-radius: 3px; min-width: 44px; text-align: center; }
+      .get    { background: #e8f5e9; color: #2e7d32; }
+      .post   { background: #e3f2fd; color: #1565c0; }
+      .put    { background: #fff3e0; color: #e65100; }
+      .delete { background: #fce4ec; color: #c62828; }
+      .ep-path { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--ink); min-width: 260px; }
+      .ep-desc { color: var(--muted); font-size: 0.82rem; }
+      .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+      .role-card { border: 1px solid var(--border); border-radius: 4px; padding: 1.25rem; background: white; }
+      .role-card h4 { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+      .role-card ul { list-style: none; font-size: 0.82rem; color: var(--muted); line-height: 1.9; }
+      .role-card ul li::before { content: '→ '; color: var(--accent-light); }
+      footer { background: var(--ink); color: rgba(245,242,235,0.5); text-align: center; padding: 2rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; }
+      footer strong { color: var(--gold); }
+      hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    </style>
+    </head>
+    <body>
+
+    <header>
+      <div class="header-label">MVP Concept · Technical Specification</div>
+      <h1>No-Deposit<em> </em>Rental Platform<br>Django · Keycloak · Kubernetes</h1>
+      <div class="header-meta">
+        <div class="meta-item">
+          <span class="meta-label">Duration</span>
+          <span class="meta-value">6 Months</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Phase</span>
+          <span class="meta-value">MVP → Beta</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Audience</span>
+          <span class="meta-value">Tenant · Landlord · Agency</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Auth</span>
+          <span class="meta-value">Keycloak · OIDC · SSO</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- BUSINESS CONTEXT -->
+      <section>
+        <div class="section-label">01 · Context</div>
+        <h2>Business Logic &amp; Actors</h2>
+        <p>The platform allows tenants to arrange their rental deposit digitally without having to provide the funds themselves. The agency acts as intermediary between tenant and landlord, issuing the guarantee in exchange for a fee.</p>
+
+        <div class="role-grid">
+          <div class="role-card">
+            <h4>Tenant</h4>
+            <ul>
+              <li>Registration &amp; KYC</li>
+              <li>Submit deposit application</li>
+              <li>Retrieve guarantee certificate</li>
+              <li>Manage payments</li>
+              <li>Status tracking</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <h4>Landlord</h4>
+            <ul>
+              <li>Validate guarantee</li>
+              <li>Report damage claim</li>
+              <li>Receive documents</li>
+              <li>Manage tenancy</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <h4>Agency (Admin)</h4>
+            <ul>
+              <li>Review &amp; approve applications</li>
+              <li>Risk assessment</li>
+              <li>Process damage claims</li>
+              <li>Reporting &amp; compliance</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <h4>System</h4>
+            <ul>
+              <li>Automated notifications</li>
+              <li>Payment processing</li>
+              <li>Document generation</li>
+              <li>Audit logging</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ARCHITECTURE -->
+      <section>
+        <div class="section-label">02 · Architecture</div>
+        <h2>System Architecture</h2>
+        <p>Single-cluster deployment on k3s (Hetzner). Keycloak and Django run as separate pods sharing the same PostgreSQL instance. oauth2-proxy handles OIDC session management in front of the application.</p>
+
+        <div class="arch-diagram">
+          <div class="arch-row">
+            <span style="color:var(--muted);font-size:0.7rem;min-width:80px">CLIENT</span>
+            <span class="arch-box">Browser</span>
+            <span class="arch-box">Mobile PWA</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-box k8s">Traefik (k8s Ingress)</span>
+          </div>
+          <div style="margin:0.5rem 0 0.5rem 80px;color:var(--muted);font-size:0.7rem">↓ HTTPS · nodeposit.kubetest.uk</div>
+          <div class="arch-row">
+            <span style="color:var(--muted);font-size:0.7rem;min-width:80px">PROXY</span>
+            <span class="arch-box proxy">oauth2-proxy (OIDC session)</span>
+            <span class="arch-arrow">←→</span>
+            <span class="arch-box keycloak">Keycloak (auth.kubetest.uk)</span>
+          </div>
+          <div style="margin:0.5rem 0 0.5rem 80px;color:var(--muted);font-size:0.7rem">↓ authenticated request</div>
+          <div class="arch-row">
+            <span style="color:var(--muted);font-size:0.7rem;min-width:80px">APP</span>
+            <span class="arch-box django">Django App (Pod)</span>
+            <span class="arch-arrow">←→</span>
+            <span class="arch-box k8s">Celery Worker (Pod)</span>
+            <span class="arch-arrow">←→</span>
+            <span class="arch-box k8s">Redis (Pod)</span>
+          </div>
+          <div style="margin:0.5rem 0 0.5rem 80px;color:var(--muted);font-size:0.7rem">↓ SQL &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓ Files</div>
+          <div class="arch-row">
+            <span style="color:var(--muted);font-size:0.7rem;min-width:80px">DATA</span>
+            <span class="arch-box db">PostgreSQL (Pod)</span>
+            <span class="arch-arrow">←→</span>
+            <span class="arch-box">S3 / MinIO (Documents)</span>
+          </div>
+          <div style="margin:0.5rem 0 0.5rem 80px;color:var(--muted);font-size:0.7rem">↓</div>
+          <div class="arch-row">
+            <span style="color:var(--muted);font-size:0.7rem;min-width:80px">EXTERNAL</span>
+            <span class="arch-box">SES (Email)</span>
+            <span class="arch-box">Stripe / SEPA</span>
+            <span class="arch-box">Credit Bureau API</span>
+          </div>
+        </div>
+
+        <div class="notice">
+          <strong>Deployment: Kubernetes (k3s on Hetzner)</strong>
+          Both Django and Keycloak run in the same k3s cluster. Keycloak uses PostgreSQL for persistent state. The Django app is stateless and scales via replica count. oauth2-proxy sits in front of the app and manages OIDC sessions so Django itself stays session-free.
+        </div>
+      </section>
+
+      <!-- TECH STACK -->
+      <section>
+        <div class="section-label">03 · Stack</div>
+        <h2>Technology Stack</h2>
+
+        <table class="stack-table">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Technology</th>
+              <th>Rationale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Backend Framework</td>
+              <td>Django 5.x + DRF</td>
+              <td>Mature ORM, admin panel out-of-the-box, compliance-friendly</td>
+            </tr>
+            <tr>
+              <td>Auth / IAM</td>
+              <td>Keycloak 24.x</td>
+              <td>SSO, OIDC, roles, MFA, social login — production-ready</td>
+            </tr>
+            <tr>
+              <td>OIDC Proxy</td>
+              <td>oauth2-proxy</td>
+              <td>Handles OIDC session in front of the app — Django stays stateless</td>
+            </tr>
+            <tr>
+              <td>App Hosting</td>
+              <td>k3s / Kubernetes</td>
+              <td>GitOps via Flux, scale with replicas, same cluster as Keycloak</td>
+            </tr>
+            <tr>
+              <td>Database</td>
+              <td>PostgreSQL 16</td>
+              <td>Shared cluster DB, separate schemas per service</td>
+            </tr>
+            <tr>
+              <td>Object Storage</td>
+              <td>AWS S3 / MinIO + django-storages</td>
+              <td>Guarantee documents, contracts, KYC uploads</td>
+            </tr>
+            <tr>
+              <td>Task Queue</td>
+              <td>Celery + Redis</td>
+              <td>Async: PDF generation, emails, payment reminders</td>
+            </tr>
+            <tr>
+              <td>Email</td>
+              <td>AWS SES</td>
+              <td>Transactional emails, templates, bounce handling</td>
+            </tr>
+            <tr>
+              <td>Payments</td>
+              <td>Stripe or Mollie</td>
+              <td>SEPA direct debit, credit card, webhooks</td>
+            </tr>
+            <tr>
+              <td>PDF Generation</td>
+              <td>WeasyPrint / ReportLab</td>
+              <td>Guarantee certificates from HTML templates</td>
+            </tr>
+            <tr>
+              <td>CI/CD</td>
+              <td>GitHub Actions → Flux</td>
+              <td>Test → Build → Push image → Flux reconciles</td>
+            </tr>
+            <tr>
+              <td>Monitoring</td>
+              <td>Sentry + Prometheus/Grafana</td>
+              <td>Error tracking, performance monitoring</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- KEYCLOAK CONFIG -->
+      <section>
+        <div class="section-label">04 · Auth</div>
+        <h2>Keycloak &amp; Authentication Flow</h2>
+
+        <h3>Realm Configuration</h3>
+        <div class="code-block"><pre><span class="code-comment"># Keycloak Realm: no-deposit</span>
+    <span class="code-key">realm</span>: <span class="code-str">no-deposit</span>
+    <span class="code-key">clients</span>:
+      - <span class="code-key">client_id</span>: <span class="code-str">no-deposit-app</span>
+        <span class="code-key">protocol</span>: <span class="code-str">openid-connect</span>
+        <span class="code-key">access_type</span>: <span class="code-str">confidential</span>
+        <span class="code-key">redirect_uris</span>:
+          - <span class="code-str">https://nodeposit.kubetest.uk/oauth2/callback</span>
+        <span class="code-key">scopes</span>: [<span class="code-str">openid</span>, <span class="code-str">profile</span>, <span class="code-str">email</span>, <span class="code-str">roles</span>]
+
+    <span class="code-key">roles</span>:
+      - <span class="code-str">tenant</span>       <span class="code-comment"># Submit applications, manage own data</span>
+      - <span class="code-str">landlord</span>     <span class="code-comment"># Validate guarantees, file claims</span>
+      - <span class="code-str">agent</span>        <span class="code-comment"># Review and approve applications</span>
+      - <span class="code-str">admin</span>        <span class="code-comment"># Full access, configuration</span>
+
+    <span class="code-key">mfa_policy</span>:
+      - <span class="code-str">agent</span>: required
+      - <span class="code-str">admin</span>: required
+      - <span class="code-str">tenant</span>: optional</pre></div>
+
+        <h3>Django OIDC Integration</h3>
+        <div class="code-block"><pre><span class="code-comment"># settings.py</span>
+    <span class="code-key">AUTHENTICATION_BACKENDS</span> = [
+        <span class="code-str">'mozilla_django_oidc.auth.OIDCAuthenticationBackend'</span>,
+    ]
+
+    <span class="code-key">OIDC_RP_CLIENT_ID</span>     = <span class="code-str">env('KEYCLOAK_CLIENT_ID')</span>
+    <span class="code-key">OIDC_RP_CLIENT_SECRET</span> = <span class="code-str">env('KEYCLOAK_CLIENT_SECRET')</span>
+    <span class="code-key">OIDC_OP_AUTHORIZATION_ENDPOINT</span> = (
+        <span class="code-str">'https://auth.kubetest.uk/realms/no-deposit'</span>
+        <span class="code-str">'/protocol/openid-connect/auth'</span>
+    )
+    <span class="code-key">OIDC_RP_SIGN_ALGO</span>     = <span class="code-str">'RS256'</span>
+    <span class="code-key">OIDC_VERIFY_SSL</span>       = <span class="code-val">True</span>
+
+    <span class="code-comment"># Map roles from JWT token to Django permissions</span>
+    <span class="code-kw">class</span> <span class="code-str">NoDepositOIDCBackend</span>(OIDCAuthenticationBackend):
+        <span class="code-kw">def</span> update_user(self, user, claims):
+            roles = claims.get(<span class="code-str">'realm_access'</span>, {}).get(<span class="code-str">'roles'</span>, [])
+            user.is_staff = <span class="code-str">'agent'</span> <span class="code-kw">in</span> roles <span class="code-kw">or</span> <span class="code-str">'admin'</span> <span class="code-kw">in</span> roles
+            user.save()
+            <span class="code-kw">return</span> user</pre></div>
+      </section>
+
+      <!-- API DESIGN -->
+      <section>
+        <div class="section-label">05 · API</div>
+        <h2>RESTful API Design</h2>
+        <p>All endpoints are JWT-secured (Bearer token from Keycloak). Role-based access control via DRF Permission Classes.</p>
+
+        <h3>Deposit Applications</h3>
+        <div class="endpoint-list">
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="ep-path">/api/v1/applications/</span>
+            <span class="ep-desc">Submit new deposit application (Tenant)</span>
+          </div>
+          <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="ep-path">/api/v1/applications/{id}/</span>
+            <span class="ep-desc">Retrieve application status</span>
+          </div>
+          <div class="endpoint">
+            <span class="method put">PATCH</span>
+            <span class="ep-path">/api/v1/applications/{id}/review/</span>
+            <span class="ep-desc">Review / approve application (Agent)</span>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="ep-path">/api/v1/applications/{id}/documents/</span>
+            <span class="ep-desc">Upload KYC documents (→ S3)</span>
+          </div>
+        </div>
+
+        <h3>Guarantees</h3>
+        <div class="endpoint-list">
+          <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="ep-path">/api/v1/guarantees/{id}/</span>
+            <span class="ep-desc">Retrieve guarantee details</span>
+          </div>
+          <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="ep-path">/api/v1/guarantees/{id}/certificate/</span>
+            <span class="ep-desc">Generate &amp; download PDF certificate</span>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="ep-path">/api/v1/guarantees/{id}/validate/</span>
+            <span class="ep-desc">Validate guarantee (Landlord via token)</span>
+          </div>
+        </div>
+
+        <h3>Damage Claims</h3>
+        <div class="endpoint-list">
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="ep-path">/api/v1/claims/</span>
+            <span class="ep-desc">File a damage claim (Landlord)</span>
+          </div>
+          <div class="endpoint">
+            <span class="method put">PATCH</span>
+            <span class="ep-path">/api/v1/claims/{id}/decision/</span>
+            <span class="ep-desc">Make decision on claim (Agent)</span>
+          </div>
+        </div>
+
+        <h3>Payments</h3>
+        <div class="endpoint-list">
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="ep-path">/api/v1/payments/intent/</span>
+            <span class="ep-desc">Create Stripe Payment Intent</span>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="ep-path">/api/v1/webhooks/stripe/</span>
+            <span class="ep-desc">Stripe webhook (payment confirmation)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- DATA MODEL -->
+      <section>
+        <div class="section-label">06 · Data Model</div>
+        <h2>Core Models (Django ORM)</h2>
+
+        <div class="code-block"><pre><span class="code-comment"># models.py (simplified)</span>
+
+    <span class="code-kw">class</span> <span class="code-str">UserProfile</span>(models.Model):
+        user        = models.OneToOneField(User, ...)
+        keycloak_id = models.UUIDField(unique=True)   <span class="code-comment"># Keycloak sub claim</span>
+        role        = models.CharField(choices=ROLES)  <span class="code-comment"># tenant/landlord/agent</span>
+        kyc_status  = models.CharField(choices=KYC_STATUS)
+        credit_score = models.IntegerField(null=True)
+
+    <span class="code-kw">class</span> <span class="code-str">RentalApplication</span>(models.Model):
+        applicant   = models.ForeignKey(UserProfile, ...)
+        landlord    = models.ForeignKey(UserProfile, ...)
+        address     = models.TextField()
+        rent_amount = models.DecimalField(max_digits=10, decimal_places=2)
+        deposit_amt = models.DecimalField(...)         <span class="code-comment"># typically 3x monthly rent</span>
+        status      = models.CharField(choices=STATUS) <span class="code-comment"># pending/approved/rejected</span>
+        created_at  = models.DateTimeField(auto_now_add=True)
+
+    <span class="code-kw">class</span> <span class="code-str">Guarantee</span>(models.Model):
+        application    = models.OneToOneField(RentalApplication, ...)
+        certificate_no = models.CharField(unique=True)
+        valid_from     = models.DateField()
+        valid_until    = models.DateField()
+        s3_key         = models.CharField()            <span class="code-comment"># PDF in S3</span>
+        validate_token = models.UUIDField(default=uuid4) <span class="code-comment"># landlord validation link</span>
+
+    <span class="code-kw">class</span> <span class="code-str">Claim</span>(models.Model):
+        guarantee   = models.ForeignKey(Guarantee, ...)
+        claimant    = models.ForeignKey(UserProfile, ...)
+        amount      = models.DecimalField(...)
+        description = models.TextField()
+        status      = models.CharField(choices=CLAIM_STATUS)
+        documents   = models.ManyToManyField('Document')</pre></div>
+      </section>
+
+      <!-- CI/CD -->
+      <section>
+        <div class="section-label">07 · CI/CD</div>
+        <h2>Deployment Pipeline</h2>
+
+        <div class="code-block"><pre><span class="code-comment"># .github/workflows/deploy.yml</span>
+    <span class="code-key">name</span>: <span class="code-str">CI/CD Pipeline</span>
+    <span class="code-key">on</span>:
+      <span class="code-key">push</span>: { <span class="code-key">branches</span>: [<span class="code-str">main</span>, <span class="code-str">staging</span>] }
+      <span class="code-key">pull_request</span>: { <span class="code-key">branches</span>: [<span class="code-str">main</span>] }
+
+    <span class="code-key">jobs</span>:
+      <span class="code-key">test</span>:
+        <span class="code-key">runs-on</span>: <span class="code-str">ubuntu-latest</span>
+        <span class="code-key">steps</span>:
+          - <span class="code-key">name</span>: <span class="code-str">Django Tests + Coverage</span>
+            <span class="code-key">run</span>: |
+              pytest --cov=. --cov-fail-under=80
+              bandit -r . -x tests/          <span class="code-comment"># Security scan</span>
+
+      <span class="code-key">deploy</span>:
+        <span class="code-key">needs</span>: test
+        <span class="code-key">if</span>: <span class="code-str">github.ref == 'refs/heads/main'</span>
+        <span class="code-key">steps</span>:
+          - <span class="code-key">name</span>: <span class="code-str">Build &amp; Push image to GHCR</span>
+            <span class="code-key">run</span>: |
+              docker build -t ghcr.io/alexbenisch/no-deposit:$SHA .
+              docker push ghcr.io/alexbenisch/no-deposit:$SHA
+          - <span class="code-key">name</span>: <span class="code-str">Flux reconciles automatically</span>
+            <span class="code-comment"># ImageUpdateAutomation patches deployment.yaml → git push → Flux applies</span></pre></div>
+      </section>
+
+      <!-- TIMELINE -->
+      <section>
+        <div class="section-label">08 · Roadmap</div>
+        <h2>Development Roadmap</h2>
+
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot phase-1">W1–4</div>
+            <div class="tl-content">
+              <div class="tl-duration">Month 1 — Foundation</div>
+              <h4>Auth Foundation &amp; Core API</h4>
+              <ul>
+                <li>Set up Keycloak realm, clients, and role configuration</li>
+                <li>Django project with OIDC integration and role model</li>
+                <li>Data models: UserProfile, RentalApplication, Guarantee</li>
+                <li>CI pipeline: GitHub Actions — test, lint, security scan</li>
+                <li>Kubernetes manifests, Flux GitOps, staging + production</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot phase-1">W5–8</div>
+            <div class="tl-content">
+              <div class="tl-duration">Month 2 — Core Features</div>
+              <h4>Application &amp; Document Flow</h4>
+              <ul>
+                <li>Full application API (submit → review → approve)</li>
+                <li>KYC document upload to S3 (django-storages)</li>
+                <li>PDF guarantee certificate generation (WeasyPrint)</li>
+                <li>Email notifications via SES + Celery</li>
+                <li>Django admin for agent workflow</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot phase-2">W9–12</div>
+            <div class="tl-content">
+              <div class="tl-duration">Month 3 — Payments &amp; Landlord</div>
+              <h4>Payment Processing &amp; Landlord Portal</h4>
+              <ul>
+                <li>Stripe integration: SEPA direct debit, Payment Intents</li>
+                <li>Landlord onboarding + guarantee validation</li>
+                <li>Damage claim workflow (Claim API)</li>
+                <li>Webhook handler (Stripe, idempotent)</li>
+                <li>Audit log for all critical actions</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot phase-2">W13–16</div>
+            <div class="tl-content">
+              <div class="tl-duration">Month 4 — Hardening</div>
+              <h4>Security &amp; Compliance</h4>
+              <ul>
+                <li>Enforce MFA for agent/admin roles in Keycloak</li>
+                <li>GDPR: data export, deletion requests, privacy policy</li>
+                <li>Rate limiting, API throttling (DRF)</li>
+                <li>Penetration testing preparation (OWASP Top 10 checklist)</li>
+                <li>Sentry error tracking, structured logging</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot phase-3">W17–20</div>
+            <div class="tl-content">
+              <div class="tl-duration">Month 5–6 — Beta &amp; Scale</div>
+              <h4>Beta Launch &amp; Extensions</h4>
+              <ul>
+                <li>Closed beta with first tenants and landlords</li>
+                <li>Feedback iteration, performance optimisation</li>
+                <li>Credit bureau API integration for creditworthiness checks</li>
+                <li>Reporting dashboard for agency (Grafana or Metabase)</li>
+                <li>Handover documentation, runbooks</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECURITY -->
+      <section>
+        <div class="section-label">09 · Security</div>
+        <h2>Security by Design</h2>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-icon">🔐</div>
+            <div class="tag">Auth</div>
+            <h4>Zero-Trust Token Validation</h4>
+            <p>Every API request validates the JWT against Keycloak JWKS. No session cookie, no server-side state.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🛡️</div>
+            <div class="tag">GDPR</div>
+            <h4>Data Minimisation</h4>
+            <p>KYC documents stored in S3 only, accessed via pre-signed URLs. No PII in logs. Encryption at rest.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🔒</div>
+            <div class="tag">Secrets</div>
+            <h4>Encrypted Secrets (SOPS)</h4>
+            <p>All credentials (DB, Stripe, Keycloak) encrypted with SOPS/age in git. No hardcoding, rotation documented.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">📋</div>
+            <div class="tag">Audit</div>
+            <h4>Complete Audit Log</h4>
+            <p>Every status change on applications, guarantees, and claims recorded with user ID, timestamp, and IP in an immutable table.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🧱</div>
+            <div class="tag">Network</div>
+            <h4>Network Isolation</h4>
+            <p>Keycloak admin console behind Tailscale only. Database not exposed externally. Namespaced deployments with NetworkPolicies.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <div class="tag">API</div>
+            <h4>Rate Limiting &amp; Throttling</h4>
+            <p>DRF throttling per user/IP. Login endpoints protected with brute-force policy via Keycloak.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      Concept document for <strong>No-Deposit Rental Platform MVP</strong> &nbsp;·&nbsp; Django · Keycloak · Kubernetes &nbsp;·&nbsp; 6-Month Roadmap
+    </footer>
+
+    </body>
+    </html>

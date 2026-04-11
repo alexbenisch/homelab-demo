@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-deposit-nginx
+  namespace: no-deposit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: no-deposit-nginx
+  template:
+    metadata:
+      labels:
+        app: no-deposit-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+              readOnly: true
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: html
+          configMap:
+            name: no-deposit-html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: no-deposit-nginx
+  namespace: no-deposit
+spec:
+  type: ClusterIP
+  selector:
+    app: no-deposit-nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http

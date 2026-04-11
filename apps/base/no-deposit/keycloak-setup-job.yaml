@@ -1,0 +1,122 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: no-deposit-keycloak-setup
+  namespace: no-deposit
+  annotations:
+    # Re-run by deleting the job: kubectl delete job -n no-deposit no-deposit-keycloak-setup
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: setup
+          image: quay.io/keycloak/keycloak:24.0
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              KC=http://keycloak.keycloak.svc.cluster.local:8080
+
+              echo "=== Authenticating to Keycloak ==="
+              /opt/keycloak/bin/kcadm.sh config credentials \
+                --server $KC \
+                --realm master \
+                --user admin \
+                --password "$KEYCLOAK_ADMIN_PASSWORD"
+
+              echo "=== Creating realm: no-deposit ==="
+              if /opt/keycloak/bin/kcadm.sh get realms/no-deposit &>/dev/null; then
+                echo "Realm already exists, skipping creation."
+              else
+                /opt/keycloak/bin/kcadm.sh create realms \
+                  -s realm=no-deposit \
+                  -s enabled=true \
+                  -s displayName="No-Deposit Rental Platform" \
+                  -s loginWithEmailAllowed=true \
+                  -s registrationAllowed=false \
+                  -s bruteForceProtected=true
+              fi
+
+              echo "=== Creating client: no-deposit-app ==="
+              CLIENT_ID=$(/opt/keycloak/bin/kcadm.sh get clients -r no-deposit \
+                --fields id,clientId --format csv --noquotes 2>/dev/null \
+                | grep ",no-deposit-app$" | cut -d, -f1 || true)
+
+              if [ -z "$CLIENT_ID" ]; then
+                CLIENT_ID=$(/opt/keycloak/bin/kcadm.sh create clients -r no-deposit \
+                  -s clientId=no-deposit-app \
+                  -s enabled=true \
+                  -s publicClient=false \
+                  -s secret="$OAUTH2_PROXY_CLIENT_SECRET" \
+                  -s 'redirectUris=["https://nodeposit.kubetest.uk/oauth2/callback"]' \
+                  -s 'webOrigins=["https://nodeposit.kubetest.uk"]' \
+                  -s standardFlowEnabled=true \
+                  -i)
+                echo "Created client: $CLIENT_ID"
+              else
+                echo "Client already exists: $CLIENT_ID"
+              fi
+
+              echo "=== Creating realm roles ==="
+              for ROLE in tenant landlord agent admin; do
+                /opt/keycloak/bin/kcadm.sh create roles -r no-deposit -s name=$ROLE 2>/dev/null \
+                  && echo "Created role: $ROLE" || echo "Role already exists: $ROLE"
+              done
+
+              echo "=== Creating test users ==="
+              create_user() {
+                local USERNAME=$1
+                local EMAIL=$2
+                local PASSWORD=$3
+                local ROLE=$4
+                local FIRSTNAME=$5
+                local LASTNAME=$6
+
+                USER_ID=$(/opt/keycloak/bin/kcadm.sh get users -r no-deposit \
+                  -q username=$USERNAME --fields id --format csv --noquotes 2>/dev/null \
+                  | head -1 || true)
+
+                if [ -z "$USER_ID" ]; then
+                  USER_ID=$(/opt/keycloak/bin/kcadm.sh create users -r no-deposit \
+                    -s username=$USERNAME \
+                    -s email=$EMAIL \
+                    -s firstName=$FIRSTNAME \
+                    -s lastName=$LASTNAME \
+                    -s enabled=true \
+                    -s emailVerified=true \
+                    -i)
+                  /opt/keycloak/bin/kcadm.sh set-password -r no-deposit \
+                    --username $USERNAME --new-password "$PASSWORD"
+                  echo "Created user: $USERNAME"
+                else
+                  echo "User already exists: $USERNAME"
+                fi
+
+                ROLE_ID=$(/opt/keycloak/bin/kcadm.sh get roles -r no-deposit \
+                  --fields id,name --format csv --noquotes 2>/dev/null \
+                  | grep ",$ROLE$" | cut -d, -f1 || true)
+
+                if [ -n "$ROLE_ID" ] && [ -n "$USER_ID" ]; then
+                  /opt/keycloak/bin/kcadm.sh add-roles -r no-deposit \
+                    --uusername $USERNAME --rolename $ROLE 2>/dev/null || true
+                fi
+              }
+
+              create_user tenant1   tenant1@nodeposit.example   "Tenant1Pass!"   tenant   Alice   Smith
+              create_user landlord1 landlord1@nodeposit.example "Landlord1Pass!" landlord Bob     Jones
+              create_user agent1    agent1@nodeposit.example    "Agent1Pass!"    agent    Carol   Admin
+
+              echo "=== Keycloak setup complete ==="
+          env:
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-oauth2-proxy
+                  key: KEYCLOAK_ADMIN_PASSWORD
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-oauth2-proxy
+                  key: OAUTH2_PROXY_CLIENT_SECRET

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVP Konzept — Mietkaution Plattform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1117;
+    --paper: #f5f2eb;
+    --accent: #2d5a3d;
+    --accent-light: #4a8c61;
+    --gold: #c8a84b;
+    --muted: #6b6b6b;
+    --border: #d4cfc4;
+    --code-bg: #1a1d23;
+    --code-text: #a8d5b5;
+    --tag-bg: #e8f0eb;
+    --tag-text: #2d5a3d;
+    --warn: #8b4513;
+    --warn-bg: #fdf3e7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 3rem 4rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,168,75,0.2);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,168,75,0.12);
+  }
+
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.15;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    max-width: 700px;
+  }
+
+  header h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(245,242,235,0.4);
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: 14px;
+    color: var(--paper);
+    font-weight: 500;
+  }
+
+  /* MAIN */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  /* SECTION */
+  section {
+    margin-bottom: 4rem;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  section:nth-child(1) { animation-delay: 0.05s; }
+  section:nth-child(2) { animation-delay: 0.1s; }
+  section:nth-child(3) { animation-delay: 0.15s; }
+  section:nth-child(4) { animation-delay: 0.2s; }
+  section:nth-child(5) { animation-delay: 0.25s; }
+  section:nth-child(6) { animation-delay: 0.3s; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 80px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    line-height: 1.25;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  p { margin-bottom: 1rem; color: #2a2a2a; }
+
+  /* CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    position: relative;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+  }
+
+  .card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .card h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+    color: var(--ink);
+  }
+
+  .card p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+
+  .card .tag {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+
+  /* TECH STACK TABLE */
+  .stack-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.25rem;
+    font-size: 0.88rem;
+  }
+
+  .stack-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.5rem 1rem 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stack-table td {
+    padding: 0.75rem 1rem 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: #2a2a2a;
+  }
+
+  .stack-table tr:last-child td { border-bottom: none; }
+
+  .stack-table td:first-child {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    white-space: nowrap;
+    padding-right: 2rem;
+    font-weight: 500;
+  }
+
+  .stack-table td:nth-child(2) {
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+    padding-right: 2rem;
+  }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+
+  .code-block pre {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--code-text);
+    line-height: 1.8;
+    white-space: pre;
+  }
+
+  .code-comment { color: #4a6b55; }
+  .code-key    { color: #7ec8a0; }
+  .code-val    { color: #d4a860; }
+  .code-str    { color: #c3dfa8; }
+  .code-kw     { color: #8fbcbb; }
+
+  /* TIMELINE */
+  .timeline {
+    margin-top: 1.5rem;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 24px; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .tl-dot {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-dot.phase-1 { background: var(--accent); }
+  .tl-dot.phase-2 { background: #3a5a8c; }
+  .tl-dot.phase-3 { background: var(--gold); color: var(--ink); }
+
+  .tl-content {
+    padding-top: 0.6rem;
+    flex: 1;
+  }
+
+  .tl-content h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+
+  .tl-content ul {
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .tl-duration {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+
+  /* ARCH DIAGRAM */
+  .arch-diagram {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 2;
+    color: var(--ink);
+    overflow-x: auto;
+  }
+
+  .arch-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.4rem 0;
+    flex-wrap: wrap;
+  }
+
+  .arch-box {
+    background: var(--tag-bg);
+    color: var(--accent);
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    font-size: 0.72rem;
+  }
+
+  .arch-box.aws { background: #fff3e0; color: #b35c00; border-color: #f5c88a; }
+  .arch-box.heroku { background: #ede7f6; color: #512da8; border-color: #c5b8e8; }
+  .arch-box.keycloak { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .arch-box.db { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+  .arch-box.django { background: #fce4ec; color: #880e4f; border-color: #f48fb1; }
+
+  .arch-arrow { color: var(--muted); font-size: 1rem; }
+
+  /* NOTICE */
+  .notice {
+    background: var(--warn-bg);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    font-size: 0.88rem;
+    color: var(--warn);
+  }
+
+  .notice strong { display: block; margin-bottom: 0.3rem; color: var(--warn); }
+
+  /* ENDPOINTS */
+  .endpoint-list {
+    margin-top: 1rem;
+  }
+
+  .endpoint {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .endpoint:last-child { border-bottom: none; }
+
+  .method {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 3px;
+    min-width: 44px;
+    text-align: center;
+  }
+
+  .get    { background: #e8f5e9; color: #2e7d32; }
+  .post   { background: #e3f2fd; color: #1565c0; }
+  .put    { background: #fff3e0; color: #e65100; }
+  .delete { background: #fce4ec; color: #c62828; }
+
+  .ep-path {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink);
+    min-width: 260px;
+  }
+
+  .ep-desc { color: var(--muted); font-size: 0.82rem; }
+
+  /* ROLE BADGE */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .role-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem;
+    background: white;
+  }
+
+  .role-card h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+
+  .role-card ul {
+    list-style: none;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  .role-card ul li::before {
+    content: '→ ';
+    color: var(--accent-light);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: rgba(245,242,235,0.5);
+    text-align: center;
+    padding: 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  footer strong { color: var(--gold); }
+
+  /* DIVIDER */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">MVP Konzept · Technische Spezifikation</div>
+  <h1>Mietkaution<em>-</em>Plattform<br>Django · Keycloak · AWS · Heroku</h1>
+  <div class="header-meta">
+    <div class="meta-item">
+      <span class="meta-label">Laufzeit</span>
+      <span class="meta-value">6 Monate</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Phase</span>
+      <span class="meta-value">MVP → Beta</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Zielgruppe</span>
+      <span class="meta-value">Mieter · Vermieter · Agentur</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Auth</span>
+      <span class="meta-value">Keycloak · OIDC · SSO</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- BUSINESS CONTEXT -->
+  <section>
+    <div class="section-label">01 · Kontext</div>
+    <h2>Business-Logik & Akteure</h2>
+    <p>Die Plattform ermöglicht es Mietern, ihre Mietkaution digital zu hinterlegen, ohne den Betrag selbst aufbringen zu müssen. Die Agentur agiert als Intermediär zwischen Mieter und Vermieter und übernimmt die Bürgschaft gegen eine Gebühr.</p>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <h4>Mieter</h4>
+        <ul>
+          <li>Registrierung & KYC</li>
+          <li>Kautionsantrag stellen</li>
+          <li>Bürgschaftsurkunde abrufen</li>
+          <li>Zahlungen verwalten</li>
+          <li>Status-Tracking</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <h4>Vermieter</h4>
+        <ul>
+          <li>Bürgschaft validieren</li>
+          <li>Schadensfall melden</li>
+          <li>Dokumente empfangen</li>
+          <li>Mietverhältnis verwalten</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <h4>Agentur (Admin)</h4>
+        <ul>
+          <li>Anträge prüfen & freigeben</li>
+          <li>Risikobewertung</li>
+          <li>Schadensfall bearbeiten</li>
+          <li>Reporting & Compliance</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <h4>System</h4>
+        <ul>
+          <li>Automatische Benachrichtigungen</li>
+          <li>Zahlungsabwicklung</li>
+          <li>Dokumentengenerierung</li>
+          <li>Audit-Logging</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section>
+    <div class="section-label">02 · Architektur</div>
+    <h2>Systemarchitektur</h2>
+    <p>Zwei-Tier-Deployment: Keycloak auf AWS (dauerhaft, stateful), Django-Applikation auf Heroku (skalierbar, dyno-basiert). RDS PostgreSQL als gemeinsame Datenbasis.</p>
+
+    <div class="arch-diagram">
+      <div class="arch-row">
+        <span style="color:var(--muted);font-size:0.7rem;min-width:80px">CLIENT</span>
+        <span class="arch-box">Browser</span>
+        <span class="arch-box">Mobile PWA</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-box heroku">Heroku CDN / Edge</span>
+      </div>
+      <div style="margin:0.5rem 0 0.5rem 80px;color:var(--muted);font-size:0.7rem">↓ HTTPS</div>
+      <div class="arch-row">
+        <span style="color:var(--muted);font-size:0.7rem;min-width:80px">HEROKU</span>
+        <span class="arch-box heroku">Django App (Web Dynos)</span>
+        <span class="arch-arrow">←→</span>
+        <span class="arch-box heroku">Celery Worker (Dynos)</span>
+        <span class="arch-arrow">←→</span>
+        <span class="arch-box heroku">Redis (Heroku Add-on)</span>
+      </div>
+      <div style="margin:0.5rem 0 0.5rem 80px;color:var(--muted);font-size:0.7rem">↓ OAuth2/OIDC Token Validation &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓ SQL</div>
+      <div class="arch-row">
+        <span style="color:var(--muted);font-size:0.7rem;min-width:80px">AWS</span>
+        <span class="arch-box keycloak">Keycloak (EC2 / ECS)</span>
+        <span class="arch-arrow">←→</span>
+        <span class="arch-box db">RDS PostgreSQL</span>
+        <span class="arch-arrow">←→</span>
+        <span class="arch-box aws">S3 (Dokumente)</span>
+      </div>
+      <div style="margin:0.5rem 0 0.5rem 80px;color:var(--muted);font-size:0.7rem">↓</div>
+      <div class="arch-row">
+        <span style="color:var(--muted);font-size:0.7rem;min-width:80px">EXTERN</span>
+        <span class="arch-box aws">SES (E-Mail)</span>
+        <span class="arch-box aws">SNS (Notifications)</span>
+        <span class="arch-box">Stripe / SEPA</span>
+        <span class="arch-box">SCHUFA API</span>
+      </div>
+    </div>
+
+    <div class="notice">
+      <strong>Deployment-Entscheidung: Hybrid</strong>
+      Keycloak benötigt persistenten State (eigene PostgreSQL-DB, Session-Store) → AWS EC2 oder ECS ist stabiler als ein Heroku Dyno. Django-App hingegen ist zustandslos und profitiert von Heroku's simplem Deployment-Workflow (git push, Review Apps, Pipelines).
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section>
+    <div class="section-label">03 · Stack</div>
+    <h2>Technologie-Stack</h2>
+
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technologie</th>
+          <th>Begründung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Backend Framework</td>
+          <td>Django 5.x + DRF</td>
+          <td>Mature ORM, Admin-Panel out-of-the-box, Compliance-freundlich</td>
+        </tr>
+        <tr>
+          <td>Auth / IAM</td>
+          <td>Keycloak 24.x</td>
+          <td>SSO, OIDC, Roles, MFA, Social Login — production-ready</td>
+        </tr>
+        <tr>
+          <td>OIDC Integration</td>
+          <td>mozilla-django-oidc</td>
+          <td>Bewährtes Django-Keycloak-Binding, wartungsarm</td>
+        </tr>
+        <tr>
+          <td>App Hosting</td>
+          <td>Heroku (Standard-2X)</td>
+          <td>Schnelles Deployment, Review Apps für Feature-Branches</td>
+        </tr>
+        <tr>
+          <td>Auth Hosting</td>
+          <td>AWS EC2 / ECS Fargate</td>
+          <td>Keycloak braucht persistent storage, kein Heroku-Restart-Problem</td>
+        </tr>
+        <tr>
+          <td>Datenbank</td>
+          <td>AWS RDS PostgreSQL 16</td>
+          <td>Managed, automatische Backups, Multi-AZ für Production</td>
+        </tr>
+        <tr>
+          <td>Objekt-Speicher</td>
+          <td>AWS S3 + django-storages</td>
+          <td>Bürgschaftsdokumente, Verträge, KYC-Uploads</td>
+        </tr>
+        <tr>
+          <td>Task Queue</td>
+          <td>Celery + Redis</td>
+          <td>Async: PDF-Generierung, E-Mails, Zahlungsremindern</td>
+        </tr>
+        <tr>
+          <td>E-Mail</td>
+          <td>AWS SES</td>
+          <td>Transaktions-E-Mails, Templates, Bounce-Handling</td>
+        </tr>
+        <tr>
+          <td>Zahlungen</td>
+          <td>Stripe oder Mollie</td>
+          <td>SEPA-Lastschrift, Kreditkarte, Webhooks</td>
+        </tr>
+        <tr>
+          <td>PDF Generierung</td>
+          <td>WeasyPrint / ReportLab</td>
+          <td>Bürgschaftsurkunden aus HTML-Templates</td>
+        </tr>
+        <tr>
+          <td>CI/CD</td>
+          <td>GitHub Actions → Heroku</td>
+          <td>Test → Build → Deploy Pipeline; Review Apps per PR</td>
+        </tr>
+        <tr>
+          <td>Monitoring</td>
+          <td>Sentry + Heroku Metrics</td>
+          <td>Error-Tracking, Performance-Monitoring</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- KEYCLOAK CONFIG -->
+  <section>
+    <div class="section-label">04 · Auth</div>
+    <h2>Keycloak & Authentication Flow</h2>
+
+    <h3>Realm-Konfiguration</h3>
+    <div class="code-block"><pre><span class="code-comment"># Keycloak Realm: mietkaution-prod</span>
+<span class="code-key">realm</span>: <span class="code-str">mietkaution-prod</span>
+<span class="code-key">clients</span>:
+  - <span class="code-key">client_id</span>: <span class="code-str">django-app</span>
+    <span class="code-key">protocol</span>: <span class="code-str">openid-connect</span>
+    <span class="code-key">access_type</span>: <span class="code-str">confidential</span>
+    <span class="code-key">redirect_uris</span>:
+      - <span class="code-str">https://app.mietkaution.de/oidc/callback/</span>
+    <span class="code-key">scopes</span>: [<span class="code-str">openid</span>, <span class="code-str">profile</span>, <span class="code-str">email</span>, <span class="code-str">roles</span>]
+
+<span class="code-key">roles</span>:
+  - <span class="code-str">mieter</span>        <span class="code-comment"># Kautionsanträge, eigene Daten</span>
+  - <span class="code-str">vermieter</span>     <span class="code-comment"># Bürgschaft validieren, Schäden melden</span>
+  - <span class="code-str">agent</span>         <span class="code-comment"># Anträge bearbeiten, freigeben</span>
+  - <span class="code-str">admin</span>         <span class="code-comment"># Full access, Konfiguration</span>
+
+<span class="code-key">identity_providers</span>:
+  - <span class="code-str">google</span>         <span class="code-comment"># Social Login (optional)</span>
+  - <span class="code-str">bankid</span>         <span class="code-comment"># Starke Identifikation (Phase 2)</span>
+
+<span class="code-key">mfa_policy</span>:
+  - <span class="code-str">agent</span>: required
+  - <span class="code-str">admin</span>: required
+  - <span class="code-str">mieter</span>: optional</pre></div>
+
+    <h3>Django OIDC Integration</h3>
+    <div class="code-block"><pre><span class="code-comment"># settings.py (Auszug)</span>
+<span class="code-key">AUTHENTICATION_BACKENDS</span> = [
+    <span class="code-str">'mozilla_django_oidc.auth.OIDCAuthenticationBackend'</span>,
+]
+
+<span class="code-key">OIDC_RP_CLIENT_ID</span>     = <span class="code-str">env('KEYCLOAK_CLIENT_ID')</span>
+<span class="code-key">OIDC_RP_CLIENT_SECRET</span> = <span class="code-str">env('KEYCLOAK_CLIENT_SECRET')</span>
+<span class="code-key">OIDC_OP_AUTHORIZATION_ENDPOINT</span> = (
+    <span class="code-str">'https://auth.mietkaution.de/realms/mietkaution-prod'</span>
+    <span class="code-str">'/protocol/openid-connect/auth'</span>
+)
+<span class="code-key">OIDC_RP_SIGN_ALGO</span>     = <span class="code-str">'RS256'</span>
+<span class="code-key">OIDC_VERIFY_SSL</span>       = <span class="code-val">True</span>
+
+<span class="code-comment"># Rollen aus JWT-Token mappen</span>
+<span class="code-kw">class</span> <span class="code-str">KautionOIDCBackend</span>(OIDCAuthenticationBackend):
+    <span class="code-kw">def</span> update_user(self, user, claims):
+        roles = claims.get(<span class="code-str">'realm_access'</span>, {}).get(<span class="code-str">'roles'</span>, [])
+        user.is_staff = <span class="code-str">'agent'</span> <span class="code-kw">in</span> roles <span class="code-kw">or</span> <span class="code-str">'admin'</span> <span class="code-kw">in</span> roles
+        user.save()
+        <span class="code-kw">return</span> user</pre></div>
+  </section>
+
+  <!-- API DESIGN -->
+  <section>
+    <div class="section-label">05 · API</div>
+    <h2>RESTful API Design</h2>
+    <p>Alle Endpunkte sind JWT-gesichert (Bearer Token aus Keycloak). Rollenbasierte Zugriffskontrolle per DRF Permission Classes.</p>
+
+    <h3>Kautionsanträge</h3>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="ep-path">/api/v1/applications/</span>
+        <span class="ep-desc">Neuen Kautionsantrag einreichen (Mieter)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="ep-path">/api/v1/applications/{id}/</span>
+        <span class="ep-desc">Antragsstatus abrufen</span>
+      </div>
+      <div class="endpoint">
+        <span class="method put">PATCH</span>
+        <span class="ep-path">/api/v1/applications/{id}/review/</span>
+        <span class="ep-desc">Antrag prüfen/genehmigen (Agent)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="ep-path">/api/v1/applications/{id}/documents/</span>
+        <span class="ep-desc">KYC-Dokumente hochladen (→ S3)</span>
+      </div>
+    </div>
+
+    <h3>Bürgschaften</h3>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="ep-path">/api/v1/guarantees/{id}/</span>
+        <span class="ep-desc">Bürgschaftsdaten abrufen</span>
+      </div>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="ep-path">/api/v1/guarantees/{id}/certificate/</span>
+        <span class="ep-desc">PDF-Urkunde generieren & herunterladen</span>
+      </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="ep-path">/api/v1/guarantees/{id}/validate/</span>
+        <span class="ep-desc">Bürgschaft validieren (Vermieter via Token)</span>
+      </div>
+    </div>
+
+    <h3>Schadensfall</h3>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="ep-path">/api/v1/claims/</span>
+        <span class="ep-desc">Schadensfall einleiten (Vermieter)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method put">PATCH</span>
+        <span class="ep-path">/api/v1/claims/{id}/decision/</span>
+        <span class="ep-desc">Entscheidung treffen (Agent)</span>
+      </div>
+    </div>
+
+    <h3>Zahlungen</h3>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="ep-path">/api/v1/payments/intent/</span>
+        <span class="ep-desc">Stripe Payment Intent erstellen</span>
+      </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <span class="ep-path">/api/v1/webhooks/stripe/</span>
+        <span class="ep-desc">Stripe Webhook (Zahlungsbestätigung)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA MODEL -->
+  <section>
+    <div class="section-label">06 · Datenmodell</div>
+    <h2>Kernmodelle (Django ORM)</h2>
+
+    <div class="code-block"><pre><span class="code-comment"># models.py (vereinfacht)</span>
+
+<span class="code-kw">class</span> <span class="code-str">UserProfile</span>(models.Model):
+    user        = models.OneToOneField(User, ...)
+    keycloak_id = models.UUIDField(unique=True)   <span class="code-comment"># Keycloak sub claim</span>
+    role        = models.CharField(choices=ROLES)  <span class="code-comment"># mieter/vermieter/agent</span>
+    kyc_status  = models.CharField(choices=KYC_STATUS)
+    schufa_score = models.IntegerField(null=True)
+
+<span class="code-kw">class</span> <span class="code-str">RentalApplication</span>(models.Model):
+    applicant   = models.ForeignKey(UserProfile, ...)
+    landlord    = models.ForeignKey(UserProfile, ...)
+    address     = models.TextField()
+    rent_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    deposit_amt = models.DecimalField(...)         <span class="code-comment"># i.d.R. 3x Nettomiete</span>
+    status      = models.CharField(choices=STATUS) <span class="code-comment"># pending/approved/rejected</span>
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+<span class="code-kw">class</span> <span class="code-str">Guarantee</span>(models.Model):
+    application    = models.OneToOneField(RentalApplication, ...)
+    certificate_no = models.CharField(unique=True)
+    valid_from     = models.DateField()
+    valid_until    = models.DateField()
+    s3_key         = models.CharField()            <span class="code-comment"># PDF in S3</span>
+    validate_token = models.UUIDField(default=uuid4) <span class="code-comment"># Vermieter-Link</span>
+
+<span class="code-kw">class</span> <span class="code-str">Claim</span>(models.Model):
+    guarantee   = models.ForeignKey(Guarantee, ...)
+    claimant    = models.ForeignKey(UserProfile, ...)
+    amount      = models.DecimalField(...)
+    description = models.TextField()
+    status      = models.CharField(choices=CLAIM_STATUS)
+    documents   = models.ManyToManyField('Document')</pre></div>
+  </section>
+
+  <!-- CI/CD -->
+  <section>
+    <div class="section-label">07 · CI/CD</div>
+    <h2>Deployment Pipeline</h2>
+
+    <div class="code-block"><pre><span class="code-comment"># .github/workflows/deploy.yml</span>
+<span class="code-key">name</span>: <span class="code-str">CI/CD Pipeline</span>
+<span class="code-key">on</span>:
+  <span class="code-key">push</span>: { <span class="code-key">branches</span>: [<span class="code-str">main</span>, <span class="code-str">staging</span>] }
+  <span class="code-key">pull_request</span>: { <span class="code-key">branches</span>: [<span class="code-str">main</span>] }
+
+<span class="code-key">jobs</span>:
+  <span class="code-key">test</span>:
+    <span class="code-key">runs-on</span>: <span class="code-str">ubuntu-latest</span>
+    <span class="code-key">steps</span>:
+      - <span class="code-key">name</span>: <span class="code-str">Django Tests + Coverage</span>
+        <span class="code-key">run</span>: |
+          pytest --cov=. --cov-fail-under=80
+          bandit -r . -x tests/          <span class="code-comment"># Security scan</span>
+
+  <span class="code-key">deploy-staging</span>:
+    <span class="code-key">needs</span>: test
+    <span class="code-key">if</span>: <span class="code-str">github.ref == 'refs/heads/staging'</span>
+    <span class="code-key">steps</span>:
+      - <span class="code-key">name</span>: <span class="code-str">Deploy to Heroku Staging</span>
+        <span class="code-key">uses</span>: <span class="code-str">akhileshns/heroku-deploy@v3</span>
+        <span class="code-key">with</span>: { <span class="code-key">heroku_app_name</span>: <span class="code-str">mietkaution-staging</span> }
+
+  <span class="code-key">deploy-prod</span>:
+    <span class="code-key">needs</span>: test
+    <span class="code-key">if</span>: <span class="code-str">github.ref == 'refs/heads/main'</span>
+    <span class="code-key">steps</span>:
+      - <span class="code-key">name</span>: <span class="code-str">Deploy to Heroku Production</span>
+        <span class="code-key">run</span>: |
+          heroku run python manage.py migrate
+          <span class="code-comment"># Zero-downtime via Heroku Preboot</span></pre></div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section>
+    <div class="section-label">08 · Roadmap</div>
+    <h2>Entwicklungs-Roadmap</h2>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot phase-1">W1–4</div>
+        <div class="tl-content">
+          <div class="tl-duration">Monat 1 — Foundation</div>
+          <h4>Auth-Fundament & Core API</h4>
+          <ul>
+            <li>Keycloak auf AWS aufsetzen, Realm + Clients konfigurieren</li>
+            <li>Django-Projekt mit OIDC-Integration, Rollenmodell</li>
+            <li>Datenmodell: UserProfile, RentalApplication, Guarantee</li>
+            <li>Heroku Pipelines: Staging + Production + Review Apps</li>
+            <li>GitHub Actions CI: Test, Lint, Bandit Security Scan</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot phase-1">W5–8</div>
+        <div class="tl-content">
+          <div class="tl-duration">Monat 2 — Core Features</div>
+          <h4>Kautionsantrag & Dokumenten-Flow</h4>
+          <ul>
+            <li>Antragsprozess API vollständig (submit → review → approve)</li>
+            <li>KYC-Dokumente Upload → S3 (django-storages)</li>
+            <li>PDF-Generierung Bürgschaftsurkunde (WeasyPrint)</li>
+            <li>E-Mail-Benachrichtigungen via AWS SES + Celery</li>
+            <li>Django Admin für Agent-Workflow</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot phase-2">W9–12</div>
+        <div class="tl-content">
+          <div class="tl-duration">Monat 3 — Payments & Landlord</div>
+          <h4>Zahlungsabwicklung & Vermieter-Portal</h4>
+          <ul>
+            <li>Stripe Integration: SEPA-Lastschrift, Payment Intents</li>
+            <li>Vermieter-Onboarding + Bürgschaftsvalidierung</li>
+            <li>Schadensfall-Workflow (Claim API)</li>
+            <li>Webhook-Handler (Stripe, idempotent)</li>
+            <li>Audit-Log für alle kritischen Aktionen</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot phase-2">W13–16</div>
+        <div class="tl-content">
+          <div class="tl-duration">Monat 4 — Hardening</div>
+          <h4>Security & Compliance</h4>
+          <ul>
+            <li>MFA für Agent/Admin-Rollen in Keycloak erzwingen</li>
+            <li>DSGVO: Datenexport, Löschanfragen, Datenschutzerklärung</li>
+            <li>Rate Limiting, API-Throttling (DRF)</li>
+            <li>Penetration-Testing vorbereiten (OWASP Top 10 Checkliste)</li>
+            <li>Sentry Error-Tracking, strukturiertes Logging</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot phase-3">W17–20</div>
+        <div class="tl-content">
+          <div class="tl-duration">Monat 5–6 — Beta & Scale</div>
+          <h4>Beta Launch & Erweiterungen</h4>
+          <ul>
+            <li>Closed Beta mit ersten Mietern/Vermietern</li>
+            <li>Feedback-Iteration, Performance-Optimierung</li>
+            <li>SCHUFA-API Integration für Bonitätsprüfung</li>
+            <li>Reporting-Dashboard für Agentur (Grafana oder Metabase)</li>
+            <li>Übergabe-Dokumentation, Runbooks</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY -->
+  <section>
+    <div class="section-label">09 · Security</div>
+    <h2>Security-by-Design</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🔐</div>
+        <div class="tag">Auth</div>
+        <h4>Zero-Trust Token Validation</h4>
+        <p>Jeder API-Request validiert JWT gegen Keycloak JWKS. Kein Session-Cookie, kein serverseitiger State.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛡️</div>
+        <div class="tag">DSGVO</div>
+        <h4>Datensparsamkeit</h4>
+        <p>KYC-Dokumente nur in S3 mit Pre-Signed URLs. Kein PII in Logs. Verschlüsselung at-rest (RDS, S3).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <div class="tag">Secrets</div>
+        <h4>AWS Secrets Manager</h4>
+        <p>Alle Credentials (DB, Stripe, Keycloak) über AWS Secrets Manager. Kein Hardcoding, Rotation automatisiert.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <div class="tag">Audit</div>
+        <h4>Vollständiges Audit-Log</h4>
+        <p>Jede Statusänderung an Anträgen, Bürgschaften, Claims mit User-ID, Timestamp, IP in unveränderlicher Tabelle.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧱</div>
+        <div class="tag">Network</div>
+        <h4>VPC Isolation</h4>
+        <p>RDS und Keycloak in privaten Subnets. Nur Django-App hat Zugriff. Security Groups strikt nach Least Privilege.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <div class="tag">API</div>
+        <h4>Rate Limiting & Throttling</h4>
+        <p>DRF Throttling pro User/IP. Login-Endpoints mit Brute-Force-Schutz via Keycloak Policy.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Konzept erstellt für <strong>Mietkaution-Plattform MVP</strong> &nbsp;·&nbsp; Django · Keycloak · AWS · Heroku &nbsp;·&nbsp; 6-Monats-Roadmap
+</footer>
+
+</body>
+</html>

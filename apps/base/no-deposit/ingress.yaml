@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: no-deposit
+  namespace: no-deposit
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: nodeposit.kubetest.uk
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+spec:
+  tls:
+    - hosts:
+        - nodeposit.kubetest.uk
+      secretName: no-deposit-tls
+  rules:
+    - host: nodeposit.kubetest.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: no-deposit-oauth2-proxy
+                port:
+                  number: 4180
