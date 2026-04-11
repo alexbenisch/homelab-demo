@@ -59,6 +59,23 @@ spec:
                 echo "Client already exists: $CLIENT_ID"
               fi
 
+              echo "=== Adding audience mapper to client ==="
+              MAPPER_EXISTS=$(/opt/keycloak/bin/kcadm.sh get \
+                clients/$CLIENT_ID/protocol-mappers/models -r no-deposit \
+                --fields name --format csv --noquotes 2>/dev/null \
+                | grep "^audience-mapper$" || true)
+              if [ -z "$MAPPER_EXISTS" ]; then
+                /opt/keycloak/bin/kcadm.sh create \
+                  clients/$CLIENT_ID/protocol-mappers/models -r no-deposit \
+                  -s name=audience-mapper \
+                  -s protocol=openid-connect \
+                  -s protocolMapper=oidc-audience-mapper \
+                  -s 'config={"included.client.audience":"no-deposit-app","id.token.claim":"false","access.token.claim":"true"}'
+                echo "Created audience mapper"
+              else
+                echo "Audience mapper already exists"
+              fi
+
               echo "=== Creating realm roles ==="
               for ROLE in tenant landlord agent admin; do
                 /opt/keycloak/bin/kcadm.sh create roles -r no-deposit -s name=$ROLE 2>/dev/null \
