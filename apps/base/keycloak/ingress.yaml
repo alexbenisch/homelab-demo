@@ -24,20 +24,6 @@ spec:
                 name: keycloak
                 port:
                   number: 8080
-          - path: /realms/master
-            pathType: Prefix
-            backend:
-              service:
-                name: keycloak
-                port:
-                  number: 8080
-          - path: /admin
-            pathType: Prefix
-            backend:
-              service:
-                name: keycloak
-                port:
-                  number: 8080
           - path: /resources
             pathType: Prefix
             backend:

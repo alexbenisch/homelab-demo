@@ -1,83 +1,56 @@
-# Keycloak Two-Instance Plan: Tailscale-Only Admin UI
+# Keycloak Admin UI — Tailscale-Only Access
 
-## Goal
+## Status
 
-Run two Keycloak instances against one PostgreSQL database so the admin
-console is completely isolated on the Tailscale network, with no admin
-paths exposed on the public internet.
+The two-instance plan was evaluated and **abandoned**. Running two Keycloak instances
+against a shared PostgreSQL database is an unsupported configuration: each instance
+has its own Infinispan cache, cache invalidation is not coordinated, and Keycloak
+maintainers explicitly warn against it. The approach has known data consistency risks.
 
-## Architecture
+## Correct Approach
+
+Single Keycloak instance with two separate ingresses and `KC_HOSTNAME_ADMIN`:
 
 ```
 Public internet
-    └── auth.kubetest.uk  (Traefik)
-            └── keycloak (deployment)         KC_HOSTNAME=auth.kubetest.uk
-                    ├── /realms/demo           ← app OIDC (Django, API)
-                    └── /resources             ← static assets
-                    (no /admin, no /realms/master)
+    └── auth.kubetest.uk  (Traefik Ingress)
+            ├── /realms/demo    ← app OIDC (Django, API)
+            └── /resources      ← static assets
+            (no /admin, no /realms/master)
 
 Tailscale
     └── keycloak-admin.tail55277.ts.net  (Tailscale Ingress)
-            └── keycloak-admin (deployment)   KC_HOSTNAME=keycloak-admin.tail55277.ts.net
-                    └── /  (all paths)         ← admin console + admin REST API
+            └── /  (all paths)  ← admin console + admin REST API
 
 Shared:
-    └── keycloak-postgres (single PostgreSQL)  ← both instances read/write here
+    └── one keycloak deployment with:
+            KC_HOSTNAME=https://auth.kubetest.uk
+            KC_HOSTNAME_ADMIN=https://keycloak-admin.tail55277.ts.net
 ```
 
-## Files to Change
+## How It Works
 
-| File | Action |
-|---|---|
-| `apps/base/keycloak/admin-deployment.yaml` | Create |
-| `apps/base/keycloak/admin-service.yaml` | Create |
-| `apps/base/keycloak/service-admin-tailscale.yaml` | Modify — point backend to `keycloak-admin` service |
-| `apps/base/keycloak/ingress.yaml` | Modify — remove `/admin` and `/realms/master` paths |
-| `apps/base/keycloak/kustomization.yaml` | Modify — add two new files |
+When `KC_HOSTNAME_ADMIN` is set, Keycloak embeds that URL as `authServerUrl` in the
+admin console page — so the JS makes all admin REST API calls to the Tailscale host,
+not to the public host. The OIDC auth flow for the admin console also runs entirely
+through the Tailscale ingress.
 
-## Step 1 — Create the admin deployment
+The public ingress exposes only `/realms/demo` and `/resources`. The admin console
+(`/admin/`) is never reachable from the public internet.
 
-New file `apps/base/keycloak/admin-deployment.yaml`:
+## Configuration
 
-- Same image (`quay.io/keycloak/keycloak:24.0`), same `args: [start-dev]`
-- Reuse existing secrets (`keycloak-credentials`, `keycloak-postgres-secret`)
-- Reuse existing PostgreSQL service (`keycloak-postgres:5432`)
-- `KC_HOSTNAME=keycloak-admin.tail55277.ts.net`
-- `KC_HTTP_ENABLED=true`, `KC_PROXY_HEADERS=xforwarded`
-- No `KC_HOSTNAME_ADMIN`, no `KC_HOSTNAME_STRICT`
-- Smaller resources — admin only, low traffic
+`KC_HOSTNAME` must be a full URL (not hostname-only) when `KC_HOSTNAME_ADMIN` is also
+set. Both values include the scheme.
 
-## Step 2 — Create the admin service
+```yaml
+- name: KC_HOSTNAME
+  value: https://auth.kubetest.uk
+- name: KC_HOSTNAME_ADMIN
+  value: https://keycloak-admin.tail55277.ts.net
+```
 
-New file `apps/base/keycloak/admin-service.yaml`:
-
-- `name: keycloak-admin`
-- `selector: app: keycloak-admin`
-- Port 8080
-
-## Step 3 — Point the Tailscale ingress at the admin service
-
-Modify `apps/base/keycloak/service-admin-tailscale.yaml`:
-
-- Change `backend.service.name` from `keycloak` → `keycloak-admin`
-
-## Step 4 — Clean up the public ingress
-
-Modify `apps/base/keycloak/ingress.yaml` — remove paths no longer needed publicly:
-
-- Remove `/admin` — admin REST API stays Tailscale-only
-- Remove `/realms/master` — admin OIDC now lives on `keycloak-admin.tail55277.ts.net`
-
-Public ingress should only expose:
-- `/realms/demo`
-- `/resources`
-- `/realms/demo/protocol/openid-connect/token` (rate-limited ingress)
-
-## Step 5 — Update kustomization.yaml
-
-Add `admin-deployment.yaml` and `admin-service.yaml` to the resources list.
-
-## Step 6 — Validate
+## Validation
 
 ```bash
 # Public instance: only demo realm reachable
@@ -95,19 +68,12 @@ curl -s https://keycloak-admin.tail55277.ts.net/admin/master/console/ \
 # → "authServerUrl": "https://keycloak-admin.tail55277.ts.net"
 ```
 
-## Cache Caveat
+## Why the Earlier Approach Appeared to Break
 
-Both instances share PostgreSQL but each has its own local Infinispan
-cache. Changes made via the admin console write to PostgreSQL immediately,
-but the public instance's cache won't reflect them until the cache expires
-or the pod restarts.
+An earlier attempt with `KC_HOSTNAME_ADMIN` failed because `KC_HOSTNAME` had a scheme
+prefix (`https://auth.kubetest.uk`) AND `KC_HOSTNAME_ADMIN` was also set — this
+caused a double-scheme OIDC issuer bug. The root cause was the KC_HOSTNAME scheme,
+not KC_HOSTNAME_ADMIN itself. With KC_HOSTNAME as a full URL, both env vars work
+correctly together.
 
-**Workaround (demo):** After making admin changes, run:
-
-```bash
-kubectl rollout restart deployment/keycloak -n keycloak
-```
-
-**Proper fix (later):** Configure JGroups `KUBE_PING` so both instances
-form a Keycloak cluster — cache invalidation then happens automatically.
-Requires one extra RBAC resource and a few env vars on both deployments.
+See also: `docs/keycloak-tailscale-operator.md` for all hard-won configuration rules.

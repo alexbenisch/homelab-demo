@@ -2,26 +2,45 @@
 
 Lessons from ~2 days of debugging. Apply all of these from the start.
 
-## 1. KC_HOSTNAME — hostname only, no scheme
+## 1. KC_HOSTNAME and KC_HOSTNAME_ADMIN — use full URLs when both are set
+
+When `KC_HOSTNAME_ADMIN` is also configured, both must be full URLs:
 
 ```yaml
 - name: KC_HOSTNAME
-  value: auth.kubetest.uk        # correct
-# value: https://auth.kubetest.uk  # wrong — causes https://https//... in OIDC issuer URLs
+  value: https://auth.kubetest.uk               # full URL required when KC_HOSTNAME_ADMIN is set
+- name: KC_HOSTNAME_ADMIN
+  value: https://keycloak-admin.tail55277.ts.net
 ```
 
-## 2. Do not use KC_HOSTNAME_ADMIN
+If running with a single hostname and no KC_HOSTNAME_ADMIN, hostname-only works:
+```yaml
+- name: KC_HOSTNAME
+  value: auth.kubetest.uk        # hostname-only is fine for single-ingress setup
+```
 
-Setting a separate admin hostname creates a split-domain problem. The admin console JS embeds `authServerUrl` (KC_HOSTNAME) and `authUrl` (request hostname) separately. With a dedicated admin hostname, the admin REST API calls and OIDC auth flows end up on different domains, causing a 5-minute hang and broken UI. Without KC_HOSTNAME_ADMIN, Keycloak sets the authUrl dynamically from the request — this works correctly for both the Tailscale ingress and the public ingress.
+## 2. Use KC_HOSTNAME_ADMIN to isolate admin behind Tailscale
 
-## 3. Expose these paths on the public Traefik ingress
+When `KC_HOSTNAME_ADMIN` is set, Keycloak embeds it as `authServerUrl` in the admin
+console page. All admin REST API calls and the admin OIDC flow go to the admin
+hostname — the public hostname never sees admin traffic.
+
+An earlier attempt without KC_HOSTNAME_ADMIN exposed `/admin` on the public ingress to
+make the console work — this defeats the Tailscale security goal. Use KC_HOSTNAME_ADMIN
+instead.
+
+Do NOT run two separate Keycloak instances against a shared PostgreSQL database —
+Infinispan cache is per-instance with no coordination. Unsupported configuration.
+
+## 3. Expose only these paths on the public Traefik ingress
 
 ```yaml
 - path: /realms/demo                  # public OIDC for app clients
-- path: /realms/master                # admin console OIDC discovery + auth flow
-- path: /admin                        # admin REST API (console breaks without this)
 - path: /resources                    # static assets
 ```
+
+Do NOT expose `/admin` or `/realms/master` publicly — those are admin-only paths,
+accessible only via the Tailscale ingress.
 
 ## 4. Use Tailscale Ingress, not LoadBalancer
 

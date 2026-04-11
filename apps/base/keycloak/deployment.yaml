@@ -28,16 +28,14 @@ spec:
                 secretKeyRef:
                   name: keycloak-credentials
                   key: admin-password
-            - name: KC_LOG_LEVEL
-              value: "DEBUG"
             - name: KC_HTTP_ENABLED
               value: "true"
             - name: KC_PROXY_HEADERS
               value: xforwarded
             - name: KC_HOSTNAME
-              value: auth.kubetest.uk
-            - name: KC_HOSTNAME_STRICT
-              value: "true"
+              value: https://auth.kubetest.uk
+            - name: KC_HOSTNAME_ADMIN
+              value: https://keycloak-admin.tail55277.ts.net
             - name: KC_DB
               value: postgres
             - name: KC_DB_URL
