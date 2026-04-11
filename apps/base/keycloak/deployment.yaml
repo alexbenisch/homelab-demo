@@ -33,9 +33,9 @@ spec:
             - name: KC_PROXY_HEADERS
               value: xforwarded
             - name: KC_HOSTNAME
-              value: https://auth.kubetest.uk
+              value: auth.kubetest.uk
             - name: KC_HOSTNAME_ADMIN
-              value: https://keycloak-admin.tail55277.ts.net
+              value: keycloak-admin.tail55277.ts.net
             - name: KC_DB
               value: postgres
             - name: KC_DB_URL
