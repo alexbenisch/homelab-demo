@@ -2,4 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../../base/no-deposit
-  - flux-image-automation.yaml
+  # flux-image-automation.yaml requires image-reflector-controller + image-automation-controller
+  # which are not in the current bootstrap. Re-enable after adding them to gotk-components.yaml.
+  # - flux-image-automation.yaml
