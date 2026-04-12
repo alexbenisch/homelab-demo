@@ -60,12 +60,18 @@ spec:
             httpGet:
               path: /health/
               port: 8000
+              httpHeaders:
+                - name: Host
+                  value: no-deposit-django.no-deposit.svc.cluster.local
             initialDelaySeconds: 15
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /health/
               port: 8000
+              httpHeaders:
+                - name: Host
+                  value: no-deposit-django.no-deposit.svc.cluster.local
             initialDelaySeconds: 30
             periodSeconds: 30
           resources:
