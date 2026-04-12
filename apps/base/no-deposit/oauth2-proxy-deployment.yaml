@@ -28,6 +28,8 @@ spec:
             - --pass-access-token=true
             - --set-xauthrequest=true
             - --whitelist-domain=auth.kubetest.uk
+            - --cookie-refresh=4m
+            - --cookie-expire=24h
           env:
             - name: OAUTH2_PROXY_CLIENT_ID
               valueFrom:
