@@ -20,7 +20,9 @@ class JWTUserMiddleware:
         token = request.META.get("HTTP_X_FORWARDED_ACCESS_TOKEN")
         if token:
             try:
-                payload = jwt.decode(token, options={"verify_signature": False})
+                payload = jwt.decode(
+                    token, options={"verify_signature": False, "verify_exp": False}
+                )
                 realm_access = payload.get("realm_access", {})
                 request.jwt_roles = set(realm_access.get("roles", []))
                 request.jwt_email = payload.get("email", "")
