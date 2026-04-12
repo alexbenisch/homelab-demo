@@ -1,0 +1,44 @@
+[project]
+name = "no-deposit"
+version = "0.1.0"
+description = "No-Deposit Rental Guarantee Platform"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.0,<6.0",
+    "djangorestframework>=3.15",
+    "gunicorn>=21.2.0",
+    "whitenoise>=6.6.0",
+    "psycopg2-binary>=2.9.9",
+    "mozilla-django-oidc>=4.0",
+    "PyJWT[crypto]>=2.8",
+    "drf-spectacular>=0.27",
+    "minio>=7.2",
+    "weasyprint>=62.0",
+    "celery[redis]>=5.3",
+    "django-prometheus>=2.3",
+    "sentry-sdk[django]>=2.0",
+    "python-json-logger>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "no_deposit.settings_ci"
+pythonpath = ["src"]
+testpaths = ["src/tests"]
+addopts = "--tb=short -q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]

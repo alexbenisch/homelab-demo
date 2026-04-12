@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-deposit-django
+  namespace: no-deposit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: no-deposit-django
+  template:
+    metadata:
+      labels:
+        app: no-deposit-django
+    spec:
+      containers:
+        - name: django
+          image: ghcr.io/alexbenisch/no-deposit:latest # {"$imagepolicy": "flux-system:no-deposit"}
+          ports:
+            - containerPort: 8000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: no-deposit-django-config
+          env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: DJANGO_SECRET_KEY
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: POSTGRES_PASSWORD
+            - name: OIDC_RP_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: OIDC_RP_CLIENT_SECRET
+            - name: HETZNER_OBJECT_STORAGE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: HETZNER_OBJECT_STORAGE_ACCESS_KEY
+            - name: HETZNER_OBJECT_STORAGE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: HETZNER_OBJECT_STORAGE_SECRET_KEY
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: SENTRY_DSN
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: no-deposit-django
+  namespace: no-deposit
+spec:
+  type: ClusterIP
+  selector:
+    app: no-deposit-django
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: no-deposit-django-config
+  namespace: no-deposit
+data:
+  DJANGO_ALLOWED_HOSTS: "nodeposit.kubetest.uk,no-deposit-django.no-deposit.svc.cluster.local,no-deposit-metrics.no-deposit.svc.cluster.local"
+  DJANGO_DEBUG: "False"
+  POSTGRES_HOST: "no-deposit-postgres.no-deposit.svc.cluster.local"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "no_deposit"
+  POSTGRES_USER: "no_deposit"
+  OIDC_RP_CLIENT_ID: "no-deposit-app"
+  CELERY_BROKER_URL: "redis://no-deposit-redis.no-deposit.svc.cluster.local:6379/0"
+  EMAIL_HOST: "smtp.example.com"
+  EMAIL_PORT: "587"
+  EMAIL_USE_TLS: "True"
+  DEFAULT_FROM_EMAIL: "noreply@nodeposit.kubetest.uk"
+  HETZNER_OBJECT_STORAGE_BUCKET_NAME: "no-deposit"
+  HETZNER_OBJECT_STORAGE_ENDPOINT: "https://fsn1.your-objectstorage.com"
+  HETZNER_OBJECT_STORAGE_REGION: "fsn1"
+---
+# Internal-only service for Prometheus scraping — not routed through oauth2-proxy or ingress
+apiVersion: v1
+kind: Service
+metadata:
+  name: no-deposit-metrics
+  namespace: no-deposit
+  labels:
+    app: no-deposit-django
+    prometheus: "true"
+spec:
+  type: ClusterIP
+  selector:
+    app: no-deposit-django
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: metrics

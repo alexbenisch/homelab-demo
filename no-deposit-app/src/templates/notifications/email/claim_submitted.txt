@@ -1,0 +1,8 @@
+A new damage claim has been submitted and requires review.
+
+Claim ID: #{{ claim.pk }}
+Guarantee: {{ claim.guarantee.certificate_number }}
+Amount Claimed: €{{ claim.amount_claimed }}
+Submitted: {{ claim.submitted_at }}
+
+Review it at: https://nodeposit.kubetest.uk/agency/

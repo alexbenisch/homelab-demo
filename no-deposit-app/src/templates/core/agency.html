@@ -1,0 +1,12 @@
+{% extends "core/base_portal.html" %}
+{% block title %}Agency Portal{% endblock %}
+{% block content %}
+  <h1>Agency Portal <span class="badge">agent</span></h1>
+  <p>Welcome, {{ email }}.</p>
+  <ul>
+    <li><a href="/api/v1/applications/">Review applications</a></li>
+    <li><a href="/api/v1/guarantees/">Manage guarantees</a></li>
+    <li><a href="/api/v1/claims/">Process claims</a></li>
+    <li><a href="/api/docs/">API documentation</a></li>
+  </ul>
+{% endblock %}

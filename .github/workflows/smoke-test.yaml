@@ -1,0 +1,45 @@
+name: Smoke Test — Staging Login
+
+# Run manually or after no-deposit build succeeds.
+# Requires staging to be deployed and accessible at nodeposit.kubetest.uk.
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Base URL to test against"
+        required: false
+        default: "https://nodeposit.kubetest.uk"
+  workflow_run:
+    workflows: ["Build and Push No-Deposit Django"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    # Only run post-build smoke test on successful build
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright
+        run: pip install playwright && playwright install chromium --with-deps
+
+      - name: Run smoke test (tenant login + API assertions)
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'https://nodeposit.kubetest.uk' }}
+        run: |
+          python scripts/test-login.py "$BASE_URL" tenant1 'Tenant1Pass!' --path /tenant/
+
+      - name: Run smoke test (agent login + API assertions)
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'https://nodeposit.kubetest.uk' }}
+        run: |
+          python scripts/test-login.py "$BASE_URL" agent1 'Agent1Pass!' --path /agency/

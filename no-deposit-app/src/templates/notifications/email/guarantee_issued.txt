@@ -1,0 +1,11 @@
+A rental guarantee certificate has been issued.
+
+Certificate Number: {{ guarantee.certificate_number }}
+Property: {{ guarantee.application.property.address }}
+Valid Until: {{ guarantee.valid_until }}
+{% if guarantee.document_url %}
+Download certificate: {{ guarantee.document_url }}
+(Link expires in 15 minutes — request a new one via the portal.)
+{% endif %}
+
+View details at: https://nodeposit.kubetest.uk/

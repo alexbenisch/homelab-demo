@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-deposit-postgres
+  namespace: no-deposit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: no-deposit-postgres
+  template:
+    metadata:
+      labels:
+        app: no-deposit-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: no_deposit
+            - name: POSTGRES_USER
+              value: no_deposit
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "no_deposit"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: no-deposit-postgres
+  namespace: no-deposit
+spec:
+  type: ClusterIP
+  selector:
+    app: no-deposit-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

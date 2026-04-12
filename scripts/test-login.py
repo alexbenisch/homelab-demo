@@ -123,7 +123,40 @@ async def run():
         except:
             pass
 
-        # ── Step 7: check for 500s ────────────────────────────────────────
+        # ── Step 7: post-auth API assertions ──────────────────────────────
+        # The browser session now has oauth2-proxy cookies; Playwright will
+        # send them automatically, and oauth2-proxy will forward the JWT.
+        log(STEP_MARK, "Asserting API: GET /api/v1/users/me/")
+        try:
+            me_resp = await page.request.get(
+                f"{args.url.rstrip('/')}/api/v1/users/me/",
+                headers={"Accept": "application/json"},
+            )
+            if me_resp.ok:
+                me_data = await me_resp.json()
+                role = me_data.get("role", "unknown")
+                email = me_data.get("email", "unknown")
+                log(PASS_MARK, f"/api/v1/users/me/ → role={role} email={email}")
+            else:
+                log(FAIL_MARK, f"/api/v1/users/me/ returned HTTP {me_resp.status}")
+        except Exception as e:
+            log(FAIL_MARK, f"/api/v1/users/me/ request failed: {e}")
+
+        log(STEP_MARK, "Asserting API: GET /api/v1/applications/")
+        try:
+            apps_resp = await page.request.get(
+                f"{args.url.rstrip('/')}/api/v1/applications/",
+                headers={"Accept": "application/json"},
+            )
+            if apps_resp.ok:
+                apps_data = await apps_resp.json()
+                log(PASS_MARK, f"/api/v1/applications/ → {len(apps_data)} record(s)")
+            else:
+                log(FAIL_MARK, f"/api/v1/applications/ returned HTTP {apps_resp.status}")
+        except Exception as e:
+            log(FAIL_MARK, f"/api/v1/applications/ request failed: {e}")
+
+        # ── Step 8: check for 500s ────────────────────────────────────────
         failures = [r for r in requests_log if str(r["status"]).startswith(("4", "5")) or r["status"] == "NET_ERR"]
         oauth_errors = [r for r in failures if "oauth2/callback" in r["url"]]
         other_errors = [r for r in failures if "oauth2/callback" not in r["url"]]

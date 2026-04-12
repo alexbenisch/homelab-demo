@@ -1,0 +1,8 @@
+A new rental application has been submitted and requires review.
+
+Application ID: #{{ application.pk }}
+Property: {{ application.property.address }}
+Tenant: {{ application.tenant.email }}
+Submitted: {{ application.submitted_at }}
+
+Review it at: https://nodeposit.kubetest.uk/agency/

@@ -1,0 +1,8 @@
+Your rental application has been reviewed.
+
+Application ID: #{{ application.pk }}
+Property: {{ application.property.address }}
+Decision: {{ application.status|upper }}
+{% if application.notes %}Notes: {{ application.notes }}{% endif %}
+
+View your application at: https://nodeposit.kubetest.uk/tenant/

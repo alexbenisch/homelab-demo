@@ -7,5 +7,10 @@ resources:
   - nginx-deployment.yaml
   - oauth2-proxy-secret.yaml
   - oauth2-proxy-deployment.yaml
+  - django-secret.yaml
+  - postgres-deployment.yaml
+  - redis-deployment.yaml
+  - django-deployment.yaml
+  - celery-worker-deployment.yaml
   - ingress.yaml
   - keycloak-setup-job.yaml

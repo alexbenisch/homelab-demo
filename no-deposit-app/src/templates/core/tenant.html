@@ -1,0 +1,11 @@
+{% extends "core/base_portal.html" %}
+{% block title %}Tenant Portal{% endblock %}
+{% block content %}
+  <h1>Tenant Portal <span class="badge">tenant</span></h1>
+  <p>Welcome, {{ email }}.</p>
+  <ul>
+    <li><a href="/api/v1/applications/">My applications</a></li>
+    <li><a href="/api/v1/guarantees/">My guarantees</a></li>
+    <li><a href="/api/v1/me/export/">Export my data (GDPR)</a></li>
+  </ul>
+{% endblock %}

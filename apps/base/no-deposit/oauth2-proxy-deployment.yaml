@@ -19,7 +19,7 @@ spec:
           args:
             - --provider=keycloak-oidc
             - --oidc-issuer-url=https://auth.kubetest.uk/realms/no-deposit
-            - --upstream=http://no-deposit-nginx:80
+            - --upstream=http://no-deposit-django:8000
             - --http-address=0.0.0.0:4180
             - --redirect-url=https://nodeposit.kubetest.uk/oauth2/callback
             - --email-domain=*

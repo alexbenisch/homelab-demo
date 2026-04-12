@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-deposit-celery-worker
+  namespace: no-deposit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: no-deposit-celery-worker
+  template:
+    metadata:
+      labels:
+        app: no-deposit-celery-worker
+    spec:
+      containers:
+        - name: celery-worker
+          image: ghcr.io/alexbenisch/no-deposit:latest # {"$imagepolicy": "flux-system:no-deposit"}
+          command: ["celery", "-A", "no_deposit", "worker", "--loglevel=info", "--concurrency=2"]
+          envFrom:
+            - configMapRef:
+                name: no-deposit-django-config
+          env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: DJANGO_SECRET_KEY
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: POSTGRES_PASSWORD
+            - name: OIDC_RP_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: OIDC_RP_CLIENT_SECRET
+            - name: HETZNER_OBJECT_STORAGE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: HETZNER_OBJECT_STORAGE_ACCESS_KEY
+            - name: HETZNER_OBJECT_STORAGE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: HETZNER_OBJECT_STORAGE_SECRET_KEY
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: no-deposit-django
+                  key: SENTRY_DSN
+                  optional: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

@@ -125,6 +125,89 @@ spec:
               create_user landlord1 landlord1@nodeposit.example "Landlord1Pass!" landlord Bob     Jones
               create_user agent1    agent1@nodeposit.example    "Agent1Pass!"    agent    Carol   Admin
 
+              echo "=== Setting up MFA for agent and admin roles ==="
+
+              # Create mfa-required realm role — assigned to users that must use TOTP
+              /opt/keycloak/bin/kcadm.sh create roles -r no-deposit \
+                -s name=mfa-required \
+                -s 'description=Requires TOTP at login' \
+                2>/dev/null && echo "Created role: mfa-required" || echo "Role already exists: mfa-required"
+
+              # Assign mfa-required to agent1 (and any future agent/admin users)
+              /opt/keycloak/bin/kcadm.sh add-roles -r no-deposit \
+                --uusername agent1 --rolename mfa-required 2>/dev/null || true
+
+              # Set realm OTP policy (TOTP, SHA1, 6 digits, 30s)
+              /opt/keycloak/bin/kcadm.sh update realms/no-deposit \
+                -s otpPolicyType=totp \
+                -s otpPolicyAlgorithm=HmacSHA1 \
+                -s otpPolicyDigits=6 \
+                -s otpPolicyPeriod=30 2>/dev/null || true
+
+              # Copy the default browser flow as browser-mfa (idempotent)
+              if ! /opt/keycloak/bin/kcadm.sh get authentication/flows -r no-deposit \
+                  --fields alias --format csv --noquotes 2>/dev/null | grep -q "^browser-mfa$"; then
+                /opt/keycloak/bin/kcadm.sh create authentication/flows/browser/copy \
+                  -r no-deposit -s newName="browser-mfa"
+                echo "Copied browser flow to browser-mfa"
+              else
+                echo "Flow browser-mfa already exists"
+              fi
+
+              # Find the Conditional OTP sub-flow within browser-mfa
+              COND_FLOW_ID=$(/opt/keycloak/bin/kcadm.sh get authentication/flows/browser-mfa/executions \
+                -r no-deposit --fields displayName,flowId --format csv --noquotes 2>/dev/null \
+                | grep "Conditional OTP" | cut -d, -f2 || true)
+
+              if [ -n "$COND_FLOW_ID" ]; then
+                COND_FLOW_ALIAS=$(/opt/keycloak/bin/kcadm.sh get authentication/flows \
+                  -r no-deposit --fields id,alias --format csv --noquotes 2>/dev/null \
+                  | grep "^$COND_FLOW_ID," | cut -d, -f2 || true)
+
+                if [ -n "$COND_FLOW_ALIAS" ]; then
+                  # Remove "Condition - User Configured" so TOTP fires for any mfa-required user
+                  # even if they haven't set it up yet (they'll be prompted on first login)
+                  OLD_COND=$(/opt/keycloak/bin/kcadm.sh get "authentication/flows/$COND_FLOW_ALIAS/executions" \
+                    -r no-deposit --fields id,providerId --format csv --noquotes 2>/dev/null \
+                    | grep ",condition-user-configured$" | cut -d, -f1 || true)
+                  if [ -n "$OLD_COND" ]; then
+                    /opt/keycloak/bin/kcadm.sh delete "authentication/executions/$OLD_COND" \
+                      -r no-deposit 2>/dev/null || true
+                    echo "Removed condition-user-configured"
+                  fi
+
+                  # Add Condition - User Role (idempotent)
+                  if ! /opt/keycloak/bin/kcadm.sh get "authentication/flows/$COND_FLOW_ALIAS/executions" \
+                      -r no-deposit --fields providerId --format csv --noquotes 2>/dev/null \
+                      | grep -q "^condition-user-role$"; then
+                    /opt/keycloak/bin/kcadm.sh create "authentication/flows/$COND_FLOW_ALIAS/executions/execution" \
+                      -r no-deposit -s provider=condition-user-role
+                    echo "Added condition-user-role execution"
+                  fi
+
+                  # Set REQUIRED and configure for mfa-required realm role
+                  ROLE_COND_ID=$(/opt/keycloak/bin/kcadm.sh get "authentication/flows/$COND_FLOW_ALIAS/executions" \
+                    -r no-deposit --fields id,providerId --format csv --noquotes 2>/dev/null \
+                    | grep ",condition-user-role$" | cut -d, -f1 || true)
+
+                  if [ -n "$ROLE_COND_ID" ]; then
+                    /opt/keycloak/bin/kcadm.sh update "authentication/executions/$ROLE_COND_ID" \
+                      -r no-deposit -s requirement=REQUIRED 2>/dev/null || true
+                    /opt/keycloak/bin/kcadm.sh create "authentication/executions/$ROLE_COND_ID/config" \
+                      -r no-deposit \
+                      -s alias=mfa-role-condition \
+                      -s 'config.condUserRole=no-deposit.mfa-required' \
+                      2>/dev/null || echo "Role condition config already exists"
+                    echo "Configured TOTP condition for mfa-required role"
+                  fi
+                fi
+              fi
+
+              # Bind browser-mfa flow to realm
+              /opt/keycloak/bin/kcadm.sh update realms/no-deposit \
+                -s browserFlow=browser-mfa 2>/dev/null \
+                && echo "Bound browser-mfa to realm" || echo "Failed to bind browser-mfa"
+
               echo "=== Keycloak setup complete ==="
           env:
             - name: KEYCLOAK_ADMIN_PASSWORD

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page { size: A4; margin: 2cm; }
+    body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #222; }
+    .header { text-align: center; border-bottom: 3px solid #1a3c6e; padding-bottom: 1em; margin-bottom: 2em; }
+    .header h1 { font-size: 2em; color: #1a3c6e; margin: 0; }
+    .header .subtitle { color: #555; font-size: 1.1em; }
+    .cert-number { font-size: 1.3em; font-weight: bold; color: #1a3c6e; }
+    table { width: 100%; border-collapse: collapse; margin: 1.5em 0; }
+    th { text-align: left; padding: 0.5em; background: #f0f4fa; color: #1a3c6e; width: 35%; }
+    td { padding: 0.5em; border-bottom: 1px solid #e0e6f0; }
+    .status { display: inline-block; padding: 0.2em 0.8em; border-radius: 4px; background: #d4edda; color: #155724; font-weight: bold; }
+    .footer { margin-top: 3em; font-size: 0.85em; color: #777; border-top: 1px solid #ddd; padding-top: 1em; }
+    .seal { text-align: right; margin-top: 2em; font-style: italic; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>No-Deposit Rental Guarantee</h1>
+    <div class="subtitle">Official Guarantee Certificate</div>
+  </div>
+
+  <p>This certificate confirms that the following rental deposit guarantee has been issued:</p>
+
+  <p class="cert-number">Certificate No: {{ guarantee.certificate_number }}</p>
+
+  <table>
+    <tr><th>Status</th><td><span class="status">{{ guarantee.get_status_display }}</span></td></tr>
+    <tr><th>Valid Until</th><td>{{ guarantee.valid_until|date:"j F Y" }}</td></tr>
+    <tr><th>Issued</th><td>{{ guarantee.issued_at|date:"j F Y" }}</td></tr>
+  </table>
+
+  <h3>Property Details</h3>
+  <table>
+    <tr><th>Address</th><td>{{ property.address }}</td></tr>
+    <tr><th>Monthly Rent</th><td>€{{ property.rent_amount }}</td></tr>
+  </table>
+
+  <h3>Tenant Details</h3>
+  <table>
+    <tr><th>Email</th><td>{{ tenant.email }}</td></tr>
+  </table>
+
+  <div class="seal">
+    <p>Issued by No-Deposit Rental Platform<br>
+    <strong>nodeposit.kubetest.uk</strong></p>
+  </div>
+
+  <div class="footer">
+    <p>This guarantee is subject to the terms and conditions of the No-Deposit Rental Platform.
+    To verify this guarantee, visit https://nodeposit.kubetest.uk/api/v1/guarantees/{{ guarantee.pk }}/validate/</p>
+  </div>
+</body>
+</html>

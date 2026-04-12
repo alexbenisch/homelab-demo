@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/alex/repos/homelab-demo/scripts/hooks/post-edit-py.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash /home/alex/repos/homelab-demo/scripts/hooks/post-edit-yaml.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
