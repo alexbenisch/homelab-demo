@@ -14,8 +14,14 @@ class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = RentalApplication
         fields = [
-            "id", "property", "tenant", "status",
-            "submitted_at", "reviewed_at", "reviewer_sub", "notes",
+            "id",
+            "property",
+            "tenant",
+            "status",
+            "submitted_at",
+            "reviewed_at",
+            "reviewer_sub",
+            "notes",
         ]
         read_only_fields = ["tenant", "status", "submitted_at", "reviewed_at", "reviewer_sub"]
 

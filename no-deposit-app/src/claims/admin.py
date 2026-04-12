@@ -18,6 +18,7 @@ class DamageClaimAdmin(admin.ModelAdmin):
     @admin.action(description="Approve selected claims")
     def approve(self, request, queryset):
         from django.utils import timezone
+
         queryset.filter(status="under_review").update(
             status="approved",
             reviewed_at=timezone.now(),
@@ -27,6 +28,7 @@ class DamageClaimAdmin(admin.ModelAdmin):
     @admin.action(description="Reject selected claims")
     def reject(self, request, queryset):
         from django.utils import timezone
+
         queryset.filter(status="under_review").update(
             status="rejected",
             reviewed_at=timezone.now(),

@@ -1,6 +1,5 @@
 from users.models import UserProfile
 
-
 _ROLE_PRIORITY = ["admin", "agent", "landlord", "tenant"]
 
 

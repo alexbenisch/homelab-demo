@@ -22,6 +22,7 @@ class RentalApplicationAdmin(admin.ModelAdmin):
     @admin.action(description="Approve selected applications")
     def approve(self, request, queryset):
         from django.utils import timezone
+
         queryset.filter(status="pending").update(
             status="approved",
             reviewed_at=timezone.now(),
@@ -31,6 +32,7 @@ class RentalApplicationAdmin(admin.ModelAdmin):
     @admin.action(description="Reject selected applications")
     def reject(self, request, queryset):
         from django.utils import timezone
+
         queryset.filter(status="pending").update(
             status="rejected",
             reviewed_at=timezone.now(),

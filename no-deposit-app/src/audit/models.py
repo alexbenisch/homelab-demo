@@ -27,7 +27,9 @@ class AuditLog(models.Model):
         return f"{self.timestamp:%Y-%m-%d %H:%M} {self.entity_type}#{self.entity_id} {self.action}"
 
     @classmethod
-    def record(cls, *, entity_type: str, entity_id, action: str, actor_id: str, actor_ip=None, payload=None):
+    def record(
+        cls, *, entity_type: str, entity_id, action: str, actor_id: str, actor_ip=None, payload=None
+    ):
         return cls.objects.create(
             entity_type=entity_type,
             entity_id=str(entity_id),

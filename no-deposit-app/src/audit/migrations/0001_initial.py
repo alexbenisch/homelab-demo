@@ -4,27 +4,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='AuditLog',
+            name="AuditLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('entity_type', models.CharField(max_length=50)),
-                ('entity_id', models.CharField(max_length=50)),
-                ('action', models.CharField(max_length=100)),
-                ('actor_id', models.CharField(max_length=255)),
-                ('actor_ip', models.GenericIPAddressField(blank=True, null=True)),
-                ('payload', models.JSONField(blank=True, default=dict)),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("entity_type", models.CharField(max_length=50)),
+                ("entity_id", models.CharField(max_length=50)),
+                ("action", models.CharField(max_length=100)),
+                ("actor_id", models.CharField(max_length=255)),
+                ("actor_ip", models.GenericIPAddressField(blank=True, null=True)),
+                ("payload", models.JSONField(blank=True, default=dict)),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'ordering': ['-timestamp'],
+                "ordering": ["-timestamp"],
             },
         ),
     ]

@@ -4,26 +4,40 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='UserProfile',
+            name="UserProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('keycloak_sub', models.CharField(db_index=True, max_length=255, unique=True)),
-                ('email', models.EmailField(blank=True, max_length=254)),
-                ('role', models.CharField(choices=[('tenant', 'Tenant'), ('landlord', 'Landlord'), ('agent', 'Agent'), ('admin', 'Admin')], max_length=20)),
-                ('phone', models.CharField(blank=True, max_length=30)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("keycloak_sub", models.CharField(db_index=True, max_length=255, unique=True)),
+                ("email", models.EmailField(blank=True, max_length=254)),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[
+                            ("tenant", "Tenant"),
+                            ("landlord", "Landlord"),
+                            ("agent", "Agent"),
+                            ("admin", "Admin"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("phone", models.CharField(blank=True, max_length=30)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
     ]

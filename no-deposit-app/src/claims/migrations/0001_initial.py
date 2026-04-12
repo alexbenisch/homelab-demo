@@ -5,30 +5,53 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('guarantees', '0001_initial'),
+        ("guarantees", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DamageClaim',
+            name="DamageClaim",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount_claimed', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('evidence_urls', models.JSONField(default=list)),
-                ('status', models.CharField(choices=[('open', 'Open'), ('under_review', 'Under Review'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='open', max_length=20)),
-                ('submitted_at', models.DateTimeField(auto_now_add=True)),
-                ('submitted_by_sub', models.CharField(max_length=255)),
-                ('reviewed_at', models.DateTimeField(blank=True, null=True)),
-                ('reviewer_sub', models.CharField(blank=True, max_length=255)),
-                ('reviewer_notes', models.TextField(blank=True)),
-                ('guarantee', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='claims', to='guarantees.guarantee')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("amount_claimed", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("evidence_urls", models.JSONField(default=list)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("open", "Open"),
+                            ("under_review", "Under Review"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
+                        ],
+                        default="open",
+                        max_length=20,
+                    ),
+                ),
+                ("submitted_at", models.DateTimeField(auto_now_add=True)),
+                ("submitted_by_sub", models.CharField(max_length=255)),
+                ("reviewed_at", models.DateTimeField(blank=True, null=True)),
+                ("reviewer_sub", models.CharField(blank=True, max_length=255)),
+                ("reviewer_notes", models.TextField(blank=True)),
+                (
+                    "guarantee",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="claims",
+                        to="guarantees.guarantee",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-submitted_at'],
+                "ordering": ["-submitted_at"],
             },
         ),
     ]

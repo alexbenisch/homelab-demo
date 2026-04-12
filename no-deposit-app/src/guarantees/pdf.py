@@ -17,6 +17,7 @@ def generate_certificate_pdf(guarantee) -> bytes:
         },
     )
     from weasyprint import HTML
+
     return HTML(string=html, base_url=None).write_pdf()
 
 

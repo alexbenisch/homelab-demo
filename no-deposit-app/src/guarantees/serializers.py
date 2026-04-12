@@ -7,8 +7,14 @@ class GuaranteeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guarantee
         fields = [
-            "id", "application", "certificate_number",
-            "valid_until", "status", "document_url", "issued_at", "issued_by_sub",
+            "id",
+            "application",
+            "certificate_number",
+            "valid_until",
+            "status",
+            "document_url",
+            "issued_at",
+            "issued_by_sub",
         ]
         read_only_fields = ["certificate_number", "issued_at", "issued_by_sub"]
 
@@ -28,4 +34,5 @@ class ValidateGuaranteeSerializer(serializers.ModelSerializer):
 
     def get_is_valid(self, obj) -> bool:
         from django.utils import timezone
+
         return obj.status == "active" and obj.valid_until >= timezone.now().date()

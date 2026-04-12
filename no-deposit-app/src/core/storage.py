@@ -9,7 +9,9 @@ from minio import Minio
 def get_minio_client() -> Minio:
     """Return a configured MinIO client for Hetzner Object Storage."""
     # Strip scheme — MinIO SDK takes host:port only
-    endpoint = settings.HETZNER_OBJECT_STORAGE_ENDPOINT.replace("https://", "").replace("http://", "")
+    endpoint = settings.HETZNER_OBJECT_STORAGE_ENDPOINT.replace("https://", "").replace(
+        "http://", ""
+    )
     return Minio(
         endpoint=endpoint,
         access_key=settings.HETZNER_OBJECT_STORAGE_ACCESS_KEY,

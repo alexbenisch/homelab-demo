@@ -11,9 +11,7 @@ from core.storage import presigned_put_url, storage_configured
 
 class KYCUploadRequestSerializer(serializers.Serializer):
     filename = serializers.CharField(max_length=255)
-    content_type = serializers.ChoiceField(
-        choices=["image/jpeg", "image/png", "application/pdf"]
-    )
+    content_type = serializers.ChoiceField(choices=["image/jpeg", "image/png", "application/pdf"])
 
 
 class KYCUploadView(APIView):
