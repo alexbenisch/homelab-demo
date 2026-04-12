@@ -20,6 +20,7 @@ class MeView(APIView):
 
     def get(self, request):
         from .serializers import UserProfileSerializer
+
         profile = get_or_create_profile(request)
         return Response(UserProfileSerializer(profile).data)
 
@@ -36,6 +37,7 @@ class MeView(APIView):
 
         # Anonymise applications submitted by this tenant
         from properties.models import RentalApplication
+
         RentalApplication.objects.filter(tenant=profile).update(notes="[deleted]")
 
         AuditLog.record(
@@ -56,30 +58,31 @@ class MeExportView(APIView):
     permission_classes = [IsValidJWT]
 
     def get(self, request):
-        from properties.models import RentalApplication
-        from guarantees.models import Guarantee
         from claims.models import DamageClaim
+        from guarantees.models import Guarantee
+        from properties.models import RentalApplication
+
         from .serializers import UserProfileSerializer
 
         profile = get_or_create_profile(request)
 
-        applications = RentalApplication.objects.select_related(
-            "property"
-        ).filter(tenant=profile).values(
-            "id", "property__address", "status", "submitted_at", "reviewed_at", "notes"
+        applications = (
+            RentalApplication.objects.select_related("property")
+            .filter(tenant=profile)
+            .values("id", "property__address", "status", "submitted_at", "reviewed_at", "notes")
         )
 
-        guarantees = Guarantee.objects.filter(
-            application__tenant=profile
-        ).values(
+        guarantees = Guarantee.objects.filter(application__tenant=profile).values(
             "id", "certificate_number", "valid_until", "status", "issued_at"
         )
 
-        claims = DamageClaim.objects.filter(
-            guarantee__application__property__landlord=profile
-        ).values(
-            "id", "amount_claimed", "status", "submitted_at"
-        ) if profile.role == "landlord" else []
+        claims = (
+            DamageClaim.objects.filter(guarantee__application__property__landlord=profile).values(
+                "id", "amount_claimed", "status", "submitted_at"
+            )
+            if profile.role == "landlord"
+            else []
+        )
 
         return Response(
             {

@@ -1,4 +1,3 @@
-from django.conf import settings
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -21,14 +20,14 @@ class GuaranteeViewSet(viewsets.ModelViewSet):
             return Guarantee.objects.select_related("application__tenant").all()
         if auth.has_role("landlord"):
             profile = get_or_create_profile(self.request)
-            return Guarantee.objects.filter(
-                application__property__landlord=profile
-            ).select_related("application")
+            return Guarantee.objects.filter(application__property__landlord=profile).select_related(
+                "application"
+            )
         if auth.has_role("tenant"):
             profile = get_or_create_profile(self.request)
-            return Guarantee.objects.filter(
-                application__tenant=profile
-            ).select_related("application")
+            return Guarantee.objects.filter(application__tenant=profile).select_related(
+                "application"
+            )
         return Guarantee.objects.none()
 
     def get_serializer_class(self):
@@ -58,9 +57,11 @@ class GuaranteeViewSet(viewsets.ModelViewSet):
 
         # Generate and upload PDF certificate if object storage is configured
         from core.storage import storage_configured
+
         if storage_configured():
             try:
                 from .pdf import generate_certificate_pdf, store_certificate
+
                 pdf_bytes = generate_certificate_pdf(guarantee)
                 guarantee.document_url = store_certificate(guarantee, pdf_bytes)
                 guarantee.save(update_fields=["document_url"])
@@ -76,11 +77,11 @@ class GuaranteeViewSet(viewsets.ModelViewSet):
             payload={"certificate_number": guarantee.certificate_number},
         )
         from notifications.tasks import send_guarantee_issued
+
         send_guarantee_issued.delay(guarantee.pk)
         return Response(GuaranteeSerializer(guarantee).data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=["get"], url_path="validate",
-            permission_classes=[IsValidJWT])
+    @action(detail=True, methods=["get"], url_path="validate", permission_classes=[IsValidJWT])
     def validate(self, request, pk=None):
         guarantee = self.get_object()
         return Response(ValidateGuaranteeSerializer(guarantee).data)

@@ -48,12 +48,12 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             actor_ip=request.META.get("REMOTE_ADDR"),
         )
         from notifications.tasks import send_application_submitted
+
         send_application_submitted.delay(application.pk)
         out = ApplicationSerializer(application)
         return Response(out.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=["patch"], url_path="review",
-            permission_classes=[IsAgentOrAdmin])
+    @action(detail=True, methods=["patch"], url_path="review", permission_classes=[IsAgentOrAdmin])
     def review(self, request, pk=None):
         application = self.get_object()
         if application.status != "pending":
@@ -79,5 +79,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             payload={"notes": notes},
         )
         from notifications.tasks import send_application_reviewed
+
         send_application_reviewed.delay(application.pk)
         return Response(ApplicationSerializer(application).data)

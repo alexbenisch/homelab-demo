@@ -50,5 +50,6 @@ class ClaimViewSet(viewsets.ModelViewSet):
             payload={"amount_claimed": str(claim.amount_claimed)},
         )
         from notifications.tasks import send_claim_submitted
+
         send_claim_submitted.delay(claim.pk)
         return Response(ClaimSerializer(claim).data, status=status.HTTP_201_CREATED)

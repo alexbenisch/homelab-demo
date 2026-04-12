@@ -11,8 +11,8 @@ from rest_framework.test import APIClient
 from core.auth import JWTPayload
 from users.models import UserProfile
 
-
 # ── JWT payload helpers ────────────────────────────────────────────────────────
+
 
 def _payload(sub: str, email: str, roles: list[str]) -> JWTPayload:
     return JWTPayload({"sub": sub, "email": email, "realm_access": {"roles": roles}})
@@ -40,6 +40,7 @@ def agent_payload() -> JWTPayload:
 
 
 # ── UserProfile fixtures ───────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def tenant_profile(tenant_payload: JWTPayload) -> UserProfile:
@@ -70,6 +71,7 @@ def agent_profile(agent_payload: JWTPayload) -> UserProfile:
 
 # ── API client fixtures ────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def tenant_client(tenant_payload: JWTPayload, tenant_profile: UserProfile) -> APIClient:
     return _client(tenant_payload)
@@ -92,9 +94,11 @@ def anon_client() -> APIClient:
 
 # ── Domain object fixtures ────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def property_obj(landlord_profile: UserProfile):
     from properties.models import Property
+
     return Property.objects.create(
         landlord=landlord_profile,
         address="1 Test Street, London",
@@ -106,6 +110,7 @@ def property_obj(landlord_profile: UserProfile):
 @pytest.fixture
 def pending_application(tenant_profile: UserProfile, property_obj):
     from properties.models import RentalApplication
+
     return RentalApplication.objects.create(
         property=property_obj,
         tenant=tenant_profile,
@@ -116,6 +121,7 @@ def pending_application(tenant_profile: UserProfile, property_obj):
 @pytest.fixture
 def approved_application(pending_application, agent_profile: UserProfile):
     from django.utils import timezone
+
     pending_application.status = "approved"
     pending_application.reviewed_at = timezone.now()
     pending_application.reviewer_sub = agent_profile.keycloak_sub
@@ -126,7 +132,9 @@ def approved_application(pending_application, agent_profile: UserProfile):
 @pytest.fixture
 def active_guarantee(approved_application, agent_profile: UserProfile):
     from django.utils import timezone
+
     from guarantees.models import Guarantee
+
     return Guarantee.objects.create(
         application=approved_application,
         valid_until=timezone.now().date(),

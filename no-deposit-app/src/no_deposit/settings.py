@@ -131,7 +131,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 HETZNER_OBJECT_STORAGE_ENDPOINT = os.environ.get("HETZNER_OBJECT_STORAGE_ENDPOINT", "")
 HETZNER_OBJECT_STORAGE_ACCESS_KEY = os.environ.get("HETZNER_OBJECT_STORAGE_ACCESS_KEY", "")
 HETZNER_OBJECT_STORAGE_SECRET_KEY = os.environ.get("HETZNER_OBJECT_STORAGE_SECRET_KEY", "")
-HETZNER_OBJECT_STORAGE_BUCKET_NAME = os.environ.get("HETZNER_OBJECT_STORAGE_BUCKET_NAME", "no-deposit")
+HETZNER_OBJECT_STORAGE_BUCKET_NAME = os.environ.get(
+    "HETZNER_OBJECT_STORAGE_BUCKET_NAME", "no-deposit"
+)
 # Pre-signed URL expiry for KYC documents and certificates (seconds)
 S3_PRESIGNED_URL_EXPIRY = 900  # 15 minutes
 
@@ -153,9 +155,7 @@ CELERY_TIMEZONE = "UTC"
 CELERY_TASK_TRACK_STARTED = True
 
 # Email (SMTP — configure via env vars; works with any provider)
-EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
-)
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"

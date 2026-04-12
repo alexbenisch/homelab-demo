@@ -7,23 +7,32 @@ def health(request):
 
 
 def landing(request):
-    return render(request, "core/landing.html", {
-        "email": request.jwt_email,
-        "roles": request.jwt_roles,
-    })
+    return render(
+        request,
+        "core/landing.html",
+        {
+            "email": request.jwt_email,
+            "roles": request.jwt_roles,
+        },
+    )
 
 
 def _portal_view(request, portal, required_role, template):
     if required_role not in request.jwt_roles:
-        return HttpResponseForbidden(
-            f"<h1>403 Forbidden</h1><p>This portal requires the <strong>{required_role}</strong> role.</p>",
-            content_type="text/html",
+        msg = (
+            f"<h1>403 Forbidden</h1>"
+            f"<p>This portal requires the <strong>{required_role}</strong> role.</p>"
         )
-    return render(request, template, {
-        "email": request.jwt_email,
-        "roles": request.jwt_roles,
-        "portal": portal,
-    })
+        return HttpResponseForbidden(msg, content_type="text/html")
+    return render(
+        request,
+        template,
+        {
+            "email": request.jwt_email,
+            "roles": request.jwt_roles,
+            "portal": portal,
+        },
+    )
 
 
 def tenant_portal(request):

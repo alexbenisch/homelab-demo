@@ -13,6 +13,8 @@ spec:
       labels:
         app: no-deposit-django
     spec:
+      imagePullSecrets:
+        - name: ghcr-credentials
       containers:
         - name: django
           image: ghcr.io/alexbenisch/no-deposit:latest # {"$imagepolicy": "flux-system:no-deposit"}

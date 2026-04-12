@@ -27,8 +27,11 @@ class TestAuditLog:
         from audit.models import AuditLog
 
         log = AuditLog.record(
-            entity_type="Test", entity_id=1, action="created",
-            actor_id="sub", actor_ip=None,
+            entity_type="Test",
+            entity_id=1,
+            action="created",
+            actor_id="sub",
+            actor_ip=None,
         )
         log.action = "tampered"
         with pytest.raises(PermissionError, match="immutable"):
@@ -38,8 +41,11 @@ class TestAuditLog:
         from audit.models import AuditLog
 
         log = AuditLog.record(
-            entity_type="Test", entity_id=2, action="created",
-            actor_id="sub", actor_ip=None,
+            entity_type="Test",
+            entity_id=2,
+            action="created",
+            actor_id="sub",
+            actor_ip=None,
         )
         with pytest.raises(PermissionError, match="cannot be deleted"):
             log.delete()
@@ -48,8 +54,11 @@ class TestAuditLog:
         from audit.models import AuditLog
 
         log = AuditLog.record(
-            entity_type="Test", entity_id=3, action="x",
-            actor_id="sub", actor_ip=None,
+            entity_type="Test",
+            entity_id=3,
+            action="x",
+            actor_id="sub",
+            actor_ip=None,
         )
         assert log.payload == {}
 
@@ -63,6 +72,7 @@ class TestGuaranteeCertificateNumber:
 
     def test_auto_generated_on_create(self, approved_application):
         from django.utils import timezone
+
         from guarantees.models import Guarantee
 
         g = Guarantee.objects.create(

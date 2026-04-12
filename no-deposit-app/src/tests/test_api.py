@@ -12,6 +12,7 @@ pytestmark = pytest.mark.django_db
 
 # ── Authentication ─────────────────────────────────────────────────────────────
 
+
 class TestAuthentication:
     def test_unauthenticated_request_rejected(self, anon_client):
         # OAuthProxyJWTAuthentication provides WWW-Authenticate: Bearer,
@@ -25,6 +26,7 @@ class TestAuthentication:
 
 
 # ── Applications ───────────────────────────────────────────────────────────────
+
 
 class TestApplications:
     def test_tenant_can_submit_application(self, tenant_client, property_obj):
@@ -77,9 +79,7 @@ class TestApplications:
         )
         assert resp.status_code == 403
 
-    def test_cannot_review_already_reviewed_application(
-        self, agent_client, approved_application
-    ):
+    def test_cannot_review_already_reviewed_application(self, agent_client, approved_application):
         resp = agent_client.patch(
             f"/api/v1/applications/{approved_application.pk}/review/",
             {"decision": "rejected"},
@@ -89,13 +89,18 @@ class TestApplications:
 
 # ── Guarantees ────────────────────────────────────────────────────────────────
 
+
 class TestGuarantees:
     def test_agent_can_issue_guarantee(self, agent_client, approved_application):
         from django.utils import timezone
-        resp = agent_client.post("/api/v1/guarantees/", {
-            "application": approved_application.pk,
-            "valid_until": (timezone.now().date()).isoformat(),
-        })
+
+        resp = agent_client.post(
+            "/api/v1/guarantees/",
+            {
+                "application": approved_application.pk,
+                "valid_until": (timezone.now().date()).isoformat(),
+            },
+        )
         assert resp.status_code == 201
         assert resp.data["certificate_number"].startswith("ND-")
 
@@ -103,44 +108,60 @@ class TestGuarantees:
         self, agent_client, pending_application
     ):
         from django.utils import timezone
-        resp = agent_client.post("/api/v1/guarantees/", {
-            "application": pending_application.pk,
-            "valid_until": timezone.now().date().isoformat(),
-        })
+
+        resp = agent_client.post(
+            "/api/v1/guarantees/",
+            {
+                "application": pending_application.pk,
+                "valid_until": timezone.now().date().isoformat(),
+            },
+        )
         assert resp.status_code == 400
 
     def test_cannot_issue_duplicate_guarantee(
         self, agent_client, approved_application, active_guarantee
     ):
         from django.utils import timezone
-        resp = agent_client.post("/api/v1/guarantees/", {
-            "application": approved_application.pk,
-            "valid_until": timezone.now().date().isoformat(),
-        })
+
+        resp = agent_client.post(
+            "/api/v1/guarantees/",
+            {
+                "application": approved_application.pk,
+                "valid_until": timezone.now().date().isoformat(),
+            },
+        )
         assert resp.status_code == 400
 
 
 # ── Claims ────────────────────────────────────────────────────────────────────
 
+
 class TestClaims:
     def test_landlord_can_submit_claim(self, landlord_client, active_guarantee):
-        resp = landlord_client.post("/api/v1/claims/", {
-            "guarantee": active_guarantee.pk,
-            "amount_claimed": "500.00",
-            "evidence_urls": [],
-        })
+        resp = landlord_client.post(
+            "/api/v1/claims/",
+            {
+                "guarantee": active_guarantee.pk,
+                "amount_claimed": "500.00",
+                "evidence_urls": [],
+            },
+        )
         assert resp.status_code == 201
         assert resp.data["status"] == "open"
 
     def test_tenant_cannot_submit_claim(self, tenant_client, active_guarantee):
-        resp = tenant_client.post("/api/v1/claims/", {
-            "guarantee": active_guarantee.pk,
-            "amount_claimed": "500.00",
-        })
+        resp = tenant_client.post(
+            "/api/v1/claims/",
+            {
+                "guarantee": active_guarantee.pk,
+                "amount_claimed": "500.00",
+            },
+        )
         assert resp.status_code == 403
 
 
 # ── GDPR endpoints ────────────────────────────────────────────────────────────
+
 
 class TestGDPR:
     def test_me_returns_own_profile(self, tenant_client, tenant_profile):
@@ -165,6 +186,7 @@ class TestGDPR:
 
 
 # ── Metrics ───────────────────────────────────────────────────────────────────
+
 
 class TestMetrics:
     def test_metrics_endpoint_accessible_without_auth(self, anon_client):
