@@ -63,7 +63,7 @@ class OAuthProxyJWTAuthentication(BaseAuthentication):
         except jwt.InvalidTokenError as exc:
             raise AuthenticationFailed(f"Invalid token: {exc}")
 
-        return (request.user, JWTPayload(payload))
+        return (request._request.user, JWTPayload(payload))
 
     def authenticate_header(self, request):
         return "Bearer"
