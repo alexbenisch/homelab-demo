@@ -1,12 +1,239 @@
 {% extends "core/base_portal.html" %}
 {% block title %}Agency Portal{% endblock %}
+
+{% block styles %}
+.filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.filter-btn { padding: 0.25rem 0.7rem; border-radius: 12px; border: 1px solid #ddd; background: #f5f5f5; font-size: 0.82rem; cursor: pointer; }
+.filter-btn.active { background: #0066cc; color: #fff; border-color: #0066cc; }
+.expand-row { display: none; }
+.expand-row.open { display: table-row; }
+.expand-row td { background: #f8f9fa; padding: 0.85rem 0.75rem; }
+.issue-inline { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+{% endblock %}
+
 {% block content %}
-  <h1>Agency Portal <span class="badge">agent</span></h1>
-  <p>Welcome, {{ email }}.</p>
-  <ul>
-    <li><a href="/api/v1/applications/">Review applications</a></li>
-    <li><a href="/api/v1/guarantees/">Manage guarantees</a></li>
-    <li><a href="/api/v1/claims/">Process claims</a></li>
-    <li><a href="/api/docs/">API documentation</a></li>
-  </ul>
+<h1>Agency Portal <span class="badge">agent</span></h1>
+<p class="meta">Welcome, {{ email }}.</p>
+
+<div id="msg-global"></div>
+
+<!-- ── Applications ──────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>Applications</h2>
+    <span id="apps-count" class="meta"></span>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterApps('all', this)">All</button>
+    <button class="filter-btn" onclick="filterApps('pending', this)">Pending</button>
+    <button class="filter-btn" onclick="filterApps('approved', this)">Approved</button>
+    <button class="filter-btn" onclick="filterApps('rejected', this)">Rejected</button>
+  </div>
+  <div id="apps-container"><p class="loading">Loading…</p></div>
+</div>
+
+<!-- ── Guarantees ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>Guarantees</h2>
+    <span id="guar-count" class="meta"></span>
+  </div>
+  <div id="guar-container"><p class="loading">Loading…</p></div>
+</div>
+
+<!-- ── Claims ─────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>Damage Claims</h2>
+    <span id="claims-count" class="meta"></span>
+  </div>
+  <div id="claims-container"><p class="loading">Loading…</p></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+let allApps = [];
+let allGuarantees = [];
+let currentFilter = 'all';
+
+// ── Applications ──────────────────────────────────────────
+async function loadApplications() {
+  const { ok, data } = await apiCall('GET', '/api/v1/applications/');
+  const el = document.getElementById('apps-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load applications.</p>'; return; }
+  allApps = data;
+  renderApps();
+}
+
+function filterApps(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderApps();
+}
+
+function renderApps() {
+  const data = currentFilter === 'all' ? allApps : allApps.filter(a => a.status === currentFilter);
+  const el = document.getElementById('apps-container');
+  document.getElementById('apps-count').textContent =
+    `${allApps.filter(a => a.status === 'pending').length} pending · ${allApps.length} total`;
+
+  if (!data.length) {
+    el.innerHTML = `<p class="empty">No ${currentFilter === 'all' ? '' : currentFilter + ' '}applications.</p>`;
+    return;
+  }
+
+  // Check which approved apps already have a guarantee
+  const guaranteedAppIds = new Set(allGuarantees.map(g => g.application));
+
+  const rows = data.map(a => {
+    const canReview = a.status === 'pending';
+    const canIssue = a.status === 'approved' && !guaranteedAppIds.has(a.id);
+    const expandId = `app-expand-${a.id}`;
+    const actionBtn = canReview
+      ? `<button class="btn btn-secondary btn-sm" onclick="toggleExpand('${expandId}', this)">Review</button>`
+      : canIssue
+        ? `<button class="btn btn-success btn-sm" onclick="toggleExpand('${expandId}', this)">Issue guarantee</button>`
+        : '—';
+
+    const expandContent = canReview
+      ? reviewForm(a.id)
+      : canIssue
+        ? issueForm(a.id)
+        : '';
+
+    return `
+      <tr>
+        <td>#${a.id}</td>
+        <td>${statusBadge(a.status)}</td>
+        <td>${fmtDate(a.submitted_at)}</td>
+        <td>${a.reviewer_sub ? `<span class="meta" title="${a.reviewer_sub}">Reviewed ${fmtDate(a.reviewed_at)}</span>` : '—'}</td>
+        <td>${actionBtn}</td>
+      </tr>
+      <tr id="${expandId}" class="expand-row">
+        <td colspan="5">${expandContent}</td>
+      </tr>`;
+  }).join('');
+
+  el.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Status</th><th>Submitted</th><th>Reviewed</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function reviewForm(appId) {
+  return `<div id="review-msg-${appId}"></div>
+    <div class="form-row">
+      <label>Decision</label>
+      <select id="decision-${appId}">
+        <option value="approved">Approve</option>
+        <option value="rejected">Reject</option>
+      </select>
+      <input type="text" id="notes-${appId}" placeholder="Notes (optional)" style="flex:1; min-width:180px;">
+      <button class="btn btn-primary btn-sm" onclick="reviewApplication(${appId})">Submit review</button>
+    </div>`;
+}
+
+function issueForm(appId) {
+  const today = new Date(); today.setFullYear(today.getFullYear() + 1);
+  const defaultDate = today.toISOString().split('T')[0];
+  return `<div id="issue-msg-${appId}"></div>
+    <div class="form-row">
+      <label>Valid until</label>
+      <input type="date" id="valid-until-${appId}" value="${defaultDate}">
+      <button class="btn btn-success btn-sm" onclick="issueGuarantee(${appId})">Confirm &amp; issue</button>
+    </div>`;
+}
+
+function toggleExpand(id, btn) {
+  const row = document.getElementById(id);
+  const open = row.classList.toggle('open');
+  btn.textContent = open ? 'Close' : btn.textContent;
+}
+
+// ── Review application ────────────────────────────────────
+async function reviewApplication(appId) {
+  const decision = document.getElementById(`decision-${appId}`).value;
+  const notes = document.getElementById(`notes-${appId}`).value.trim();
+  const msgEl = document.getElementById(`review-msg-${appId}`);
+  const btn = event.target;
+  btn.disabled = true;
+  const { ok, status, data } = await apiCall('PATCH', `/api/v1/applications/${appId}/review/`, { decision, notes });
+  btn.disabled = false;
+  if (ok) {
+    flash(document.getElementById('msg-global'), `Application #${appId} ${decision}.`, 'success');
+    await loadApplications();
+    await loadGuarantees(); // approved apps now show issue button
+  } else {
+    flash(msgEl, data?.detail ?? `Could not ${decision} application.`, 'error');
+  }
+}
+
+// ── Issue guarantee ───────────────────────────────────────
+async function issueGuarantee(appId) {
+  const validUntil = document.getElementById(`valid-until-${appId}`).value;
+  const msgEl = document.getElementById(`issue-msg-${appId}`);
+  if (!validUntil) { flash(msgEl, 'Valid-until date is required.', 'error'); return; }
+  const btn = event.target;
+  btn.disabled = true;
+  const { ok, status, data } = await apiCall('POST', '/api/v1/guarantees/', { application: appId, valid_until: validUntil });
+  btn.disabled = false;
+  if (ok || status === 400) {
+    const msg = ok ? `Guarantee issued: ${data?.certificate_number}` : 'Guarantee already exists for this application.';
+    flash(document.getElementById('msg-global'), msg, ok ? 'success' : 'error');
+    await loadGuarantees();
+    await loadApplications();
+  } else {
+    flash(msgEl, data?.detail ?? data?.application?.[0] ?? 'Could not issue guarantee.', 'error');
+  }
+}
+
+// ── Guarantees ────────────────────────────────────────────
+async function loadGuarantees() {
+  const { ok, data } = await apiCall('GET', '/api/v1/guarantees/');
+  const el = document.getElementById('guar-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load guarantees.</p>'; return; }
+  allGuarantees = data;
+  document.getElementById('guar-count').textContent = `${data.filter(g => g.status === 'active').length} active · ${data.length} total`;
+  if (!data.length) { el.innerHTML = '<p class="empty">No guarantees issued yet.</p>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Certificate</th><th>App ID</th><th>Status</th><th>Valid Until</th><th>Issued</th><th></th></tr></thead>
+    <tbody>${data.map(g => `<tr>
+      <td><code>${g.certificate_number}</code></td>
+      <td>#${g.application}</td>
+      <td>${statusBadge(g.status)}</td>
+      <td>${fmtDate(g.valid_until)}</td>
+      <td>${fmtDate(g.issued_at)}</td>
+      <td><a class="btn btn-secondary btn-sm" href="/api/v1/guarantees/${g.id}/validate/" target="_blank">Validate</a></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── Claims ────────────────────────────────────────────────
+async function loadClaims() {
+  const { ok, data } = await apiCall('GET', '/api/v1/claims/');
+  const el = document.getElementById('claims-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load claims.</p>'; return; }
+  document.getElementById('claims-count').textContent = `${data.filter(c => c.status === 'open').length} open · ${data.length} total`;
+  if (!data.length) { el.innerHTML = '<p class="empty">No claims submitted yet.</p>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Guarantee</th><th>Amount</th><th>Status</th><th>Submitted</th><th>Notes</th></tr></thead>
+    <tbody>${data.map(c => `<tr>
+      <td>#${c.id}</td>
+      <td>#${c.guarantee}</td>
+      <td>£${parseFloat(c.amount_claimed).toLocaleString('en-GB')}</td>
+      <td>${statusBadge(c.status)}</td>
+      <td>${fmtDate(c.submitted_at)}</td>
+      <td style="max-width:200px; font-size:0.83rem; color:#555;">${c.notes || '—'}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── Boot ──────────────────────────────────────────────────
+(async () => {
+  // Load guarantees first so renderApps knows which approved apps already have one
+  await loadGuarantees();
+  await loadApplications();
+  await loadClaims();
+})();
 {% endblock %}

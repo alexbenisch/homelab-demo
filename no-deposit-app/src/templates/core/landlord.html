@@ -1,10 +1,206 @@
 {% extends "core/base_portal.html" %}
 {% block title %}Landlord Portal{% endblock %}
+
 {% block content %}
-  <h1>Landlord Portal <span class="badge">landlord</span></h1>
-  <p>Welcome, {{ email }}.</p>
-  <ul>
-    <li><a href="/api/v1/guarantees/">Validate guarantees</a></li>
-    <li><a href="/api/v1/claims/">Damage claims</a></li>
-  </ul>
+<h1>Landlord Portal <span class="badge">landlord</span></h1>
+<p class="meta">Welcome, {{ email }}.</p>
+
+<div id="msg-global"></div>
+
+<!-- ── My Properties ────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>My Properties</h2>
+    <button class="btn btn-primary btn-sm" onclick="toggleAddProperty()">+ Add property</button>
+  </div>
+
+  <div id="add-property-form" style="display:none; background:#f8f9fa; border:1px solid #e0e0e0; border-radius:6px; padding:1rem; margin-bottom:1rem;">
+    <strong style="font-size:0.9rem;">New property</strong>
+    <div id="add-property-msg"></div>
+    <div class="form-row" style="margin-top:0.6rem;">
+      <label>Address</label>
+      <input type="text" id="new-address" placeholder="1 Example Street, London E1 1AA" style="flex:1; min-width:250px;">
+    </div>
+    <div class="form-row">
+      <label>Monthly rent (£)</label>
+      <input type="number" id="new-rent" placeholder="1200" min="1" step="0.01" style="width:120px;">
+    </div>
+    <div class="form-row">
+      <button class="btn btn-primary btn-sm" onclick="addProperty()">Save</button>
+      <button class="btn btn-secondary btn-sm" onclick="toggleAddProperty()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="props-container"><p class="loading">Loading…</p></div>
+</div>
+
+<!-- ── My Guarantees ────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>Active Guarantees</h2>
+    <span id="guar-count" class="meta"></span>
+  </div>
+  <div id="guar-container"><p class="loading">Loading…</p></div>
+</div>
+
+<!-- ── My Claims ────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>Damage Claims</h2>
+    <button class="btn btn-secondary btn-sm" onclick="toggleNewClaim()">+ New claim</button>
+  </div>
+
+  <div id="new-claim-form" style="display:none; background:#f8f9fa; border:1px solid #e0e0e0; border-radius:6px; padding:1rem; margin-bottom:1rem;">
+    <strong style="font-size:0.9rem;">Submit damage claim</strong>
+    <div id="new-claim-msg"></div>
+    <div class="form-row" style="margin-top:0.6rem;">
+      <label>Guarantee</label>
+      <select id="claim-guarantee" style="flex:1; min-width:200px;">
+        <option value="">— select guarantee —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Amount claimed (£)</label>
+      <input type="number" id="claim-amount" placeholder="500.00" min="0.01" step="0.01" style="width:120px;">
+    </div>
+    <div class="form-row">
+      <label>Notes</label>
+      <textarea id="claim-notes" rows="2" placeholder="Describe the damage…" style="flex:1; min-width:250px;"></textarea>
+    </div>
+    <div class="form-row">
+      <button class="btn btn-danger btn-sm" onclick="submitClaim()">Submit claim</button>
+      <button class="btn btn-secondary btn-sm" onclick="toggleNewClaim()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="claims-container"><p class="loading">Loading…</p></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+let guarantees = [];
+
+// ── Toggle helpers ────────────────────────────────────────
+function toggleAddProperty() {
+  const f = document.getElementById('add-property-form');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+function toggleNewClaim() {
+  const f = document.getElementById('new-claim-form');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── Load properties ───────────────────────────────────────
+async function loadProperties() {
+  const { ok, data } = await apiCall('GET', '/api/v1/properties/');
+  const el = document.getElementById('props-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load properties.</p>'; return; }
+  if (!data.length) { el.innerHTML = '<p class="empty">No properties yet. Add your first one above.</p>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Address</th><th>Rent/mo</th><th>Status</th></tr></thead>
+    <tbody>${data.map(p => `<tr>
+      <td>${p.address}</td>
+      <td>£${parseFloat(p.rent_amount).toLocaleString('en-GB')}</td>
+      <td>${statusBadge(p.status)}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── Add property ──────────────────────────────────────────
+async function addProperty() {
+  const address = document.getElementById('new-address').value.trim();
+  const rent = document.getElementById('new-rent').value.trim();
+  const msgEl = document.getElementById('add-property-msg');
+  if (!address || !rent) { flash(msgEl, 'Address and rent are required.', 'error'); return; }
+  const btn = event.target;
+  btn.disabled = true;
+  const { ok, data } = await apiCall('POST', '/api/v1/properties/', { address, rent_amount: rent, status: 'available' });
+  btn.disabled = false;
+  if (ok) {
+    document.getElementById('new-address').value = '';
+    document.getElementById('new-rent').value = '';
+    toggleAddProperty();
+    flash(document.getElementById('msg-global'), `Property added: ${data.address}`, 'success');
+    await loadProperties();
+  } else {
+    flash(msgEl, data?.address?.[0] ?? data?.rent_amount?.[0] ?? data?.detail ?? 'Could not add property.', 'error');
+  }
+}
+
+// ── Load guarantees ───────────────────────────────────────
+async function loadGuarantees() {
+  const { ok, data } = await apiCall('GET', '/api/v1/guarantees/');
+  const el = document.getElementById('guar-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load guarantees.</p>'; return; }
+  guarantees = data;
+  document.getElementById('guar-count').textContent = `${data.length} total`;
+
+  // Populate guarantee select for the claims form
+  const sel = document.getElementById('claim-guarantee');
+  sel.innerHTML = '<option value="">— select guarantee —</option>' +
+    data.filter(g => g.status === 'active').map(g =>
+      `<option value="${g.id}">${g.certificate_number} (valid until ${fmtDate(g.valid_until)})</option>`
+    ).join('');
+
+  if (!data.length) { el.innerHTML = '<p class="empty">No guarantees on your properties yet.</p>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Certificate</th><th>Status</th><th>Valid Until</th><th></th></tr></thead>
+    <tbody>${data.map(g => `<tr>
+      <td><code>${g.certificate_number}</code></td>
+      <td>${statusBadge(g.status)}</td>
+      <td>${fmtDate(g.valid_until)}</td>
+      <td><a class="btn btn-secondary btn-sm" href="/api/v1/guarantees/${g.id}/validate/" target="_blank">Validate</a></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── Load claims ───────────────────────────────────────────
+async function loadClaims() {
+  const { ok, data } = await apiCall('GET', '/api/v1/claims/');
+  const el = document.getElementById('claims-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load claims.</p>'; return; }
+  if (!data.length) { el.innerHTML = '<p class="empty">No claims submitted yet.</p>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Guarantee</th><th>Amount</th><th>Status</th><th>Submitted</th></tr></thead>
+    <tbody>${data.map(c => {
+      const cert = guarantees.find(g => g.id === c.guarantee)?.certificate_number ?? `#${c.guarantee}`;
+      return `<tr>
+        <td><code>${cert}</code></td>
+        <td>£${parseFloat(c.amount_claimed).toLocaleString('en-GB')}</td>
+        <td>${statusBadge(c.status)}</td>
+        <td>${fmtDate(c.submitted_at)}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// ── Submit claim ──────────────────────────────────────────
+async function submitClaim() {
+  const guarantee = parseInt(document.getElementById('claim-guarantee').value);
+  const amount = document.getElementById('claim-amount').value.trim();
+  const notes = document.getElementById('claim-notes').value.trim();
+  const msgEl = document.getElementById('new-claim-msg');
+  if (!guarantee) { flash(msgEl, 'Please select a guarantee.', 'error'); return; }
+  if (!amount) { flash(msgEl, 'Amount is required.', 'error'); return; }
+  const btn = event.target;
+  btn.disabled = true;
+  const { ok, status, data } = await apiCall('POST', '/api/v1/claims/', {
+    guarantee, amount_claimed: amount, notes, evidence_urls: []
+  });
+  btn.disabled = false;
+  if (ok || status === 400) {
+    toggleNewClaim();
+    flash(document.getElementById('msg-global'), ok ? 'Claim submitted.' : 'Claim already exists for this guarantee.', ok ? 'success' : 'error');
+    await loadClaims();
+  } else {
+    flash(msgEl, data?.detail ?? data?.guarantee?.[0] ?? 'Could not submit claim.', 'error');
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────
+(async () => {
+  await loadProperties();
+  await loadGuarantees();
+  await loadClaims();
+})();
 {% endblock %}

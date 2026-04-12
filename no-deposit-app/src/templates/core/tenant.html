@@ -1,11 +1,142 @@
 {% extends "core/base_portal.html" %}
 {% block title %}Tenant Portal{% endblock %}
+
 {% block content %}
-  <h1>Tenant Portal <span class="badge">tenant</span></h1>
-  <p>Welcome, {{ email }}.</p>
-  <ul>
-    <li><a href="/api/v1/applications/">My applications</a></li>
-    <li><a href="/api/v1/guarantees/">My guarantees</a></li>
-    <li><a href="/api/v1/me/export/">Export my data (GDPR)</a></li>
-  </ul>
+<h1>Tenant Portal <span class="badge">tenant</span></h1>
+<p class="meta">Welcome, {{ email }}.</p>
+
+<div id="msg-global"></div>
+
+<!-- ── Available Properties ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>Available Properties</h2>
+    <span id="props-count" class="meta"></span>
+  </div>
+  <div id="props-container"><p class="loading">Loading…</p></div>
+</div>
+
+<!-- ── My Applications ──────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>My Applications</h2>
+    <span id="apps-count" class="meta"></span>
+  </div>
+  <div id="apps-container"><p class="loading">Loading…</p></div>
+</div>
+
+<!-- ── My Guarantees ────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>My Guarantees</h2>
+    <span id="guar-count" class="meta"></span>
+  </div>
+  <div id="guar-container"><p class="loading">Loading…</p></div>
+</div>
+
+<!-- ── Data Export ──────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header"><h2>My Data</h2></div>
+  <a class="btn btn-secondary" href="/api/v1/users/me/export/" target="_blank">Download GDPR export</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+let propertyMap = {};   // id → property object, shared by apps section
+
+// ── Utilities ────────────────────────────────────────────
+function propRow(p, applied) {
+  const applyCell = applied
+    ? `<span class="st-approved">Applied</span>`
+    : `<button class="btn btn-primary btn-sm" onclick="applyForProperty(${p.id}, this)">Apply</button>`;
+  return `<tr>
+    <td>${p.address}</td>
+    <td>£${parseFloat(p.rent_amount).toLocaleString('en-GB')}/mo</td>
+    <td>${statusBadge(p.status)}</td>
+    <td>${applyCell}</td>
+  </tr>`;
+}
+
+function appRow(a) {
+  const addr = propertyMap[a.property]?.address ?? `Property #${a.property}`;
+  return `<tr>
+    <td>${addr}</td>
+    <td>${statusBadge(a.status)}</td>
+    <td>${fmtDate(a.submitted_at)}</td>
+    <td>${a.status === 'approved' ? `<span class="meta">Reviewed ${fmtDate(a.reviewed_at)}</span>` : '—'}</td>
+  </tr>`;
+}
+
+function guarRow(g) {
+  return `<tr>
+    <td><code>${g.certificate_number}</code></td>
+    <td>${statusBadge(g.status)}</td>
+    <td>${fmtDate(g.valid_until)}</td>
+    <td><a class="btn btn-secondary btn-sm" href="/api/v1/guarantees/${g.id}/validate/" target="_blank">Validate</a></td>
+  </tr>`;
+}
+
+// ── Load properties ───────────────────────────────────────
+async function loadProperties(appliedPropertyIds) {
+  const { ok, data } = await apiCall('GET', '/api/v1/properties/');
+  const el = document.getElementById('props-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load properties.</p>'; return; }
+  data.forEach(p => propertyMap[p.id] = p);
+  if (!data.length) { el.innerHTML = '<p class="empty">No available properties at this time.</p>'; document.getElementById('props-count').textContent = '0'; return; }
+  document.getElementById('props-count').textContent = `${data.length} listed`;
+  el.innerHTML = `<table>
+    <thead><tr><th>Address</th><th>Rent</th><th>Status</th><th></th></tr></thead>
+    <tbody>${data.map(p => propRow(p, appliedPropertyIds.has(p.id))).join('')}</tbody>
+  </table>`;
+}
+
+// ── Load applications ─────────────────────────────────────
+async function loadApplications() {
+  const { ok, data } = await apiCall('GET', '/api/v1/applications/');
+  const el = document.getElementById('apps-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load applications.</p>'; return; }
+  document.getElementById('apps-count').textContent = `${data.length} total`;
+  if (!data.length) { el.innerHTML = '<p class="empty">You have not applied for any properties yet.</p>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Property</th><th>Status</th><th>Submitted</th><th>Reviewed</th></tr></thead>
+    <tbody>${data.map(appRow).join('')}</tbody>
+  </table>`;
+  return new Set(data.map(a => a.property));
+}
+
+// ── Load guarantees ───────────────────────────────────────
+async function loadGuarantees() {
+  const { ok, data } = await apiCall('GET', '/api/v1/guarantees/');
+  const el = document.getElementById('guar-container');
+  if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load guarantees.</p>'; return; }
+  document.getElementById('guar-count').textContent = `${data.length} total`;
+  if (!data.length) { el.innerHTML = '<p class="empty">No guarantees issued yet.</p>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Certificate</th><th>Status</th><th>Valid Until</th><th></th></tr></thead>
+    <tbody>${data.map(guarRow).join('')}</tbody>
+  </table>`;
+}
+
+// ── Apply for a property ──────────────────────────────────
+async function applyForProperty(propertyId, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Applying…';
+  const { ok, status, data } = await apiCall('POST', '/api/v1/applications/', { property: propertyId });
+  if (ok || status === 400) {
+    // 400 means already applied — either way reload
+    btn.closest('td').innerHTML = `<span class="st-approved">Applied</span>`;
+    await loadApplications();
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Apply';
+    flash(document.getElementById('msg-global'), data?.detail ?? 'Application failed.', 'error');
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────
+(async () => {
+  const appliedIds = await loadApplications() ?? new Set();
+  await loadProperties(appliedIds);
+  await loadGuarantees();
+})();
 {% endblock %}

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}No-Deposit{% endblock %}</title>
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
     body { font-family: system-ui, sans-serif; max-width: 960px; margin: 0 auto; padding: 0 1rem; color: #333; }
     nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #eee; }
     nav a { color: #333; text-decoration: none; margin-left: 1rem; }
@@ -12,7 +13,56 @@
     .logout { margin-left: 1rem; padding: 0.3rem 0.8rem; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none; font-size: 0.85rem; }
     .logout:hover { background: #e8e8e8; }
     main { padding: 2rem 0; }
+    /* Badges */
     .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; background: #e0f0ff; color: #0066cc; }
+    .st-pending    { background: #fff3cd; color: #856404; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.8rem; }
+    .st-approved, .st-active   { background: #d4edda; color: #155724; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.8rem; }
+    .st-rejected, .st-claimed  { background: #f8d7da; color: #721c24; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.8rem; }
+    .st-expired, .st-rented    { background: #e2e3e5; color: #383d41; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.8rem; }
+    .st-open, .st-available    { background: #d1ecf1; color: #0c5460; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.8rem; }
+    .st-under_review            { background: #d6d8f8; color: #2f2f8b; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.8rem; }
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 0.5rem; }
+    th { text-align: left; border-bottom: 2px solid #ddd; padding: 0.5rem 0.75rem; font-size: 0.8rem; color: #666; white-space: nowrap; }
+    td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; vertical-align: middle; }
+    tr:hover td { background: #fafafa; }
+    /* Buttons */
+    .btn { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-size: 0.85rem; font-family: inherit; line-height: 1.4; }
+    .btn-primary { background: #0066cc; color: #fff; border-color: #0066cc; }
+    .btn-primary:hover:not(:disabled) { background: #0052a3; border-color: #0052a3; }
+    .btn-secondary { background: #f5f5f5; color: #333; border-color: #ddd; }
+    .btn-secondary:hover:not(:disabled) { background: #e8e8e8; }
+    .btn-danger { background: #dc3545; color: #fff; border-color: #dc3545; }
+    .btn-danger:hover:not(:disabled) { background: #c82333; border-color: #c82333; }
+    .btn-success { background: #28a745; color: #fff; border-color: #28a745; }
+    .btn-success:hover:not(:disabled) { background: #218838; border-color: #218838; }
+    .btn-sm { padding: 0.2rem 0.55rem; font-size: 0.8rem; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    /* Forms */
+    .form-row { display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .form-row label { font-size: 0.85rem; color: #555; padding-top: 0.45rem; white-space: nowrap; }
+    input[type=text], input[type=number], input[type=date], textarea, select {
+      padding: 0.4rem 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; font-family: inherit;
+    }
+    input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, textarea:focus, select:focus {
+      outline: 2px solid #0066cc; outline-offset: 1px; border-color: #0066cc;
+    }
+    textarea { resize: vertical; }
+    /* Sections */
+    .section { margin-bottom: 2.5rem; }
+    .section-header { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 0.4rem; margin-bottom: 1rem; }
+    .section-header h2 { font-size: 1rem; margin: 0; }
+    /* Alerts */
+    .alert { padding: 0.5rem 0.9rem; border-radius: 4px; font-size: 0.88rem; margin-bottom: 0.75rem; }
+    .alert-success { background: #d4edda; color: #155724; }
+    .alert-error   { background: #f8d7da; color: #721c24; }
+    /* Utils */
+    .empty { color: #aaa; font-size: 0.9rem; padding: 0.5rem 0.75rem; }
+    .loading { color: #aaa; font-size: 0.9rem; padding: 0.5rem 0.75rem; }
+    .collapsible { display: none; }
+    .collapsible.open { display: table-row; }
+    .expand-row td { background: #f8f9fa; padding: 1rem; }
+    {% block styles %}{% endblock %}
   </style>
 </head>
 <body>
@@ -27,5 +77,30 @@
   <main>
     {% block content %}{% endblock %}
   </main>
+  <script>
+    // Shared API helper — all portal pages use these
+    async function apiCall(method, path, body) {
+      const opts = {
+        method,
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      };
+      if (body !== undefined) opts.body = JSON.stringify(body);
+      const r = await fetch(path, opts);
+      let data;
+      try { data = await r.json(); } catch { data = null; }
+      return { ok: r.ok, status: r.status, data };
+    }
+    function statusBadge(s) {
+      return `<span class="st-${s}">${s.replace('_', '\u00a0')}</span>`;
+    }
+    function fmtDate(d) {
+      return d ? new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    }
+    function flash(el, msg, type) {
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      setTimeout(() => { el.innerHTML = ''; }, 4000);
+    }
+    {% block scripts %}{% endblock %}
+  </script>
 </body>
 </html>
