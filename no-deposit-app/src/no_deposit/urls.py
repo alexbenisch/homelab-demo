@@ -7,10 +7,11 @@ from rest_framework.routers import DefaultRouter
 from claims.views import ClaimViewSet
 from core.api_views import KYCUploadView, PaymentIntentView
 from guarantees.views import GuaranteeViewSet
-from properties.views import ApplicationViewSet
+from properties.views import ApplicationViewSet, PropertyViewSet
 from users.views import MeExportView, MeView
 
 router = DefaultRouter()
+router.register("properties", PropertyViewSet, basename="property")
 router.register("applications", ApplicationViewSet, basename="application")
 router.register("guarantees", GuaranteeViewSet, basename="guarantee")
 router.register("claims", ClaimViewSet, basename="claim")

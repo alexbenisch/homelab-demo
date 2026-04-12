@@ -29,10 +29,34 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: playwright-chromium-${{ runner.os }}-
+
       - name: Install Playwright
         run: pip install playwright && playwright install chromium --with-deps
 
-      - name: Run E2E API test suite (all roles, all endpoints)
+      # Pass 1: login + read-only checks (creates UserProfiles as a side-effect)
+      - name: Pass 1 — Login and read-only endpoint checks (all roles)
         env:
           BASE_URL: ${{ github.event.inputs.base_url || 'https://nodeposit.kubetest.uk' }}
         run: python scripts/e2e-api-tests.py "$BASE_URL"
+
+      # Seed: create the test property now that all UserProfiles exist
+      - name: Seed test property
+        id: seed
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'https://nodeposit.kubetest.uk' }}
+        run: |
+          PROPERTY_ID=$(python scripts/seed-e2e.py "$BASE_URL")
+          echo "property_id=$PROPERTY_ID" >> "$GITHUB_OUTPUT"
+          echo "Test property ID: $PROPERTY_ID"
+
+      # Pass 2: full CRUD flow — tenant applies, agent approves + issues guarantee, landlord claims
+      - name: Pass 2 — Full CRUD flow (submit, approve, guarantee, claim)
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'https://nodeposit.kubetest.uk' }}
+        run: python scripts/e2e-api-tests.py "$BASE_URL" --property-id ${{ steps.seed.outputs.property_id }}

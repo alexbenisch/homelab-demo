@@ -7,12 +7,54 @@ from audit.models import AuditLog
 from core.permissions import IsAgentOrAdmin, IsValidJWT
 from users.utils import get_or_create_profile
 
-from .models import RentalApplication
+from .models import Property, RentalApplication
 from .serializers import (
     ApplicationSerializer,
     CreateApplicationSerializer,
+    PropertySerializer,
     ReviewApplicationSerializer,
 )
+
+
+class PropertyViewSet(viewsets.ModelViewSet):
+    """
+    Landlords manage their own properties.
+    Agents/admins can list all properties (read-only).
+    Tenants see all available properties (read-only, for browsing).
+    """
+
+    serializer_class = PropertySerializer
+    permission_classes = [IsValidJWT]
+    http_method_names = ["get", "post", "head", "options"]
+
+    def get_queryset(self):
+        auth = self.request.auth
+        if auth.has_role("agent") or auth.has_role("admin"):
+            return Property.objects.select_related("landlord").all()
+        if auth.has_role("landlord"):
+            profile = get_or_create_profile(self.request)
+            return Property.objects.filter(landlord=profile)
+        # Tenants can browse available properties
+        return Property.objects.filter(status="available")
+
+    def create(self, request, *args, **kwargs):
+        if not request.auth.has_role("landlord"):
+            return Response(
+                {"detail": "Landlord role required."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        profile = get_or_create_profile(request)
+        prop = serializer.save(landlord=profile)
+        AuditLog.record(
+            entity_type="Property",
+            entity_id=prop.pk,
+            action="created",
+            actor_id=request.auth.sub,
+            actor_ip=request.META.get("REMOTE_ADDR"),
+        )
+        return Response(PropertySerializer(prop).data, status=status.HTTP_201_CREATED)
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
