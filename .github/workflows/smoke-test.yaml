@@ -32,14 +32,7 @@ jobs:
       - name: Install Playwright
         run: pip install playwright && playwright install chromium --with-deps
 
-      - name: Run smoke test (tenant login + API assertions)
+      - name: Run E2E API test suite (all roles, all endpoints)
         env:
           BASE_URL: ${{ github.event.inputs.base_url || 'https://nodeposit.kubetest.uk' }}
-        run: |
-          python scripts/test-login.py "$BASE_URL" tenant1 'Tenant1Pass!' --path /tenant/
-
-      - name: Run smoke test (agent login + API assertions)
-        env:
-          BASE_URL: ${{ github.event.inputs.base_url || 'https://nodeposit.kubetest.uk' }}
-        run: |
-          python scripts/test-login.py "$BASE_URL" agent1 'Agent1Pass!' --path /agency/
+        run: python scripts/e2e-api-tests.py "$BASE_URL"
