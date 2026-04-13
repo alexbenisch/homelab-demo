@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-dns
+  namespace: external-dns
+spec:
+  interval: 30m
+  serviceAccountName: flux-applier
+  install:
+    createNamespace: false
+  chart:
+    spec:
+      chart: external-dns
+      version: "1.14.x"
+      interval: 12h
+      sourceRef:
+        kind: HelmRepository
+        name: external-dns
+        namespace: external-dns
+  values:
+    provider: cloudflare
+    domainFilters:
+      - kubetest.uk
+    sources:
+      - ingress
+    policy: sync
+    registry: txt
+    txtOwnerId: mercury-cluster
+    txtPrefix: ext-dns-
+    interval: 1m
+    logLevel: info
+    cloudflare:
+      proxied: true
+    env:
+      - name: CF_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: cloudflare-api-token
+            key: api-token
