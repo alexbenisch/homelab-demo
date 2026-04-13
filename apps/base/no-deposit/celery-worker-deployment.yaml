@@ -17,7 +17,7 @@ spec:
         - name: ghcr-credentials
       containers:
         - name: celery-worker
-          image: ghcr.io/alexbenisch/no-deposit:latest # {"$imagepolicy": "flux-system:no-deposit"}
+          image: ghcr.io/alexbenisch/no-deposit:main-c555ad7 # {"$imagepolicy": "flux-system:no-deposit"}
           command: ["celery", "-A", "no_deposit", "worker", "--loglevel=info", "--concurrency=2"]
           envFrom:
             - configMapRef:
