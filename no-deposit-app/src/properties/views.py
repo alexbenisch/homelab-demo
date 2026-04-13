@@ -25,7 +25,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
     serializer_class = PropertySerializer
     permission_classes = [IsValidJWT]
-    http_method_names = ["get", "post", "head", "options"]
+    http_method_names = ["get", "post", "patch", "head", "options"]
 
     def get_queryset(self):
         auth = self.request.auth
@@ -36,6 +36,31 @@ class PropertyViewSet(viewsets.ModelViewSet):
             return Property.objects.filter(landlord=profile)
         # Tenants can browse available properties
         return Property.objects.filter(status="available")
+
+    def partial_update(self, request, *args, **kwargs):
+        if not request.auth.has_role("landlord"):
+            return Response(
+                {"detail": "Landlord role required."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        instance = self.get_object()
+        profile = get_or_create_profile(request)
+        if instance.landlord != profile:
+            return Response({"detail": "Not your property."}, status=status.HTTP_403_FORBIDDEN)
+        allowed = {"status"}
+        data = {k: v for k, v in request.data.items() if k in allowed}
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        prop = serializer.save()
+        AuditLog.record(
+            entity_type="Property",
+            entity_id=prop.pk,
+            action="updated",
+            actor_id=request.auth.sub,
+            actor_ip=request.META.get("REMOTE_ADDR"),
+            payload={"status": prop.status},
+        )
+        return Response(PropertySerializer(prop).data)
 
     def create(self, request, *args, **kwargs):
         if not request.auth.has_role("landlord"):

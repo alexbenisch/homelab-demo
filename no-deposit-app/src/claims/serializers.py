@@ -25,3 +25,8 @@ class CreateClaimSerializer(serializers.ModelSerializer):
     class Meta:
         model = DamageClaim
         fields = ["guarantee", "amount_claimed", "evidence_urls"]
+
+
+class ReviewClaimSerializer(serializers.Serializer):
+    decision = serializers.ChoiceField(choices=["under_review", "approved", "rejected"])
+    notes = serializers.CharField(required=False, allow_blank=True)

@@ -97,13 +97,20 @@ async function loadProperties() {
   if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load properties.</p>'; return; }
   if (!data.length) { el.innerHTML = '<p class="empty">No properties yet. Add your first one above.</p>'; return; }
   el.innerHTML = `<table>
-    <thead><tr><th>Address</th><th>Rent/mo</th><th>Status</th></tr></thead>
-    <tbody>${data.map(p => `<tr>
-      <td>${p.address}</td>
-      <td>£${parseFloat(p.rent_amount).toLocaleString('en-GB')}</td>
-      <td>${statusBadge(p.status)}</td>
-    </tr>`).join('')}</tbody>
+    <thead><tr><th>Address</th><th>Rent/mo</th><th>Status</th><th></th></tr></thead>
+    <tbody>${data.map(propRow).join('')}</tbody>
   </table>`;
+}
+
+function propRow(p) {
+  const nextStatus = p.status === 'available' ? 'rented' : 'available';
+  const btnLabel = p.status === 'available' ? 'Mark rented' : 'Mark available';
+  return `<tr>
+    <td>${p.address}</td>
+    <td>£${parseFloat(p.rent_amount).toLocaleString('en-GB')}</td>
+    <td>${statusBadge(p.status)}</td>
+    <td><button class="btn btn-secondary btn-sm" onclick="updatePropertyStatus(${p.id}, '${nextStatus}', this)">${btnLabel}</button></td>
+  </tr>`;
 }
 
 // ── Add property ──────────────────────────────────────────
@@ -127,6 +134,19 @@ async function addProperty() {
   }
 }
 
+// ── Update property status ────────────────────────────────
+async function updatePropertyStatus(propId, newStatus, btn) {
+  btn.disabled = true;
+  const { ok, data } = await apiCall('PATCH', `/api/v1/properties/${propId}/`, { status: newStatus });
+  btn.disabled = false;
+  if (ok) {
+    flash(document.getElementById('msg-global'), `Property marked as ${newStatus}.`, 'success');
+    await loadProperties();
+  } else {
+    flash(document.getElementById('msg-global'), data?.detail ?? 'Could not update property.', 'error');
+  }
+}
+
 // ── Load guarantees ───────────────────────────────────────
 async function loadGuarantees() {
   const { ok, data } = await apiCall('GET', '/api/v1/guarantees/');
@@ -135,7 +155,6 @@ async function loadGuarantees() {
   guarantees = data;
   document.getElementById('guar-count').textContent = `${data.length} total`;
 
-  // Populate guarantee select for the claims form
   const sel = document.getElementById('claim-guarantee');
   sel.innerHTML = '<option value="">— select guarantee —</option>' +
     data.filter(g => g.status === 'active').map(g =>
@@ -149,7 +168,10 @@ async function loadGuarantees() {
       <td><code>${g.certificate_number}</code></td>
       <td>${statusBadge(g.status)}</td>
       <td>${fmtDate(g.valid_until)}</td>
-      <td><a class="btn btn-secondary btn-sm" href="/api/v1/guarantees/${g.id}/validate/" target="_blank">Validate</a></td>
+      <td>${g.document_url
+        ? `<a class="btn btn-secondary btn-sm" href="${g.document_url}" target="_blank">Download PDF</a>`
+        : `<a class="btn btn-secondary btn-sm" href="/api/v1/guarantees/${g.id}/validate/" target="_blank">Validate</a>`
+      }</td>
     </tr>`).join('')}</tbody>
   </table>`;
 }
@@ -161,7 +183,7 @@ async function loadClaims() {
   if (!ok || !Array.isArray(data)) { el.innerHTML = '<p class="empty">Could not load claims.</p>'; return; }
   if (!data.length) { el.innerHTML = '<p class="empty">No claims submitted yet.</p>'; return; }
   el.innerHTML = `<table>
-    <thead><tr><th>Guarantee</th><th>Amount</th><th>Status</th><th>Submitted</th></tr></thead>
+    <thead><tr><th>Guarantee</th><th>Amount</th><th>Status</th><th>Submitted</th><th>Reviewer notes</th></tr></thead>
     <tbody>${data.map(c => {
       const cert = guarantees.find(g => g.id === c.guarantee)?.certificate_number ?? `#${c.guarantee}`;
       return `<tr>
@@ -169,6 +191,7 @@ async function loadClaims() {
         <td>£${parseFloat(c.amount_claimed).toLocaleString('en-GB')}</td>
         <td>${statusBadge(c.status)}</td>
         <td>${fmtDate(c.submitted_at)}</td>
+        <td style="max-width:200px; font-size:0.83rem; color:#555;">${c.reviewer_notes || '—'}</td>
       </tr>`;
     }).join('')}</tbody>
   </table>`;

@@ -1,17 +1,19 @@
+from django.utils import timezone
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from audit.models import AuditLog
-from core.permissions import IsValidJWT
+from core.permissions import IsAgentOrAdmin, IsValidJWT
 from users.utils import get_or_create_profile
 
 from .models import DamageClaim
-from .serializers import ClaimSerializer, CreateClaimSerializer
+from .serializers import ClaimSerializer, CreateClaimSerializer, ReviewClaimSerializer
 
 
 class ClaimViewSet(viewsets.ModelViewSet):
     permission_classes = [IsValidJWT]
-    http_method_names = ["get", "post", "head", "options"]
+    http_method_names = ["get", "post", "patch", "head", "options"]
 
     def get_queryset(self):
         auth = self.request.auth
@@ -53,3 +55,30 @@ class ClaimViewSet(viewsets.ModelViewSet):
 
         send_claim_submitted.delay(claim.pk)
         return Response(ClaimSerializer(claim).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["patch"], url_path="review", permission_classes=[IsAgentOrAdmin])
+    def review(self, request, pk=None):
+        claim = self.get_object()
+        if claim.status in ("approved", "rejected"):
+            return Response(
+                {"detail": "Claim has already been resolved."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = ReviewClaimSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        decision = serializer.validated_data["decision"]
+        notes = serializer.validated_data.get("notes", "")
+        claim.status = decision
+        claim.reviewed_at = timezone.now()
+        claim.reviewer_sub = request.auth.sub
+        claim.reviewer_notes = notes
+        claim.save()
+        AuditLog.record(
+            entity_type="DamageClaim",
+            entity_id=claim.pk,
+            action=decision,
+            actor_id=request.auth.sub,
+            actor_ip=request.META.get("REMOTE_ADDR"),
+            payload={"notes": notes},
+        )
+        return Response(ClaimSerializer(claim).data)

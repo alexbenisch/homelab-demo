@@ -34,15 +34,44 @@
   <div id="guar-container"><p class="loading">Loading…</p></div>
 </div>
 
-<!-- ── Data Export ──────────────────────────────────────── -->
+<!-- ── KYC Document Upload ───────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <h2>Identity Documents</h2>
+    <span class="meta">Required for application processing</span>
+  </div>
+  <div id="kyc-msg"></div>
+  <div class="form-row">
+    <label>Upload document</label>
+    <input type="file" id="kyc-file" accept=".jpg,.jpeg,.png,.pdf" style="flex:1;">
+    <button class="btn btn-primary btn-sm" onclick="uploadKYC()">Upload</button>
+  </div>
+  <p class="meta" style="margin-top:0.25rem;">Accepted: JPEG, PNG, PDF. File is stored securely and only accessible to reviewers.</p>
+  <div id="kyc-uploads" style="margin-top:0.5rem;"></div>
+</div>
+
+<!-- ── Data & Account ────────────────────────────────────── -->
 <div class="section">
   <div class="section-header"><h2>My Data</h2></div>
-  <a class="btn btn-secondary" href="/api/v1/users/me/export/" target="_blank">Download GDPR export</a>
+  <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+    <a class="btn btn-secondary" href="/api/v1/users/me/export/" target="_blank">Download GDPR export</a>
+    <button class="btn btn-danger btn-sm" onclick="toggleDeleteAccount()">Delete my account</button>
+  </div>
+  <div id="delete-account-form" style="display:none; margin-top:1rem; background:#fff3f3; border:1px solid #f5c6cb; border-radius:6px; padding:1rem; max-width:480px;">
+    <strong style="color:#721c24;">Permanently delete account</strong>
+    <p style="font-size:0.88rem; color:#555; margin:0.5rem 0;">This will anonymise all your personal data (email, phone). Your rental history is retained for audit purposes. This cannot be undone.</p>
+    <div id="delete-account-msg"></div>
+    <div class="form-row" style="margin-top:0.75rem;">
+      <button class="btn btn-danger btn-sm" onclick="deleteAccount()">Yes, delete my account</button>
+      <button class="btn btn-secondary btn-sm" onclick="toggleDeleteAccount()">Cancel</button>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-let propertyMap = {};   // id → property object, shared by apps section
+let propertyMap = {};
+let kycUploads = [];   // track uploaded keys this session
 
 // ── Utilities ────────────────────────────────────────────
 function propRow(p, applied) {
@@ -59,20 +88,25 @@ function propRow(p, applied) {
 
 function appRow(a) {
   const addr = propertyMap[a.property]?.address ?? `Property #${a.property}`;
+  const notesCell = a.notes ? `<span class="meta" title="${a.notes}">${a.notes.length > 40 ? a.notes.slice(0,40)+'…' : a.notes}</span>` : '—';
   return `<tr>
     <td>${addr}</td>
     <td>${statusBadge(a.status)}</td>
     <td>${fmtDate(a.submitted_at)}</td>
-    <td>${a.status === 'approved' ? `<span class="meta">Reviewed ${fmtDate(a.reviewed_at)}</span>` : '—'}</td>
+    <td>${a.reviewed_at ? fmtDate(a.reviewed_at) : '—'}</td>
+    <td>${notesCell}</td>
   </tr>`;
 }
 
 function guarRow(g) {
+  const certLink = g.document_url
+    ? `<a class="btn btn-secondary btn-sm" href="${g.document_url}" target="_blank">Download PDF</a>`
+    : `<a class="btn btn-secondary btn-sm" href="/api/v1/guarantees/${g.id}/validate/" target="_blank">Validate</a>`;
   return `<tr>
     <td><code>${g.certificate_number}</code></td>
     <td>${statusBadge(g.status)}</td>
     <td>${fmtDate(g.valid_until)}</td>
-    <td><a class="btn btn-secondary btn-sm" href="/api/v1/guarantees/${g.id}/validate/" target="_blank">Validate</a></td>
+    <td>${certLink}</td>
   </tr>`;
 }
 
@@ -98,7 +132,7 @@ async function loadApplications() {
   document.getElementById('apps-count').textContent = `${data.length} total`;
   if (!data.length) { el.innerHTML = '<p class="empty">You have not applied for any properties yet.</p>'; return; }
   el.innerHTML = `<table>
-    <thead><tr><th>Property</th><th>Status</th><th>Submitted</th><th>Reviewed</th></tr></thead>
+    <thead><tr><th>Property</th><th>Status</th><th>Submitted</th><th>Reviewed</th><th>Notes</th></tr></thead>
     <tbody>${data.map(appRow).join('')}</tbody>
   </table>`;
   return new Set(data.map(a => a.property));
@@ -123,13 +157,79 @@ async function applyForProperty(propertyId, btn) {
   btn.textContent = 'Applying…';
   const { ok, status, data } = await apiCall('POST', '/api/v1/applications/', { property: propertyId });
   if (ok || status === 400) {
-    // 400 means already applied — either way reload
     btn.closest('td').innerHTML = `<span class="st-approved">Applied</span>`;
     await loadApplications();
   } else {
     btn.disabled = false;
     btn.textContent = 'Apply';
     flash(document.getElementById('msg-global'), data?.detail ?? 'Application failed.', 'error');
+  }
+}
+
+// ── KYC upload ────────────────────────────────────────────
+async function uploadKYC() {
+  const fileInput = document.getElementById('kyc-file');
+  const msgEl = document.getElementById('kyc-msg');
+  const file = fileInput.files[0];
+  if (!file) { flash(msgEl, 'Please select a file.', 'error'); return; }
+
+  const contentTypeMap = { 'image/jpeg': 'image/jpeg', 'image/png': 'image/png', 'application/pdf': 'application/pdf' };
+  const contentType = contentTypeMap[file.type];
+  if (!contentType) { flash(msgEl, 'Only JPEG, PNG, and PDF files are accepted.', 'error'); return; }
+
+  flash(msgEl, 'Requesting upload URL…', 'success');
+  const { ok, status, data } = await apiCall('POST', '/api/v1/documents/upload/', {
+    filename: file.name, content_type: contentType
+  });
+
+  if (!ok) {
+    flash(msgEl, data?.detail ?? (status === 503 ? 'Document storage not available.' : 'Upload failed.'), 'error');
+    return;
+  }
+
+  try {
+    const uploadRes = await fetch(data.upload_url, {
+      method: 'PUT',
+      headers: { 'Content-Type': contentType },
+      body: file,
+    });
+    if (!uploadRes.ok) throw new Error(`HTTP ${uploadRes.status}`);
+    kycUploads.push({ name: file.name, key: data.key });
+    renderKYCUploads();
+    fileInput.value = '';
+    flash(msgEl, `"${file.name}" uploaded successfully.`, 'success');
+  } catch (e) {
+    flash(msgEl, `Upload to storage failed: ${e.message}`, 'error');
+  }
+}
+
+function renderKYCUploads() {
+  const el = document.getElementById('kyc-uploads');
+  if (!kycUploads.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<p class="meta" style="margin-bottom:0.3rem;">Uploaded this session:</p>' +
+    kycUploads.map(u => `<div style="font-size:0.85rem; padding:0.2rem 0;">✓ ${u.name}</div>`).join('');
+}
+
+// ── GDPR erasure ──────────────────────────────────────────
+function toggleDeleteAccount() {
+  const f = document.getElementById('delete-account-form');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+async function deleteAccount() {
+  const msgEl = document.getElementById('delete-account-msg');
+  const btn = event.target;
+  btn.disabled = true;
+  const { ok, status } = await apiCall('DELETE', '/api/v1/users/me/');
+  if (ok || status === 204) {
+    document.body.innerHTML = `<div style="font-family:system-ui;max-width:600px;margin:4rem auto;padding:0 1rem;">
+      <h2>Account deleted</h2>
+      <p>Your personal data has been anonymised. You will be signed out shortly.</p>
+    </div>`;
+    setTimeout(() => { window.location = '/oauth2/sign_out?rd=https%3A%2F%2Fauth.kubetest.uk%2Frealms%2Fno-deposit%2Fprotocol%2Fopenid-connect%2Flogout'; }, 3000);
+  } else {
+    btn.disabled = false;
+    flash(msgEl, 'Could not delete account. Please try again.', 'error');
   }
 }
 
