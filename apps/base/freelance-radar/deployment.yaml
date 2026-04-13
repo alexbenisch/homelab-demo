@@ -4,7 +4,7 @@ metadata:
   name: freelance-radar
   namespace: freelance-radar
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: freelance-radar

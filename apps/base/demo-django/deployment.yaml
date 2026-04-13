@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: demo-django
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: demo-django
