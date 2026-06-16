@@ -17,3 +17,4 @@ resources:
   - keycloak
   - no-deposit
   - external-dns
+  - webapp-operator

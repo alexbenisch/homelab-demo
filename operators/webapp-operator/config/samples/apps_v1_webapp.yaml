@@ -1,0 +1,11 @@
+apiVersion: apps.kubetest.uk/v1
+kind: WebApp
+metadata:
+  labels:
+    app.kubernetes.io/name: webapp-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: webapp-sample
+spec:
+  image: nginx:1.25
+  replicas: 2
+  port: 80
