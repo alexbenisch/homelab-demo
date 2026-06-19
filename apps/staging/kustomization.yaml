@@ -16,5 +16,6 @@ resources:
   - wp-ai-chatbot-redirect
   - keycloak
   - no-deposit
+  - django-crm
   - external-dns
   - webapp-operator
